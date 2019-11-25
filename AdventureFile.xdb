@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xdb="http://www.borland.com/schemas/delphi/6.0/XMLDataBinding">
+  <xs:element name="AdventureGame" type="AdventureGameType"/>
+  <xs:complexType name="AdventureGameType"><xs:annotation>
+      <xs:appinfo xdb:docElement="AdventureGame"/>
+    </xs:annotation>
+    
+    <xs:sequence>
+      <xs:element name="MetaInfo" type="MetaInfoType"/>
+      <xs:element name="GameNodes" type="GameNodesType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MetaInfoType">
+    <xs:sequence>
+      <xs:element name="Title" type="xs:string"/>
+      <xs:element name="Author" type="xs:string"/>
+      <xs:element name="Description" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="GameNodesType">
+    <xs:sequence>
+      <xs:element name="Node" type="NodeType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="NodeType"><xs:annotation>
+      <xs:appinfo xdb:repeated="True"/>
+    </xs:annotation>
+    
+    <xs:sequence>
+      <xs:element name="DescriptionText" type="xs:string"/>
+      <xs:element name="Choices" type="ChoicesType"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="ChoicesType">
+    <xs:sequence>
+      <xs:element name="Choice" type="ChoiceType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ChoiceType">
+    <xs:simpleContent>
+      <xs:restriction base="xs:string">
+        <xs:attribute name="addscore" type="xs:integer"/>
+        <xs:attribute name="endgame" type="xs:string"><xs:annotation>
+            <xs:appinfo xdb:dataType="Boolean"/>
+          </xs:annotation>
+          
+        </xs:attribute>
+        <xs:attribute name="targetnode" type="xs:string"/>
+      </xs:restriction>
+    </xs:simpleContent>
+  </xs:complexType>
+</xs:schema>

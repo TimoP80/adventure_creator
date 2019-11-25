@@ -1,0 +1,57 @@
+unit MetaData;
+
+interface
+
+uses
+  Windows,AdventureBinary, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls;
+
+type
+  TForm2 = class(TForm)
+    lbl1: TLabel;
+    edttitle: TEdit;
+    lbl2: TLabel;
+    edtauthor: TEdit;
+    lbl3: TLabel;
+    mmodescription: TMemo;
+    btn1: TButton;
+    procedure edttitleKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure edtauthorKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure mmodescriptionKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form2: TForm2;
+
+implementation
+
+{$R *.dfm}
+
+procedure TForm2.edttitleKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+AdventureData.MetaInfo.Title := edttitle.text;
+end;
+
+procedure TForm2.edtauthorKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+AdventureData.MetaInfo.Author := edtauthor.text;
+
+end;
+
+procedure TForm2.mmodescriptionKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+AdventureData.MetaInfo.Description := mmodescription.text;
+
+end;
+
+end.
