@@ -454,6 +454,9 @@ newnode.NodeParent := thenode.Name;
 UpdateNodeLists;
  thechoice.Targetnode := newnode.name;
  UpdateChoiceSel;
+ cbbchoicenodelist.ItemIndex := cbbchoicenodelist.Items.IndexOf(newnode.name);
+ newnodename.Text := '';
+
 end;
 
 procedure TForm1.cbbcmdClick(Sender: TObject);
