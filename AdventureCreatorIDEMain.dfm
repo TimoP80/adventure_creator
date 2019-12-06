@@ -12,6 +12,7 @@ object Form1: TForm1
   Font.Style = []
   Menu = mm1
   OldCreateOrder = False
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object lbl1: TLabel
@@ -309,6 +310,10 @@ object Form1: TForm1
     Top = 136
     object File1: TMenuItem
       Caption = 'File'
+      object NewAdventureFile1: TMenuItem
+        Caption = 'New AdventureFile'
+        OnClick = NewAdventureFile1Click
+      end
       object LoadAdventureFile1: TMenuItem
         Caption = 'Load AdventureFile'
         OnClick = LoadAdventureFile1Click

@@ -62,6 +62,7 @@ type
     lbl11: TLabel;
     mmoparamval: TMemo;
     ools1: TMenuItem;
+    NewAdventureFile1: TMenuItem;
     procedure LoadAdventureFile1Click(Sender: TObject);
     procedure Quit1Click(Sender: TObject);
     procedure lstnodelistmainClick(Sender: TObject);
@@ -93,6 +94,8 @@ type
     procedure mmoparamvalKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure lstcommandsClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure NewAdventureFile1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -304,6 +307,11 @@ begin
 updatechoicesel;
 end;
 
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+ AdventureData := NewAdventureGame;
+end;
+
 procedure TForm1.chkendgameClick(Sender: TObject);
 begin
   thechoice.Endgame := chkendgame.Checked;
@@ -415,6 +423,13 @@ procedure TForm1.mmoparamvalKeyUp(Sender: TObject; var Key: Word;
 begin
 thecmd.Text :=  mmoparamval.Text;
 UpdateNodeCommandSel;
+end;
+
+procedure TForm1.NewAdventureFile1Click(Sender: TObject);
+begin
+AdventureData := NewAdventureGame;
+   UpdateNodeLists;
+    UpdateVariables;
 end;
 
 procedure TForm1.lstcommandsClick(Sender: TObject);
