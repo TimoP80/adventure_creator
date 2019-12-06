@@ -63,6 +63,9 @@ type
     mmoparamval: TMemo;
     ools1: TMenuItem;
     NewAdventureFile1: TMenuItem;
+    Label1: TLabel;
+    newnodename: TEdit;
+    Button1: TButton;
     procedure LoadAdventureFile1Click(Sender: TObject);
     procedure Quit1Click(Sender: TObject);
     procedure lstnodelistmainClick(Sender: TObject);
@@ -96,6 +99,7 @@ type
     procedure lstcommandsClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure NewAdventureFile1Click(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -108,7 +112,7 @@ var
   TheNode: IXMLNodeType;
   thechoice: IXMLChoiceType;
   thecmd: IXMLCMDType;
-
+  NewNode: IXMLNodeType;
   procedure LogMsg(s: string);
 
 implementation
@@ -243,6 +247,9 @@ end;
 
 procedure TForm1.lstchoicelistClick(Sender: TObject);
 begin
+// prevent list index out of bounds with this
+if lstchoicelist.ItemIndex=-1  then exit;
+
   thechoice := thenode.Choices.Choice[lstchoicelist.itemindex];
   edtchoicetext.Text := thechoice.Text;
   cbbchoicenodelist.ItemIndex :=
@@ -404,6 +411,13 @@ begin
 thenode.NodeCommands.Delete(lstcommands.itemindex);
 UpdateNodeCommands;
 
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+newnode := AdventureData.GameNodes.Add;
+newnode.Name := newnodename.Text;
+UpdateNodeLists;
 end;
 
 procedure TForm1.cbbcmdClick(Sender: TObject);

@@ -37,15 +37,15 @@ object Form1: TForm1
     Caption = 'Choices'
   end
   object lbl4: TLabel
-    Left = 328
-    Top = 352
+    Left = 364
+    Top = 351
     Width = 59
     Height = 13
     Caption = 'Choice text:'
   end
   object lbl5: TLabel
-    Left = 328
-    Top = 384
+    Left = 327
+    Top = 379
     Width = 96
     Height = 13
     Caption = 'Choice target node:'
@@ -64,6 +64,13 @@ object Form1: TForm1
     Height = 13
     AutoSize = False
     Caption = 'Score award for this choice:'
+  end
+  object Label1: TLabel
+    Left = 667
+    Top = 381
+    Width = 87
+    Height = 13
+    Caption = 'Create new node:'
   end
   object lstnodelistmain: TListBox
     Left = 8
@@ -208,8 +215,8 @@ object Form1: TForm1
     OnClick = btn7Click
   end
   object grp1: TGroupBox
-    Left = 576
-    Top = 400
+    Left = 567
+    Top = 409
     Width = 529
     Height = 257
     Caption = 'Node commands:'
@@ -299,6 +306,22 @@ object Form1: TForm1
       TabOrder = 5
       OnKeyUp = mmoparamvalKeyUp
     end
+  end
+  object newnodename: TEdit
+    Left = 760
+    Top = 379
+    Width = 129
+    Height = 21
+    TabOrder = 17
+  end
+  object Button1: TButton
+    Left = 895
+    Top = 379
+    Width = 66
+    Height = 24
+    Caption = 'Create'
+    TabOrder = 18
+    OnClick = Button1Click
   end
   object DataReader: TXMLDocument
     Left = 240
