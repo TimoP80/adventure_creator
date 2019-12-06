@@ -140,6 +140,26 @@ begin
     form1.cbbvarsel.Items.Add(adventuredata.Variables.Variable[u].name);
   end;
 end;
+ function TreeItemSearch(TV: TTreeView; SucheItem: string): TTreeNode;
+var
+  i: Integer;
+  iItem: string;
+begin
+  if (TV = nil) or (SucheItem = '') then Exit;
+  for i := 0 to TV.Items.Count - 1 do
+  begin
+    iItem := TV.Items[i].Text;
+    if SucheItem = iItem then
+    begin
+      Result := TV.Items[i];
+      Exit;
+    end
+    else
+    begin
+      Result := nil;
+    end;
+  end;
+end;
 
 procedure UpdateNodeLists;
 var
@@ -151,21 +171,29 @@ begin
   form1.cbbchoicenodelist.clear;
   form1.node_parent.clear;
   form1.node_parent.Items.Add('<< NONE >>');
+ form1.nodes_tree.Items.Clear;
 
   for u := 0 to adventuredata.GameNodes.Count - 1 do
   begin
    sibling := nil;
   if adventuredata.GameNodes.Node[u].NodeParent = '' then
-   node := Form1.nodes_tree.Items.Add(nil, adventuredata.GameNodes.Node[u].Name) else
-
-   //  begin
+   node := Form1.nodes_tree.Items.Add(nil, adventuredata.GameNodes.Node[u].Name);
+      //  begin
  //     sibling := node;
   //  end;
     Form1.cbbchoicenodelist.Items.Add(adventuredata.GameNodes.Node[u].Name);
     Form1.node_parent.Items.Add(adventuredata.GameNodes.Node[u].Name);
   end;
 
-
+  for u := 0 to adventuredata.GameNodes.Count-1 do
+  begin
+    if adventuredata.GameNodes.Node[u].NodeParent <> '' then
+      begin
+        node :=  treeitemsearch(Form1.nodes_tree, adventuredata.GameNodes.Node[u].NodeParent);
+        child := form1.nodes_tree.Items.AddChild(node, adventuredata.GameNodes.Node[u].Name);
+      end;
+  end;
+   form1.nodes_tree.FullExpand;
 end;
 
 procedure TForm1.LoadAdventureFile1Click(Sender: TObject);
@@ -422,6 +450,7 @@ procedure TForm1.Button1Click(Sender: TObject);
 begin
 newnode := AdventureData.GameNodes.Add;
 newnode.Name := newnodename.Text;
+newnode.NodeParent := thenode.Name;
 UpdateNodeLists;
  thechoice.Targetnode := newnode.name;
  UpdateChoiceSel;
@@ -453,13 +482,28 @@ AdventureData := NewAdventureGame;
     UpdateVariables;
 end;
 
+function FindNode (nodename: string): IXMLNodeType;
+var u: integer;
+begin
+result:=nil;
+ for u := 0 to AdventureData.GameNodes.Count-1 do
+ begin
+   if adventuredata.GameNodes.Node[u].Name = nodename then
+   begin
+     result:=adventuredata.GameNodes.Node[u];
+     exit;
+   end;
+ end;
+end;
 procedure TForm1.nodes_treeClick(Sender: TObject);
 begin
-  TheNode := AdventureData.GameNodes.Node[nodes_tree.Selected.Index];
+  TheNode := findnode(nodes_tree.Selected.text);
   mmonodetext.Text := thenode.DescriptionText;
   mmonodetext.text := StringReplace(mmonodetext.text, #10,'\n',[rfreplaceall]);
   mmonodetext.text := StringReplace(mmonodetext.text, '\n',#13#10,[rfreplaceall]);
-
+  node_parent.itemindex := node_parent.Items.IndexOf(thenode.NodeParent);
+  if thenode.NodeParent =''  then
+   node_parent.ItemIndex:=0;
   edtnodename.Text := TheNode.Name;
   UpdateChoices;
   UpdateNodeCommands;
