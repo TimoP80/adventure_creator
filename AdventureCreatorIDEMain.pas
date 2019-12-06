@@ -115,12 +115,17 @@ var
   TheNode: IXMLNodeType;
   thechoice: IXMLChoiceType;
   thecmd: IXMLCMDType;
+  CurrentFilename: string;
   NewNode: IXMLNodeType;
   procedure LogMsg(s: string);
 
 implementation
 
 uses MetaData, VarEditor;
+procedure UpdateCaption;
+begin
+      Form1.Caption := 'Adventure Creator 1.0 IDE - ['+currentfilename+']';
+end;
 
 
 {$R *.dfm}
@@ -206,7 +211,8 @@ begin
     LogMsg('Node count: '+inttostr(AdventureData.GameNodes.Count));
     UpdateNodeLists;
     UpdateVariables;
-
+    currentfilename := extractfilename(dlgopen1.FileName);
+   updatecaption;
   end;
 end;
 
@@ -311,6 +317,11 @@ begin
     AdventureData := GetAdventureGame(datareader);
 
     DataReader.SaveToFile(dlgsave1.FileName);
+    currentfilename := extractfilename(dlgsave1.FileName);
+    updatecaption;
+
+    //    form1.Caption := 'Adventure Creator 1.0 IDE - ['+extractfilename(dlgsave1.FileName)+']';
+
   end;
 end;
 
@@ -478,11 +489,13 @@ thecmd.Text :=  mmoparamval.Text;
 UpdateNodeCommandSel;
 end;
 
+
 procedure TForm1.NewAdventureFile1Click(Sender: TObject);
 begin
 AdventureData := NewAdventureGame;
    UpdateNodeLists;
     UpdateVariables;
+    currentfilename := 'Untitled.xml';
 end;
 
 function FindNode (nodename: string): IXMLNodeType;

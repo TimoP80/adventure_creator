@@ -1,7 +1,7 @@
 object Form1: TForm1
   Left = 237
   Top = 129
-  Caption = 'Adventure Creator 1.0 IDE'
+  Caption = 'Adventure Creator 1.0 IDE - [Untitled.xml]'
   ClientHeight = 770
   ClientWidth = 1120
   Color = clBtnFace
