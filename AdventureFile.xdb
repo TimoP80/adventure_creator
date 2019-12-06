@@ -28,6 +28,7 @@
     
     <xs:sequence>
       <xs:element name="DescriptionText" type="xs:string"/>
+      <xs:element name="NodeParent" type="xs:string"/>
       <xs:element name="Choices" type="ChoicesType"/>
     </xs:sequence>
     <xs:attribute name="name" type="xs:string"/>

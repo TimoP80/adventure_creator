@@ -3,12 +3,12 @@ program AdventureCreatorIDE;
 uses
   Forms,
   AdventureCreatorIDEMain in 'AdventureCreatorIDEMain.pas' {Form1},
-  AdventureFile in 'AdventureFile.pas',
   AdventureBinary in 'AdventureBinary.pas',
   MetaData in 'MetaData.pas' {Form2},
   VarEditor in 'VarEditor.pas' {Form3},
   Vcl.Themes,
-  Vcl.Styles;
+  Vcl.Styles,
+  AdventureFile in 'AdventureFile.pas';
 
 {$R *.res}
 

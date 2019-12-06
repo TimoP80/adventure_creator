@@ -16,8 +16,8 @@ object Form1: TForm1
   PixelsPerInch = 96
   TextHeight = 13
   object lbl1: TLabel
-    Left = 24
-    Top = 24
+    Left = 8
+    Top = 20
     Width = 34
     Height = 13
     Caption = 'Nodes:'
@@ -72,14 +72,12 @@ object Form1: TForm1
     Height = 13
     Caption = 'Create new node:'
   end
-  object lstnodelistmain: TListBox
-    Left = 8
-    Top = 40
-    Width = 313
-    Height = 577
-    ItemHeight = 13
-    TabOrder = 0
-    OnClick = lstnodelistmainClick
+  object Label2: TLabel
+    Left = 952
+    Top = 8
+    Width = 64
+    Height = 13
+    Caption = 'Node parent:'
   end
   object mmonodetext: TMemo
     Left = 328
@@ -92,7 +90,7 @@ object Form1: TForm1
     Font.Name = 'Lucida Console'
     Font.Style = []
     ParentFont = False
-    TabOrder = 1
+    TabOrder = 0
     OnKeyUp = mmonodetextKeyUp
   end
   object lstchoicelist: TListBox
@@ -101,7 +99,7 @@ object Form1: TForm1
     Width = 777
     Height = 81
     ItemHeight = 13
-    TabOrder = 2
+    TabOrder = 1
     OnClick = lstchoicelistClick
   end
   object edtchoicetext: TEdit
@@ -109,7 +107,7 @@ object Form1: TForm1
     Top = 352
     Width = 673
     Height = 21
-    TabOrder = 3
+    TabOrder = 2
     OnKeyUp = edtchoicetextKeyUp
   end
   object btn1: TButton
@@ -118,7 +116,7 @@ object Form1: TForm1
     Width = 89
     Height = 33
     Caption = 'Add node'
-    TabOrder = 4
+    TabOrder = 3
     OnClick = btn1Click
   end
   object btn2: TButton
@@ -127,7 +125,7 @@ object Form1: TForm1
     Width = 89
     Height = 33
     Caption = 'Delete node'
-    TabOrder = 5
+    TabOrder = 4
     OnClick = btn2Click
   end
   object btn3: TButton
@@ -136,7 +134,7 @@ object Form1: TForm1
     Width = 121
     Height = 25
     Caption = 'Add choice'
-    TabOrder = 6
+    TabOrder = 5
     OnClick = btn3Click
   end
   object btn4: TButton
@@ -145,7 +143,7 @@ object Form1: TForm1
     Width = 121
     Height = 25
     Caption = 'Delete choice'
-    TabOrder = 7
+    TabOrder = 6
     OnClick = btn4Click
   end
   object cbbchoicenodelist: TComboBox
@@ -153,7 +151,7 @@ object Form1: TForm1
     Top = 376
     Width = 217
     Height = 21
-    TabOrder = 8
+    TabOrder = 7
     OnClick = cbbchoicenodelistClick
   end
   object edtnodename: TEdit
@@ -161,7 +159,7 @@ object Form1: TForm1
     Top = 24
     Width = 505
     Height = 21
-    TabOrder = 9
+    TabOrder = 8
   end
   object chkendgame: TCheckBox
     Left = 328
@@ -169,7 +167,7 @@ object Form1: TForm1
     Width = 233
     Height = 25
     Caption = 'This choice causes the game to end'
-    TabOrder = 10
+    TabOrder = 9
     OnClick = chkendgameClick
   end
   object btn5: TButton
@@ -178,7 +176,7 @@ object Form1: TForm1
     Width = 105
     Height = 25
     Caption = 'Init booleans'
-    TabOrder = 11
+    TabOrder = 10
     OnClick = btn5Click
   end
   object btn6: TButton
@@ -187,7 +185,7 @@ object Form1: TForm1
     Width = 89
     Height = 25
     Caption = 'Apply changes'
-    TabOrder = 12
+    TabOrder = 11
     OnClick = btn6Click
   end
   object mmomessages: TMemo
@@ -195,14 +193,14 @@ object Form1: TForm1
     Top = 672
     Width = 1105
     Height = 89
-    TabOrder = 13
+    TabOrder = 12
   end
   object edtchoicescore: TEdit
     Left = 328
     Top = 424
     Width = 105
     Height = 21
-    TabOrder = 14
+    TabOrder = 13
     OnKeyUp = edtchoicescoreKeyUp
   end
   object btn7: TButton
@@ -211,7 +209,7 @@ object Form1: TForm1
     Width = 121
     Height = 25
     Caption = 'Insert choice'
-    TabOrder = 15
+    TabOrder = 14
     OnClick = btn7Click
   end
   object grp1: TGroupBox
@@ -220,7 +218,7 @@ object Form1: TForm1
     Width = 529
     Height = 257
     Caption = 'Node commands:'
-    TabOrder = 16
+    TabOrder = 15
     object lbl8: TLabel
       Left = 8
       Top = 24
@@ -312,7 +310,7 @@ object Form1: TForm1
     Top = 379
     Width = 129
     Height = 21
-    TabOrder = 17
+    TabOrder = 16
   end
   object Button1: TButton
     Left = 895
@@ -320,8 +318,25 @@ object Form1: TForm1
     Width = 66
     Height = 24
     Caption = 'Create'
-    TabOrder = 18
+    TabOrder = 17
     OnClick = Button1Click
+  end
+  object node_parent: TComboBox
+    Left = 951
+    Top = 27
+    Width = 154
+    Height = 21
+    TabOrder = 18
+    OnClick = node_parentClick
+  end
+  object nodes_tree: TTreeView
+    Left = 8
+    Top = 39
+    Width = 305
+    Height = 583
+    Indent = 19
+    TabOrder = 19
+    OnClick = nodes_treeClick
   end
   object DataReader: TXMLDocument
     Left = 240
