@@ -399,19 +399,29 @@ end;
 
 procedure TForm1.ValidateNodes1Click(Sender: TObject);
 var x,i: integer;
+var messages: TStrings;
 begin
+messages:=TStringlist.Create;
 for x:=0 to AdventureData.GameNodes.Count-1 do
 begin
   if adventuredata.GameNodes.Node[x].DescriptionText='' then
+  begin
+  Messages.Add('Node "'+adventuredata.GameNodes.Node[x].Name+'" has no text.');
   LogMsg('Node "'+adventuredata.GameNodes.Node[x].Name+'" has no text.');
+  end;
+
   for i:=0 to adventuredata.GameNodes.Node[x].Choices.Count-1 do
   begin
     if adventuredata.GameNodes.Node[x].Choices.Choice[i].Targetnode='' then
     begin
       LogMsg('Node "'+adventuredata.GameNodes.Node[x].Name+'" has a null link in choice #'+inttostr(i+1)+'"'+adventuredata.GameNodes.Node[x].Choices.Choice[i].text+'"');
+      Messages.Add('Node "'+adventuredata.GameNodes.Node[x].Name+'" has a null link in choice #'+inttostr(i+1)+'"'+adventuredata.GameNodes.Node[x].Choices.Choice[i].text+'"');
     end;
   end;
 end;
+if messages.Count>0 then
+showmessage('The following errors were found: '+#13#10+messages.Text) else
+showmessage('Game data seems to be OK. No errors found.');
 end;
 
 procedure TForm1.Metadata1Click(Sender: TObject);

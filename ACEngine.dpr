@@ -3,7 +3,7 @@ program ACEngine;
 {$APPTYPE CONSOLE}
 
 uses
-  Windows, AdventureBinary, jclstrings, Console, SysUtils;
+  Windows, AdventureBinary, jclstrings, Console, Inifiles, SysUtils;
 
 const
   alphabets: array[0..10] of char = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
@@ -17,8 +17,11 @@ var
   moneystring, currentnode: ansistring;
   wingame, endgame: boolean;
   moneydisplay, debugmode: boolean;
+  msg_wrongchoice, msg_pressanykey: string;
+  msgtemp, msg_gamefinished: string;
   savedx, savedy, choiceinteger: integer;
   addedscore, score: integer;
+  config: TIniFile;
  label start;
 
 function AlphabetToNumber(alpha: char): integer;
@@ -172,6 +175,7 @@ end;
 procedure ProcessNodeCommands(name: string);
 var
   z, nodeind: integer;
+  ch: char;
   txt: widestring;
   valuetemp: integer;
 begin
@@ -196,6 +200,13 @@ begin
           StrToInt(adventurebindata.GameNodes[nodeind].NodeCommands[z].value);
         setvarvalue(adventurebindata.GameNodes[nodeind].NodeCommands[z].varparam, inttostr(valuetemp));
 
+      end
+      else
+      if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd =
+        'DisplayMessage' then
+      begin
+        writeln(adventurebindata.GameNodes[nodeind].NodeCommands[z].value);
+          ch := ReadKey;
       end
       else if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd =
         'DecreaseVar' then
@@ -255,6 +266,7 @@ begin
 end;
 
 begin
+  config :=  TIniFile.Create('.\ACEngine.ini');
   ClrScr;
   TextBackground(blue);
   ClrEol;
@@ -282,6 +294,10 @@ begin
     end;
    // writeln('Loading '+paramstr(1));
     LoadAdventureBin(ParamStr(1));
+ msg_pressanykey := config.ReadString(GetVarValue('GameLanguage'),'PressAnyKey','');
+ msg_gamefinished := config.ReadString(GetVarValue('GameLanguage'),'FinishedGame','');
+ msg_wrongchoice := config.ReadString(GetVarValue('GameLanguage'),'WrongChoice','');
+
     Writeln('Loaded "' + adventurebindata.metatitle + '" by ' +
      adventurebindata.metaauthor);
     Writeln;
@@ -299,7 +315,8 @@ begin
     Writeln(adventurebindata.metadescription);
     Writeln;
     textcolor(lightgray);
-    writeln(ansi2ascii('Paina mitä tahansa näppäintä'));
+    //msgtemp := msg_pressanykey;
+    writeln(ansi2ascii(msg_pressanykey));
     score := 0;
     wingame:=false;
     choice := readkey;
@@ -310,7 +327,7 @@ begin
       TextBackground(blue);
       TextColor(yellow);
       ClrEol;
-      ProcessNodeCommands(currentnode);
+
       Writeln(adventurebindata.metatitle + ' by ' +
      adventurebindata.metaauthor);
       if debugmode = true then
@@ -351,6 +368,7 @@ begin
         numchoices := GetChoiceCountInNode(currentnode);
         if choiceinteger <= numchoices - 1 then
         begin
+          ProcessNodeCommands(currentnode);
           endgame := GetEndGameFlagFromChoice(currentnode, choiceinteger);
           wingame := GetWinGameFlagFromChoice(currentnode, choiceinteger);
 
@@ -371,7 +389,8 @@ begin
         end
         else
         begin
-          Writeln(ansi2ascii('Väärä valinta, yritä uudelleen!'));
+
+          Writeln(ansi2ascii(msg_wrongchoice));
           ch := readkey;
         end;
       end;
@@ -382,7 +401,12 @@ begin
     begin
     DisplayNode(currentnode);
     writeln;
-    writeln('You finished the game with the score '+inttostr(score)+ ' out of '+inttostr(AdventureBinData.MaxScore));
+    msgtemp := msg_gamefinished;
+    msgtemp := Stringreplace(msgtemp,'%score',IntToStr(score), [rfReplaceAll]);
+    msgtemp := Stringreplace(msgtemp,'%maxscore',IntToStr(AdventureBinData.MaxScore), [rfReplaceAll]);
+   writeln(ansi2ascii(msgtemp));
+
+    //writeln('You finished the game with the score '+inttostr(score)+ ' out of '+inttostr(AdventureBinData.MaxScore));
     end else
     begin
     DisplayNode(currentnode);
