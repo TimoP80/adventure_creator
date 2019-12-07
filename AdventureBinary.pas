@@ -6,8 +6,8 @@ uses FileIOFunctions, AdventureFile;
 
 type
   NodeChoice = record
-    ChoiceText: string;
-    Targetnode: string;
+    ChoiceText: ansistring;
+    Targetnode: ansistring;
     addscore: integer;
     endgame: boolean;
     wingame: boolean;
@@ -15,15 +15,15 @@ type
 
 type
   NodeCommand = record
-    cmd: string;
-    varparam: string;
-    value: string;
+    cmd: ansistring;
+    varparam: ansistring;
+    value: ansistring;
   end;
 
 type
   GameNode = record
-    NodeName: string;
-    NodeText: string;
+    NodeName: ansistring;
+    NodeText: ansistring;
     NodeCommands: array of NodeCommand;
     NodeCommandCount: integer;
     NodeChoices: array of NodeChoice;
@@ -31,8 +31,8 @@ type
   end;
 type
   GameVariable = record
-    name: string;
-    value: string;
+    name: ansistring;
+    value: ansistring;
   end;
 
 type
@@ -41,9 +41,9 @@ type
     GameNodeCount: integer;
     Variables: array of GameVariable;
     VariableCount: integer;
-    MetaTitle: string;
-    MetaAuthor: string;
-    MetaDescription: string;
+    MetaTitle: ansistring;
+    MetaAuthor: ansistring;
+    MetaDescription: ansistring;
     MaxScore: integer;
   end;
 

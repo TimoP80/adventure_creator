@@ -1,0 +1,101 @@
+unit FileIOFunctions;
+
+interface
+
+uses
+    
+    SysUtils;
+
+procedure WriteStringNoLength(var f: file; Data: string);
+procedure WriteString(var f: file; Data: string);
+procedure ReadHeader(var f: file; Data: string);
+procedure ReadString(var f: file; var Data: string);
+procedure ReadStringWithLength(var f: file; len: integer; var Data: string);
+
+implementation
+
+procedure WriteString(var f: file; Data: string);
+var
+    t, len: integer;
+    s: char;
+begin
+    len := length(Data);
+    BlockWrite(f, len, 4);
+    for t := 1 to len do
+        begin
+        s := Data[t];
+        BlockWrite(f, s, 1);
+        end;
+end;
+
+procedure ReadHeader(var f: file; Data: string);
+var
+    t: integer;
+    temp: string;
+    len: integer;
+var
+    s: char;
+begin
+    temp := '';
+
+    for t := 1 to length(Data) do
+        begin
+          BlockRead(f, s, 1);
+        temp := temp + s;
+        end;
+    if temp <> Data then
+        begin
+        //showmessage('Warning: Header mismatch! expected="' + Data + '"');
+        end;
+
+end;
+
+procedure ReadStringWithLength(var f: file; len: integer; var Data: string);
+var
+    t: integer;
+    s: char;
+begin
+    Data := '';
+    for t := 1 to len do
+        begin
+        BlockRead(f, s, 1);
+        Data := Data + s;
+        end;
+end;
+
+procedure ReadString(var f: file; var Data: string);
+var
+    t: integer;
+    len: integer;
+
+    s: char;
+    chars: array [0..4095] of char;
+begin
+    Data := '';
+    BlockRead(f, len, 4);
+   // SetLength(chars,len+1);
+   // for t := 1 to len do
+    //    begin
+    chars:='';
+        BlockRead(f, chars, len);
+    Data := chars;
+    //    Data := Data + s;
+      //  end;
+end;
+
+procedure WriteStringNoLength(var f: file; Data: string);
+var
+    t, len: integer;
+    s: char;
+begin
+    len := length(Data);
+//  BlockWrite(f, len, 4);
+    for t := 1 to len do
+        begin
+        s := Data[t];
+        BlockWrite(f, s, 1);
+        end;
+end;
+
+end.
+

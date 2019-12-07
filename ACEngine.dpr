@@ -14,8 +14,8 @@ const
 var
   ch, choice: char;
   currentmoney, numchoices: integer;
-  moneystring, currentnode: string;
-  endgame: boolean;
+  moneystring, currentnode: ansistring;
+  wingame, endgame: boolean;
   moneydisplay, debugmode: boolean;
   savedx, savedy, choiceinteger: integer;
   addedscore, score: integer;
@@ -40,17 +40,16 @@ begin
   if Result <> '' then
   begin
     UniqueString(Result);
-    CharToOem(Pchar(Result), Pchar(Result));
+    CharToOem(Pchar(Result), Pansichar(Result));
   end;
 end;
 
 function Ascii2Ansi(const s: AnsiString): AnsiString;
 begin
   Result := s;
-  if Result <> '' then
-  begin
+ begin
     UniqueString(Result);
-    OemToChar(Pchar(Result), Pchar(Result));
+    OemToChar(Pansichar(Result), Pchar(Result));
   end;
 end;
 
@@ -79,6 +78,18 @@ begin
   if nodeind <> -1 then
   begin
     result := adventurebindata.gamenodes[nodeind].NodeChoiceCount;
+  end;
+end;
+
+function GetWinGameFlagFromChoice(name: string; ch: integer): boolean;
+var
+  nodeind: integer;
+begin
+  result := false;
+  nodeind := GetNodeIndex(name);
+  if nodeind <> -1 then
+  begin
+    result := adventurebindata.gamenodes[nodeind].NodeChoices[ch].wingame;
   end;
 end;
 
@@ -212,7 +223,7 @@ begin
   begin
     txt := adventurebindata.gamenodes[nodeind].nodetext;
     txt :=  ReplaceVars(txt);
-    txt := Ansi2Ascii(txt);
+   // txt := Ansi2Ascii(txt);
     if txt = '' then
     begin
       writeln('Runtime Engine Error: This node contains no text.');
@@ -268,9 +279,10 @@ begin
       Writeln('File "', paramstr(1), '" not found!');
       halt;
     end;
+   // writeln('Loading '+paramstr(1));
     LoadAdventureBin(ParamStr(1));
-    Writeln('Loaded "' + ansi2ascii(adventurebindata.metatitle) + '" by ' +
-      ansi2ascii(adventurebindata.metaauthor));
+    Writeln('Loaded "' + adventurebindata.metatitle + '" by ' +
+     adventurebindata.metaauthor);
     Writeln;
     if GetVarValue('MoneyDisplay') = 'true' then
       moneydisplay := true
@@ -280,22 +292,22 @@ begin
     endgame := false;
     TextColor(lightcyan);
  //   Writeln('MoneyDisplay: ', GetVarValue('MoneyDisplay'));
-    Writeln(ansi2ascii(adventurebindata.metadescription));
+    Writeln(adventurebindata.metadescription);
     Writeln;
     textcolor(lightgray);
     writeln(ansi2ascii('Paina mitä tahansa näppäintä'));
     score := 0;
     choice := readkey;
 
-    while (endgame = false) and (choice <> 'q') do
+    while (wingame = false)  and (endgame = false) and (choice <> 'q') do
     begin
       ClrScr;
       TextBackground(blue);
       TextColor(yellow);
       ClrEol;
       ProcessNodeCommands(currentnode);
-      Writeln(ansi2ascii(adventurebindata.metatitle) + ' by ' +
-        ansi2ascii(adventurebindata.metaauthor));
+      Writeln(adventurebindata.metatitle + ' by ' +
+     adventurebindata.metaauthor);
       if debugmode = true then
       begin
         gotoxy(35, 1);
@@ -331,6 +343,8 @@ begin
         if choiceinteger <= numchoices - 1 then
         begin
           endgame := GetEndGameFlagFromChoice(currentnode, choiceinteger);
+          wingame := GetWinGameFlagFromChoice(currentnode, choiceinteger);
+
           addedscore := GetScoreFromChoice(currentnode, choiceinteger);
           currentnode := GetTargetNodeFromChoice(currentnode,
             choiceinteger);
@@ -351,7 +365,17 @@ begin
       Writeln;
     end;
     // display final node
+    if wingame=true then
+    begin
     DisplayNode(currentnode);
+    writeln;
+    writeln('You finished the game with the score '+inttostr(score)+ ' out of '+inttostr(AdventureBinData.MaxScore));
+    end else
+    begin
+    DisplayNode(currentnode);
+    writeln;
+    writeln ('Game over, try again!');
+    end;
   end;
 
 end.
