@@ -105,6 +105,8 @@ type
     procedure nodes_treeClick(Sender: TObject);
     procedure node_parentClick(Sender: TObject);
     procedure gamewinnerClick(Sender: TObject);
+    procedure lstchoicelistMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
   private
     { Private declarations }
   public
@@ -290,7 +292,6 @@ end;
 procedure TForm1.lstchoicelistClick(Sender: TObject);
 begin
 // prevent list index out of bounds with this
-if lstchoicelist.ItemIndex=-1  then exit;
 
   thechoice := thenode.Choices.Choice[lstchoicelist.itemindex];
   edtchoicetext.Text := thechoice.Text;
@@ -299,6 +300,29 @@ if lstchoicelist.ItemIndex=-1  then exit;
   chkendgame.Checked := thechoice.Endgame;
   gamewinner.Checked:=thechoice.Wingame;
   edtchoicescore.Text := inttostr(thechoice.Addscore);
+end;
+
+procedure TForm1.lstchoicelistMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+  var point: TPoint;
+  begin
+  point.X := x;
+  point.Y := y;
+  if lstchoicelist.ItemIndex=-1 then exit;
+
+
+if lstchoicelist.ItemAtPos(point,true)=-1  then
+
+begin
+  edtchoicetext.Text := '';
+  cbbchoicenodelist.ItemIndex := -1;
+
+ // lstcommands.Clear;
+  edtchoicescore.Text := '';
+  lstchoicelist.ItemIndex := -1;
+exit;
+end;
+
 end;
 
 procedure TForm1.btn5Click(Sender: TObject);
@@ -429,7 +453,8 @@ begin
 form2.edttitle.text := adventuredata.MetaInfo.Title;
 form2.edtauthor.text := adventuredata.MetaInfo.Author;
 form2.mmodescription.text := adventuredata.MetaInfo.Description;
-
+form2.mmodescription.text := Stringreplace(form2.mmodescription.Text, #10,'\n',[rfReplaceAll]);
+form2.mmodescription.text := Stringreplace(form2.mmodescription.Text, '\n',#13#10,[rfReplaceAll]);
 form2.showmodal;
 
 end;
@@ -537,6 +562,8 @@ begin
   mmonodetext.Text := thenode.DescriptionText;
   mmonodetext.text := StringReplace(mmonodetext.text, #10,'\n',[rfreplaceall]);
   mmonodetext.text := StringReplace(mmonodetext.text, '\n',#13#10,[rfreplaceall]);
+  edtchoicetext.Text := '';
+
   node_parent.itemindex := node_parent.Items.IndexOf(thenode.NodeParent);
   if thenode.NodeParent =''  then
    node_parent.ItemIndex:=0;

@@ -1,9 +1,9 @@
 object Form2: TForm2
   Left = 798
   Top = 501
-  Width = 425
-  Height = 313
   Caption = 'Game metadata'
+  ClientHeight = 274
+  ClientWidth = 409
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

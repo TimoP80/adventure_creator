@@ -52,6 +52,10 @@ procedure TForm2.mmodescriptionKeyUp(Sender: TObject; var Key: Word;
 begin
 AdventureData.MetaInfo.Description := mmodescription.text;
 
+AdventureData.MetaInfo.Description := Stringreplace(AdventureData.MetaInfo.Description, #13#10,'\n',[rfReplaceAll]);
+AdventureData.MetaInfo.Description := Stringreplace(AdventureData.MetaInfo.Description, '\n',#10,[rfReplaceAll]);
+
+
 end;
 
 end.

@@ -537,8 +537,6 @@ begin
   mmonodetext.Text := thenode.DescriptionText;
   mmonodetext.text := StringReplace(mmonodetext.text, #10,'\n',[rfreplaceall]);
   mmonodetext.text := StringReplace(mmonodetext.text, '\n',#13#10,[rfreplaceall]);
-  edtchoicetext.Text := '';
-
   node_parent.itemindex := node_parent.Items.IndexOf(thenode.NodeParent);
   if thenode.NodeParent =''  then
    node_parent.ItemIndex:=0;

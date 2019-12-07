@@ -242,9 +242,9 @@ begin
       writeln('Runtime Engine Error: This node contains no text.');
     end;
     Writeln(txt);
+    writeln;
     if adventurebindata.gamenodes[nodeind].NodeChoiceCount > 0 then
     begin
-      Writeln;
       for z := 0 to adventurebindata.gamenodes[nodeind].NodeChoiceCount - 1 do
       begin
         txt := adventurebindata.gamenodes[nodeind].nodechoices[z].choicetext;
@@ -394,9 +394,10 @@ begin
 
           Writeln(msg_wrongchoice);
           ch := readkey;
+          writeln;
         end;
       end;
-      Writeln;
+
     end;
     // display final node
     if wingame=true then
@@ -412,9 +413,7 @@ begin
     //writeln('You finished the game with the score '+inttostr(score)+ ' out of '+inttostr(AdventureBinData.MaxScore));
     end else
     begin
-    writeln;
     DisplayNode(currentnode);
-    writeln;
     writeln (msg_gameover);
     Readln(choice);
     if choice='y' then Goto Start;

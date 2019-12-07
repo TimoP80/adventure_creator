@@ -101,6 +101,7 @@ object Form1: TForm1
     ItemHeight = 13
     TabOrder = 1
     OnClick = lstchoicelistClick
+    OnMouseUp = lstchoicelistMouseUp
   end
   object edtchoicetext: TEdit
     Left = 432
