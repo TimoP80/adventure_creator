@@ -197,6 +197,8 @@ begin
         Adventuredata.GameNodes.Node[u].Choices.Choice[z].Targetnode;
       AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount].endgame :=
         Adventuredata.GameNodes.Node[u].Choices.Choice[z].Endgame;
+           AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount].wingame :=
+        Adventuredata.GameNodes.Node[u].Choices.Choice[z].Wingame;
       AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount].addscore :=
         Adventuredata.GameNodes.Node[u].Choices.Choice[z].Addscore;
       inc(AdventureBinData.MaxScore,

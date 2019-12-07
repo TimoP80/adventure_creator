@@ -3,7 +3,7 @@
         <ProjectGuid>{D927B967-A0CA-472D-B2E9-38112D8C7601}</ProjectGuid>
         <MainSource>ACEngine.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Console</AppType>
         <FrameworkType>None</FrameworkType>

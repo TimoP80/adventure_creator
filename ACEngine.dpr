@@ -19,6 +19,7 @@ var
   moneydisplay, debugmode: boolean;
   savedx, savedy, choiceinteger: integer;
   addedscore, score: integer;
+ label start;
 
 function AlphabetToNumber(alpha: char): integer;
 var
@@ -284,6 +285,9 @@ begin
     Writeln('Loaded "' + adventurebindata.metatitle + '" by ' +
      adventurebindata.metaauthor);
     Writeln;
+    Start:
+    begin
+
     if GetVarValue('MoneyDisplay') = 'true' then
       moneydisplay := true
     else
@@ -297,9 +301,10 @@ begin
     textcolor(lightgray);
     writeln(ansi2ascii('Paina mitä tahansa näppäintä'));
     score := 0;
+    wingame:=false;
     choice := readkey;
 
-    while (wingame = false)  and (endgame = false) and (choice <> 'q') do
+    while ((wingame = false) or (endgame = false)) and (choice <> 'q') do
     begin
       ClrScr;
       TextBackground(blue);
@@ -327,11 +332,15 @@ begin
       writeln;
       TextBackground(black);
       TextColor(white);
-      DisplayNode(currentnode);
+      if wingame = true then
+      begin
+        break;
+      end;
       if endgame = true then
       begin
         break;
       end;
+      DisplayNode(currentnode);
       Write('> ');
       Readln(choice);
       if choice = 'q' then
@@ -349,7 +358,11 @@ begin
           currentnode := GetTargetNodeFromChoice(currentnode,
             choiceinteger);
           Inc(score, addedscore);
-
+           if wingame=true then
+             begin
+               endgame := true;
+               break;
+             end;
           if currentnode = '' then
           begin
             Writeln('Runtime error: Null NODE!');
@@ -374,8 +387,13 @@ begin
     begin
     DisplayNode(currentnode);
     writeln;
-    writeln ('Game over, try again!');
+    writeln ('Game over, do you wish to try again? (Y/N)');
+    Readln(choice);
+    if choice='y' then Goto Start;
+
     end;
+    end;
+
   end;
 
 end.
