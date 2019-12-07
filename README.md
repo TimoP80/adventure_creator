@@ -2,6 +2,15 @@
 
 Simple text based adventure game engine
 
+This is a game engine project inspired by finnish text adventures coded in QBasic or Turbo Pascal.
+The system is based on nodes, the engine displays a text describing the current scene and gives you a few choices
+to advance in the game. Some choices lead to premature ending of the game, but some choices advance the game further until
+you reach a point where the game ends.
+
+An example game is provided to show you what this engine is capable of.
+
+Everything is coded in Object Pascal so knowledge of that language is required if you wish to contribute to this project.
+
 This project contains three executables: 
 
 
