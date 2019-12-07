@@ -10,6 +10,7 @@ type
     Targetnode: string;
     addscore: integer;
     endgame: boolean;
+    wingame: boolean;
   end;
 
 type
@@ -99,6 +100,7 @@ begin
       ReadString(x, AdventureBinData.gamenodes[i].nodechoices[j].ChoiceText);
       ReadString(x, AdventureBinData.gamenodes[i].nodechoices[j].Targetnode);
       BlockRead(x, AdventureBinData.gamenodes[i].nodechoices[j].endgame, 1);
+      BlockRead(x, AdventureBinData.gamenodes[i].nodechoices[j].wingame, 1);
       BlockRead(x, AdventureBinData.gamenodes[i].nodechoices[j].addscore, 4);
     end;
   end;
@@ -141,6 +143,7 @@ begin
       WriteString(x, AdventureBinData.gamenodes[i].nodechoices[j].ChoiceText);
       WriteString(x, AdventureBinData.gamenodes[i].nodechoices[j].Targetnode);
       BlockWrite(x, AdventureBinData.gamenodes[i].nodechoices[j].endgame, 1);
+      BlockWrite(x, AdventureBinData.gamenodes[i].nodechoices[j].wingame, 1);
       BlockWrite(x, AdventureBinData.gamenodes[i].nodechoices[j].addscore, 4);
     end;
   end;

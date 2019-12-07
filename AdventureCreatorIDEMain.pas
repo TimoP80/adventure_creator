@@ -68,6 +68,7 @@ type
     Label2: TLabel;
     node_parent: TComboBox;
     nodes_tree: TTreeView;
+    gamewinner: TCheckBox;
     procedure LoadAdventureFile1Click(Sender: TObject);
     procedure Quit1Click(Sender: TObject);
     procedure btn3Click(Sender: TObject);
@@ -103,6 +104,7 @@ type
     procedure Button1Click(Sender: TObject);
     procedure nodes_treeClick(Sender: TObject);
     procedure node_parentClick(Sender: TObject);
+    procedure gamewinnerClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -272,6 +274,7 @@ begin
   thechoice.Targetnode := '';
   thechoice.Text := '<< NEW CHOICE >>';
   thechoice.Endgame := false;
+  thechoice.Wingame := false;
   thechoice.Addscore:=0;
   UpdateChoices;
 
@@ -294,6 +297,7 @@ if lstchoicelist.ItemIndex=-1  then exit;
   cbbchoicenodelist.ItemIndex :=
     cbbchoicenodelist.Items.IndexOf(thechoice.Targetnode);
   chkendgame.Checked := thechoice.Endgame;
+  gamewinner.Checked:=thechoice.Wingame;
   edtchoicescore.Text := inttostr(thechoice.Addscore);
 end;
 
@@ -305,7 +309,7 @@ begin
   begin
     for y := 0 to adventuredata.GameNodes.Node[x].Choices.Count - 1 do
     begin
-      adventuredata.GameNodes.Node[x].Choices.Choice[y].addscore := 0;
+      adventuredata.GameNodes.Node[x].Choices.Choice[y].Wingame := false;
     end;
   end;
 end;
@@ -363,6 +367,11 @@ begin
  AdventureData := NewAdventureGame;
 end;
 
+procedure TForm1.gamewinnerClick(Sender: TObject);
+begin
+ thechoice.wingame := gamewinner.Checked;
+end;
+
 procedure TForm1.chkendgameClick(Sender: TObject);
 begin
   thechoice.Endgame := chkendgame.Checked;
@@ -383,6 +392,7 @@ begin
     logmsg('Max score: '+inttostr(AdventureBinData.MaxScore));
     LogMsg('Saving binary data...');
     SaveAdventureBin(dlgsave2.FileName);
+    Logmsg('Binary data saved');
   end;
 
 end;

@@ -383,7 +383,6 @@ begin
     logmsg('Max score: '+inttostr(AdventureBinData.MaxScore));
     LogMsg('Saving binary data...');
     SaveAdventureBin(dlgsave2.FileName);
-    Logmsg('Binary data saved');
   end;
 
 end;

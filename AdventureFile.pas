@@ -3,7 +3,7 @@
 {                                                                            }
 {                              XML Data Binding                              }
 {                                                                            }
-{         Generated on: 6.12.2019 21:28:42                                   }
+{         Generated on: 7.12.2019 17:42:21                                   }
 {       Generated from: C:\CodeProjects\AdventureCreator\AdventureFile.xdb   }
 {   Settings stored in: C:\CodeProjects\AdventureCreator\AdventureFile.xdb   }
 {                                                                            }
@@ -33,7 +33,7 @@ type
 { IXMLAdventureGameType }
 
   IXMLAdventureGameType = interface(IXMLNode)
-    ['{BCB6A624-AD4D-4ECB-9AEB-2EF73BCE030C}']
+    ['{EE2A199A-F6A1-4FBC-A4C1-7230F5C76819}']
     { Property Accessors }
     function Get_MetaInfo: IXMLMetaInfoType;
     function Get_Variables: IXMLVariablesType;
@@ -47,7 +47,7 @@ type
 { IXMLMetaInfoType }
 
   IXMLMetaInfoType = interface(IXMLNode)
-    ['{D9EF9C77-5F7C-44E4-8F59-FF8F81B47769}']
+    ['{3049E41C-83DC-4AE2-9DFF-ADDA075B69E8}']
     { Property Accessors }
     function Get_Title: UnicodeString;
     function Get_Author: UnicodeString;
@@ -64,7 +64,7 @@ type
 { IXMLVariablesType }
 
   IXMLVariablesType = interface(IXMLNodeCollection)
-    ['{DDC81247-B528-4B41-9C06-2CD8B8A97D56}']
+    ['{A198EB6C-C77A-45BF-8B61-698AF75C8A41}']
     { Property Accessors }
     function Get_Variable(Index: Integer): IXMLVariableType;
     { Methods & Properties }
@@ -76,7 +76,7 @@ type
 { IXMLVariableType }
 
   IXMLVariableType = interface(IXMLNode)
-    ['{A00FFB18-2B58-4E6C-A8DD-ACB9833A4CA7}']
+    ['{B6BBD868-D85D-4106-B028-93A9989D2376}']
     { Property Accessors }
     function Get_Name: UnicodeString;
     procedure Set_Name(Value: UnicodeString);
@@ -87,7 +87,7 @@ type
 { IXMLGameNodesType }
 
   IXMLGameNodesType = interface(IXMLNodeCollection)
-    ['{BB34B454-3C40-44DE-90AE-256F90330684}']
+    ['{491FB1E4-8525-49A0-8FD7-18F9110C5480}']
     { Property Accessors }
     function Get_Node(Index: Integer): IXMLNodeType;
     { Methods & Properties }
@@ -99,7 +99,7 @@ type
 { IXMLNodeType }
 
   IXMLNodeType = interface(IXMLNode)
-    ['{C0FE64E7-A654-4818-A5E7-8A19D5292729}']
+    ['{981EA931-FDCE-4751-ABA5-CE5EFD7DDD42}']
     { Property Accessors }
     function Get_Name: UnicodeString;
     function Get_DescriptionText: UnicodeString;
@@ -120,7 +120,7 @@ type
 { IXMLChoicesType }
 
   IXMLChoicesType = interface(IXMLNodeCollection)
-    ['{416467C9-3383-4505-ACCF-9CA5D215CAC9}']
+    ['{7BEB0ACA-378E-4CFF-953D-09334C0B9F1E}']
     { Property Accessors }
     function Get_Choice(Index: Integer): IXMLChoiceType;
     { Methods & Properties }
@@ -132,24 +132,27 @@ type
 { IXMLChoiceType }
 
   IXMLChoiceType = interface(IXMLNode)
-    ['{1540EB81-32FF-43DE-AF78-DFF5A681C8A4}']
+    ['{4692E5E7-5728-497F-9784-C506093A5DF4}']
     { Property Accessors }
     function Get_Addscore: Integer;
     function Get_Endgame: Boolean;
+    function Get_Wingame: Boolean;
     function Get_Targetnode: UnicodeString;
     procedure Set_Addscore(Value: Integer);
     procedure Set_Endgame(Value: Boolean);
+    procedure Set_Wingame(Value: Boolean);
     procedure Set_Targetnode(Value: UnicodeString);
     { Methods & Properties }
     property Addscore: Integer read Get_Addscore write Set_Addscore;
     property Endgame: Boolean read Get_Endgame write Set_Endgame;
+    property Wingame: Boolean read Get_Wingame write Set_Wingame;
     property Targetnode: UnicodeString read Get_Targetnode write Set_Targetnode;
   end;
 
 { IXMLNodeCommandsType }
 
   IXMLNodeCommandsType = interface(IXMLNodeCollection)
-    ['{12F91326-CBC5-4F11-81A0-3C2C357D49AF}']
+    ['{37AB073C-5580-4532-85FB-5507DADBEAFC}']
     { Property Accessors }
     function Get_CMD(Index: Integer): IXMLCMDType;
     { Methods & Properties }
@@ -161,7 +164,7 @@ type
 { IXMLCMDType }
 
   IXMLCMDType = interface(IXMLNode)
-    ['{117E20E3-2E4C-417E-8E81-3228DBCA1E10}']
+    ['{61F8D06F-8EB7-4974-955F-806E8F5A2CF0}']
     { Property Accessors }
     function Get_Name: UnicodeString;
     function Get_Variable: UnicodeString;
@@ -279,9 +282,11 @@ type
     { IXMLChoiceType }
     function Get_Addscore: Integer;
     function Get_Endgame: Boolean;
+    function Get_Wingame: Boolean;
     function Get_Targetnode: UnicodeString;
     procedure Set_Addscore(Value: Integer);
     procedure Set_Endgame(Value: Boolean);
+    procedure Set_Wingame(Value: Boolean);
     procedure Set_Targetnode(Value: UnicodeString);
   end;
 
@@ -549,6 +554,16 @@ end;
 procedure TXMLChoiceType.Set_Endgame(Value: Boolean);
 begin
   SetAttribute('endgame', Value);
+end;
+
+function TXMLChoiceType.Get_Wingame: Boolean;
+begin
+  Result := AttributeNodes['wingame'].NodeValue;
+end;
+
+procedure TXMLChoiceType.Set_Wingame(Value: Boolean);
+begin
+  SetAttribute('wingame', Value);
 end;
 
 function TXMLChoiceType.Get_Targetnode: UnicodeString;

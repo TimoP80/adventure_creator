@@ -127,9 +127,6 @@
                 <Source>
                     <Source Name="MainSource">AdventureCreatorIDE.dpr</Source>
                 </Source>
-                <Language>
-                    <Language Name="RootDir">C:\CodeProjects\AdventureCreator\src\adventurecreator\</Language>
-                </Language>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\DataExplorerDBXPluginEnt230.bpl">DBExpress Enterprise Data Explorer Integration</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclFMXFireDAC230.bpl">Embarcadero FMX FireDAC Components</Excluded_Packages>

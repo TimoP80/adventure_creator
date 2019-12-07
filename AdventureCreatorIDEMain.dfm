@@ -338,6 +338,15 @@ object Form1: TForm1
     TabOrder = 19
     OnClick = nodes_treeClick
   end
+  object gamewinner: TCheckBox
+    Left = 328
+    Top = 476
+    Width = 233
+    Height = 25
+    Caption = 'This choice causes game win condition'
+    TabOrder = 20
+    OnClick = gamewinnerClick
+  end
   object DataReader: TXMLDocument
     Left = 240
     Top = 120

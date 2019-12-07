@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{70E8806E-2B84-4031-91C2-0850ED573ACA}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="AdventureCreatorIDE.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ACCompiler.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ACEngine.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="AdventureCreatorIDE">
+        <MSBuild Projects="AdventureCreatorIDE.dproj"/>
+    </Target>
+    <Target Name="AdventureCreatorIDE:Clean">
+        <MSBuild Projects="AdventureCreatorIDE.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AdventureCreatorIDE:Make">
+        <MSBuild Projects="AdventureCreatorIDE.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ACCompiler">
+        <MSBuild Projects="ACCompiler.dproj"/>
+    </Target>
+    <Target Name="ACCompiler:Clean">
+        <MSBuild Projects="ACCompiler.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ACCompiler:Make">
+        <MSBuild Projects="ACCompiler.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ACEngine">
+        <MSBuild Projects="ACEngine.dproj"/>
+    </Target>
+    <Target Name="ACEngine:Clean">
+        <MSBuild Projects="ACEngine.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ACEngine:Make">
+        <MSBuild Projects="ACEngine.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="AdventureCreatorIDE;ACCompiler;ACEngine"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="AdventureCreatorIDE:Clean;ACCompiler:Clean;ACEngine:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="AdventureCreatorIDE:Make;ACCompiler:Make;ACEngine:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
