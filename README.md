@@ -12,3 +12,6 @@ accompiler.exe for compiling xml files to agf
 
 AdventureCreatorIDE.exe for editing game files and saving them to xml format
 
+The source code is compilable with Delphi 10 Seattle and above. Compiled binaries are provided and they are
+updated regularly.
+
