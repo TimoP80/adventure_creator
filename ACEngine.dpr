@@ -17,8 +17,8 @@ var
   moneystring, currentnode: ansistring;
   wingame, endgame: boolean;
   moneydisplay, debugmode: boolean;
-  msg_wrongchoice, msg_pressanykey: string;
-  msgtemp, msg_gamefinished: string;
+  msg_gameover, msg_wrongchoice, msg_pressanykey: ansistring;
+  msgtemp, msg_gamefinished: ansistring;
   savedx, savedy, choiceinteger: integer;
   addedscore, score: integer;
   config: TIniFile;
@@ -38,7 +38,7 @@ begin
   end;
 end;
 
-function Ansi2Ascii(const s: AnsiString): AnsiString;
+function Ansi2Ascii (const s: AnsiString): AnsiString;
 begin
   Result := s;
   if Result <> '' then
@@ -205,6 +205,7 @@ begin
       if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd =
         'DisplayMessage' then
       begin
+        writeln;
         writeln(adventurebindata.GameNodes[nodeind].NodeCommands[z].value);
           ch := ReadKey;
       end
@@ -271,7 +272,7 @@ begin
   TextBackground(blue);
   ClrEol;
   TextColor(Yellow);
-  Writeln(ansi2ascii('Adventure Creator Runtime Engine v1.0 by T. Pitkänen'));
+  Writeln('Adventure Creator Runtime Engine v1.0 by T. Pitkänen');
   textbackground(black);
   textcolor(White);
   writeln;
@@ -297,6 +298,7 @@ begin
  msg_pressanykey := config.ReadString(GetVarValue('GameLanguage'),'PressAnyKey','');
  msg_gamefinished := config.ReadString(GetVarValue('GameLanguage'),'FinishedGame','');
  msg_wrongchoice := config.ReadString(GetVarValue('GameLanguage'),'WrongChoice','');
+ msg_gameover := config.ReadString(GetVarValue('GameLanguage'),'GameOver','');
 
     Writeln('Loaded "' + adventurebindata.metatitle + '" by ' +
      adventurebindata.metaauthor);
@@ -316,7 +318,7 @@ begin
     Writeln;
     textcolor(lightgray);
     //msgtemp := msg_pressanykey;
-    writeln(ansi2ascii(msg_pressanykey));
+    writeln(msg_pressanykey);
     score := 0;
     wingame:=false;
     choice := readkey;
@@ -390,7 +392,7 @@ begin
         else
         begin
 
-          Writeln(ansi2ascii(msg_wrongchoice));
+          Writeln(msg_wrongchoice);
           ch := readkey;
         end;
       end;
@@ -399,19 +401,21 @@ begin
     // display final node
     if wingame=true then
     begin
+    writeln;
     DisplayNode(currentnode);
     writeln;
     msgtemp := msg_gamefinished;
-    msgtemp := Stringreplace(msgtemp,'%score',IntToStr(score), [rfReplaceAll]);
-    msgtemp := Stringreplace(msgtemp,'%maxscore',IntToStr(AdventureBinData.MaxScore), [rfReplaceAll]);
-   writeln(ansi2ascii(msgtemp));
+    msgtemp := Stringreplace(msgtemp,'%score%',IntToStr(score), [rfReplaceAll]);
+    msgtemp := Stringreplace(msgtemp,'%maxscore%',IntToStr(AdventureBinData.MaxScore), [rfReplaceAll]);
+   writeln(msgtemp);
 
     //writeln('You finished the game with the score '+inttostr(score)+ ' out of '+inttostr(AdventureBinData.MaxScore));
     end else
     begin
+    writeln;
     DisplayNode(currentnode);
     writeln;
-    writeln ('Game over, do you wish to try again? (Y/N)');
+    writeln (msg_gameover);
     Readln(choice);
     if choice='y' then Goto Start;
 
