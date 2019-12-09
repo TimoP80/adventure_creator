@@ -69,6 +69,7 @@ type
     node_parent: TComboBox;
     nodes_tree: TTreeView;
     gamewinner: TCheckBox;
+    Button2: TButton;
     procedure LoadAdventureFile1Click(Sender: TObject);
     procedure Quit1Click(Sender: TObject);
     procedure btn3Click(Sender: TObject);
@@ -107,6 +108,7 @@ type
     procedure gamewinnerClick(Sender: TObject);
     procedure lstchoicelistMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure Button2Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -121,11 +123,13 @@ var
   thecmd: IXMLCMDType;
   CurrentFilename: string;
   NewNode: IXMLNodeType;
-  procedure LogMsg(s: string);
+  Commandlist: IXMLCommandListType;
 
-implementation
+procedure LogMsg(s: string);
 
-uses MetaData, VarEditor;
+  implementation
+
+uses MetaData, VarEditor, ChoiceCommandsForm;
 procedure UpdateCaption;
 begin
       Form1.Caption := 'Adventure Creator 1.0 IDE - ['+currentfilename+']';
@@ -144,9 +148,11 @@ var
   u: integer;
 begin
   form1.cbbvarsel.items.clear;
+  form4.cbbvarsel.items.clear;
   for U := 0 to AdventureData.Variables.Count - 1 do
   begin
     form1.cbbvarsel.Items.Add(adventuredata.Variables.Variable[u].name);
+    form4.cbbvarsel.Items.Add(adventuredata.Variables.Variable[u].name);
   end;
 end;
  function TreeItemSearch(TV: TTreeView; SucheItem: string): TTreeNode;
@@ -328,12 +334,15 @@ end;
 procedure TForm1.btn5Click(Sender: TObject);
 var
   x, y: Integer;
+  choicecommands: IXMLCommandListType;
 begin
   for x := 0 to AdventureData.GameNodes.Count - 1 do
   begin
     for y := 0 to adventuredata.GameNodes.Node[x].Choices.Count - 1 do
     begin
-      adventuredata.GameNodes.Node[x].Choices.Choice[y].Wingame := false;
+    LogMsg('Added commands list for choice: '+inttostr(y)+' in node '+adventuredata.GameNodes.Node[x].Name);
+    choicecommands := adventuredata.GameNodes.Node[x].ChoiceCommands.Add;
+      //adventuredata.GameNodes.Node[x].Choices.Choice[y].Wingame := false;
     end;
   end;
 end;
@@ -515,6 +524,14 @@ UpdateNodeLists;
 
 end;
 
+procedure TForm1.Button2Click(Sender: TObject);
+begin
+Commandlist := thenode.ChoiceCommands.CommandList[lstchoicelist.itemindex];
+   updatechoicecommands;
+form4.showmodal;
+
+end;
+
 procedure TForm1.cbbcmdClick(Sender: TObject);
 begin
 thecmd.Name := cbbcmd.text;
@@ -562,6 +579,7 @@ begin
   mmonodetext.Text := thenode.DescriptionText;
   mmonodetext.text := StringReplace(mmonodetext.text, #10,'\n',[rfreplaceall]);
   mmonodetext.text := StringReplace(mmonodetext.text, '\n',#13#10,[rfreplaceall]);
+  mmonodetext.text := StringReplace(mmonodetext.text, #9,'',[rfreplaceall]);
   edtchoicetext.Text := '';
 
   node_parent.itemindex := node_parent.Items.IndexOf(thenode.NodeParent);

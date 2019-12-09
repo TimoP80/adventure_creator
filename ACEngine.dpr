@@ -3,7 +3,12 @@ program ACEngine;
 {$APPTYPE CONSOLE}
 
 uses
-  Windows, AdventureBinary, jclstrings, Console, Inifiles, SysUtils;
+  Windows,
+  AdventureBinary,
+  jclstrings,
+  Console,
+  Inifiles,
+  SysUtils;
 
 const
   alphabets: array[0..10] of char = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
@@ -176,7 +181,7 @@ procedure ProcessNodeCommands(name: string);
 var
   z, nodeind: integer;
   ch: char;
-  txt: widestring;
+  textvaluetemp, txt: widestring;
   valuetemp: integer;
 begin
 
@@ -206,9 +211,21 @@ begin
         'DisplayMessage' then
       begin
         writeln;
-        writeln(adventurebindata.GameNodes[nodeind].NodeCommands[z].value);
+        textvaluetemp := adventurebindata.GameNodes[nodeind].NodeCommands[z].value;
+        textvaluetemp := ReplaceVars(textvaluetemp);
+        writeln(textvaluetemp);
           ch := ReadKey;
+
       end
+      else if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd =
+        'TextPrompt' then
+      begin
+        writeln;
+        write(adventurebindata.GameNodes[nodeind].NodeCommands[z].value);
+        readln(textvaluetemp);
+        SetVarValue(adventurebindata.GameNodes[nodeind].NodeCommands[z].varparam, textvaluetemp);
+      end
+
       else if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd =
         'DecreaseVar' then
       begin
@@ -414,7 +431,7 @@ begin
     end else
     begin
     DisplayNode(currentnode);
-    writeln (msg_gameover);
+    write (msg_gameover);
     Readln(choice);
     if choice='y' then Goto Start;
 

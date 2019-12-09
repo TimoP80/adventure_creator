@@ -176,7 +176,7 @@ object Form1: TForm1
     Top = 8
     Width = 105
     Height = 25
-    Caption = 'Init booleans'
+    Caption = 'Init values'
     TabOrder = 10
     OnClick = btn5Click
   end
@@ -287,7 +287,8 @@ object Form1: TForm1
         'DisplayMessage'
         'WaitForKeyPress'
         'IncreaseVar'
-        'DecreaseVar')
+        'DecreaseVar'
+        'TextPrompt')
     end
     object cbbvarsel: TComboBox
       Left = 240
@@ -348,7 +349,17 @@ object Form1: TForm1
     TabOrder = 20
     OnClick = gamewinnerClick
   end
+  object Button2: TButton
+    Left = 968
+    Top = 319
+    Width = 137
+    Height = 25
+    Caption = 'Edit choice commands...'
+    TabOrder = 21
+    OnClick = Button2Click
+  end
   object DataReader: TXMLDocument
+    Options = [doNodeAutoCreate, doNodeAutoIndent, doAttrNull, doAutoPrefix, doNamespaceDecl]
     Left = 240
     Top = 120
     DOMVendorDesc = 'MSXML'
