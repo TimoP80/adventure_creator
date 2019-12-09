@@ -177,6 +177,77 @@ begin
   end;
 end;
 
+
+procedure ProcessChoiceCommands(name: string; choiceindex: integer);
+var
+  z, nodeind: integer;
+  ch: char;
+  textvaluetemp, txt: widestring;
+  valuetemp: integer;
+  cmd, variable, value: string;
+begin
+
+  nodeind := getnodeindex(name);
+  if nodeind <> -1 then
+  begin
+    // Process node commands here
+    for z := 0 to AdventureBinData.gamenodes[nodeind].NodeChoices[choiceindex].ChoiceCommandCount - 1 do
+    begin
+    cmd := AdventureBinData.gamenodes[nodeind].NodeChoices[choiceindex].ChoiceCommands[z].cmd;
+    variable := AdventureBinData.gamenodes[nodeind].NodeChoices[choiceindex].ChoiceCommands[z].varparam;
+    value := AdventureBinData.gamenodes[nodeind].NodeChoices[choiceindex].ChoiceCommands[z].value;
+
+      if cmd = 'SetVar'
+        then
+      begin
+        SetVarValue(variable, value);
+      end
+      else if cmd =
+        'IncreaseVar' then
+      begin
+        valuetemp :=
+          strtoint(getvarvalue(value));
+        valuetemp := valuetemp +
+          StrToInt(value);
+        setvarvalue(variable, inttostr(valuetemp));
+
+      end
+      else
+      if cmd =
+        'DisplayMessage' then
+      begin
+        writeln;
+        textvaluetemp := value;
+        textvaluetemp := ReplaceVars(textvaluetemp);
+        writeln(textvaluetemp);
+          ch := ReadKey;
+
+      end
+      else if cmd =
+        'TextPrompt' then
+      begin
+        writeln;
+        write(value);
+        readln(textvaluetemp);
+        SetVarValue(variable, textvaluetemp);
+      end
+
+      else if cmd =
+        'DecreaseVar' then
+      begin
+        valuetemp :=
+          strtoint(getvarvalue(variable));
+        valuetemp := valuetemp -
+          StrToInt(value);
+        setvarvalue(variable, inttostr(valuetemp));
+      end;
+
+    end;
+    // end of commands processing code
+  end;
+
+end;
+
 procedure ProcessNodeCommands(name: string);
 var
   z, nodeind: integer;

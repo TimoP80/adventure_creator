@@ -285,7 +285,6 @@ object Form1: TForm1
       Items.Strings = (
         'SetVar'
         'DisplayMessage'
-        'WaitForKeyPress'
         'IncreaseVar'
         'DecreaseVar'
         'TextPrompt')
@@ -359,7 +358,6 @@ object Form1: TForm1
     OnClick = Button2Click
   end
   object DataReader: TXMLDocument
-    Options = [doNodeAutoCreate, doNodeAutoIndent, doAttrNull, doAutoPrefix, doNamespaceDecl]
     Left = 240
     Top = 120
     DOMVendorDesc = 'MSXML'
@@ -409,6 +407,10 @@ object Form1: TForm1
       object ValidateNodes1: TMenuItem
         Caption = 'Validate Nodes'
         OnClick = ValidateNodes1Click
+      end
+      object ShowNodeLinks1: TMenuItem
+        Caption = 'Show Node Links'
+        OnClick = ShowNodeLinks1Click
       end
     end
     object Help1: TMenuItem

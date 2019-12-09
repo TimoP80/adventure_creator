@@ -86,6 +86,7 @@ object Form4: TForm4
       Items.Strings = (
         'SetVar'
         'DisplayMessage'
+        'WaitForKeyPress'
         'IncreaseVar'
         'DecreaseVar'
         'TextPrompt')

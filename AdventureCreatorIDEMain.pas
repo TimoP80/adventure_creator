@@ -70,6 +70,7 @@ type
     nodes_tree: TTreeView;
     gamewinner: TCheckBox;
     Button2: TButton;
+    ShowNodeLinks1: TMenuItem;
     procedure LoadAdventureFile1Click(Sender: TObject);
     procedure Quit1Click(Sender: TObject);
     procedure btn3Click(Sender: TObject);
@@ -109,6 +110,7 @@ type
     procedure lstchoicelistMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure Button2Click(Sender: TObject);
+    procedure ShowNodeLinks1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -362,6 +364,27 @@ begin
   end;
 end;
 
+procedure TForm1.ShowNodeLinks1Click(Sender: TObject);
+var z,u: integer;
+var links: TSTrings;
+begin
+links := TStringlist.Create;
+ for u := 0 to AdventureData.GameNodes.Count-1 do
+  begin
+  for z := 0 to adventuredata.GameNodes[u]. Choices.Count-1 do
+  begin
+    if (AdventureData.GameNodes[u].Name<>thenode.name)
+    and (AdventureData.GameNodes[u].Choices[z].Targetnode = thenode.name) then
+    begin
+      links.Add('Node "'+AdventureData.GameNodes[u].Name+'" choice #'+inttostr(z+1)+' ("'+AdventureData.GameNodes[u].Choices[z].text+'")');
+    end;
+  end;
+    end;
+if links.Count=0 then
+  showmessage('This is the start node.') else
+  showmessage(links.Text);
+end;
+
 procedure TForm1.btn1Click(Sender: TObject);
 begin
   thenode := AdventureData.GameNodes.Add;
@@ -377,7 +400,19 @@ begin
 end;
 
 procedure TForm1.btn6Click(Sender: TObject);
+var oldname: string;
+var u: integer;
 begin
+oldname := thenode.Name;
+for u := 0 to AdventureData.GameNodes.Count-1 do
+   begin
+     if adventuredata.GameNodes.Node[u].NodeParent = oldname then
+      begin
+         LogMsg('Remapped node parent '+oldname +' to '+edtnodename.text);
+         adventuredata.GameNodes.Node[u].NodeParent := edtnodename.Text;
+      end;
+   end;
+// before doing this, remap all node parents to new name;
   TheNode.Name := edtnodename.Text;
   UpdateNodeLists;
 end;
