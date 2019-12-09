@@ -285,7 +285,10 @@ begin
   thechoice.Text := '<< NEW CHOICE >>';
   thechoice.Endgame := false;
   thechoice.Wingame := false;
+
   thechoice.Addscore:=0;
+  Commandlist := thenode.ChoiceCommands.Add;
+
   UpdateChoices;
 
 end;
@@ -293,6 +296,8 @@ end;
 procedure TForm1.btn4Click(Sender: TObject);
 begin
   TheNode.Choices.Delete(lstchoicelist.itemindex);
+  TheNode.ChoiceCommands.Delete(lstchoicelist.itemindex);
+
   UpdateChoices;
 
 end;
@@ -561,6 +566,11 @@ end;
 
 procedure TForm1.Button2Click(Sender: TObject);
 begin
+if lstchoicelist.ItemIndex>thenode.ChoiceCommands.Count-1 then
+begin
+  LogMsg('Choice commands out of sync, adding new!');
+  Commandlist := thenode.ChoiceCommands.Add;
+end;
 Commandlist := thenode.ChoiceCommands.CommandList[lstchoicelist.itemindex];
    updatechoicecommands;
 form4.showmodal;

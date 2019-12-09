@@ -448,6 +448,8 @@ begin
         break;
       end;
       DisplayNode(currentnode);
+      ProcessNodeCommands(currentnode);
+
       Write('> ');
       Readln(choice);
       if choice = 'q' then
@@ -458,11 +460,11 @@ begin
         numchoices := GetChoiceCountInNode(currentnode);
         if choiceinteger <= numchoices - 1 then
         begin
-          ProcessNodeCommands(currentnode);
           endgame := GetEndGameFlagFromChoice(currentnode, choiceinteger);
           wingame := GetWinGameFlagFromChoice(currentnode, choiceinteger);
 
           addedscore := GetScoreFromChoice(currentnode, choiceinteger);
+           ProcessChoiceCommands(currentnode, choiceinteger);
           currentnode := GetTargetNodeFromChoice(currentnode,
             choiceinteger);
           Inc(score, addedscore);

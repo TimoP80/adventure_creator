@@ -105,8 +105,8 @@ begin
       BlockRead(x, AdventureBinData.gamenodes[i].nodechoices[j].endgame, 1);
       BlockRead(x, AdventureBinData.gamenodes[i].nodechoices[j].wingame, 1);
       BlockRead(x, AdventureBinData.gamenodes[i].nodechoices[j].addscore, 4);
-
        blockread(x,AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommandCount,4);
+setlength(AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommands, AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommandCount+1);
      for y := 0 to AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommandCount-1 do
       begin
   ReadString(x, AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommands[y].cmd);
