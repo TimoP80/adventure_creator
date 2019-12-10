@@ -80,7 +80,6 @@ object Form6: TForm6
       Height = 25
       Caption = 'Delete'
       TabOrder = 2
-      OnClick = btn9Click
     end
     object cbbcmd: TComboBox
       Left = 240
@@ -88,7 +87,6 @@ object Form6: TForm6
       Width = 209
       Height = 21
       TabOrder = 3
-      OnClick = cbbcmdClick
       Items.Strings = (
         'VariableValue')
     end
@@ -98,7 +96,6 @@ object Form6: TForm6
       Width = 209
       Height = 21
       TabOrder = 4
-      OnClick = cbbvarselClick
     end
     object mmoparamval: TMemo
       Left = 240
@@ -106,7 +103,6 @@ object Form6: TForm6
       Width = 273
       Height = 105
       TabOrder = 5
-      OnKeyUp = mmoparamvalKeyUp
     end
     object evallist: TComboBox
       Left = 240
@@ -114,7 +110,6 @@ object Form6: TForm6
       Width = 209
       Height = 21
       TabOrder = 6
-      OnClick = evallistClick
       Items.Strings = (
         'is equal to'
         'less than or equal to'

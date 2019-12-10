@@ -1,9 +1,9 @@
-object Form6: TForm6
+object Form4: TForm4
   Left = 0
   Top = 0
-  Caption = 'Choice conditions'
-  ClientHeight = 345
-  ClientWidth = 539
+  Caption = 'ChoiceCommands'
+  ClientHeight = 311
+  ClientWidth = 540
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,51 +18,45 @@ object Form6: TForm6
     Left = 3
     Top = 8
     Width = 529
-    Height = 297
-    Caption = 'Choice conditions'
+    Height = 257
+    Caption = 'Choice commands:'
     TabOrder = 0
     object lbl8: TLabel
       Left = 8
       Top = 24
-      Width = 61
+      Width = 67
       Height = 13
-      Caption = 'Condition list'
+      Caption = 'Command list:'
     end
     object lbl9: TLabel
       Left = 240
-      Top = 11
-      Width = 75
+      Top = 24
+      Width = 51
       Height = 13
-      Caption = 'Condiion Name:'
+      Caption = 'Command:'
     end
     object lbl10: TLabel
       Left = 240
-      Top = 57
+      Top = 72
       Width = 42
       Height = 13
       Caption = 'Variable:'
     end
     object lbl11: TLabel
       Left = 240
-      Top = 156
+      Top = 120
       Width = 83
       Height = 13
       Caption = 'Parameter value:'
     end
-    object Label1: TLabel
-      Left = 240
-      Top = 110
-      Width = 54
-      Height = 13
-      Caption = 'Evaluation:'
-    end
-    object lstconditions: TListBox
+    object lstcommands: TListBox
       Left = 8
       Top = 40
       Width = 209
       Height = 177
       ItemHeight = 13
       TabOrder = 0
+      OnClick = lstcommandsClick
     end
     object btn8: TButton
       Left = 9
@@ -84,17 +78,22 @@ object Form6: TForm6
     end
     object cbbcmd: TComboBox
       Left = 240
-      Top = 30
+      Top = 40
       Width = 209
       Height = 21
       TabOrder = 3
       OnClick = cbbcmdClick
       Items.Strings = (
-        'VariableValue')
+        'SetVar'
+        'DisplayMessage'
+        'DisplayMessageDirect'
+        'IncreaseVar'
+        'DecreaseVar'
+        'TextPrompt')
     end
     object cbbvarsel: TComboBox
       Left = 240
-      Top = 76
+      Top = 88
       Width = 209
       Height = 21
       TabOrder = 4
@@ -102,33 +101,18 @@ object Form6: TForm6
     end
     object mmoparamval: TMemo
       Left = 240
-      Top = 175
+      Top = 136
       Width = 273
       Height = 105
       TabOrder = 5
       OnKeyUp = mmoparamvalKeyUp
     end
-    object evallist: TComboBox
-      Left = 240
-      Top = 129
-      Width = 209
-      Height = 21
-      TabOrder = 6
-      OnClick = evallistClick
-      Items.Strings = (
-        'is equal to'
-        'less than or equal to'
-        'less than'
-        'larger than or equal to'
-        'larger than'
-        'not equal to')
-    end
   end
   object Button1: TButton
-    Left = 452
-    Top = 311
+    Left = 457
+    Top = 271
     Width = 75
-    Height = 25
+    Height = 32
     Caption = 'OK'
     ModalResult = 1
     TabOrder = 1

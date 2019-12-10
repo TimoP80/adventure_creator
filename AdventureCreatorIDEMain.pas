@@ -115,6 +115,7 @@ type
     procedure ShowNodeLinks1Click(Sender: TObject);
     procedure About1Click(Sender: TObject);
     procedure InitnewfieldsinXMLdevonly1Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -136,7 +137,7 @@ procedure LogMsg(s: string);
 
   implementation
 
-uses MetaData, VarEditor, ChoiceCommandsForm, AboutForm;
+uses MetaData, VarEditor, ChoiceCommandsForm, AboutForm, ChoiceConditionsForm;
 procedure UpdateCaption;
 begin
       Form1.Caption := 'Adventure Creator 1.0 IDE - ['+currentfilename+']';
@@ -156,10 +157,12 @@ var
 begin
   form1.cbbvarsel.items.clear;
   form4.cbbvarsel.items.clear;
+  form6.cbbvarsel.items.clear;
   for U := 0 to AdventureData.Variables.Count - 1 do
   begin
     form1.cbbvarsel.Items.Add(adventuredata.Variables.Variable[u].name);
     form4.cbbvarsel.Items.Add(adventuredata.Variables.Variable[u].name);
+    form6.cbbvarsel.Items.Add(adventuredata.Variables.Variable[u].name);
   end;
 end;
  function TreeItemSearch(TV: TTreeView; SucheItem: string): TTreeNode;
@@ -611,6 +614,12 @@ Commandlist := thenode.ChoiceCommands.CommandList[lstchoicelist.itemindex];
    updatechoicecommands;
 form4.showmodal;
 
+end;
+
+procedure TForm1.Button3Click(Sender: TObject);
+begin
+ConditionList := thenode.ChoiceConditions.ConditionList[lstchoicelist.itemindex];
+form6.showmodal;
 end;
 
 procedure TForm1.cbbcmdClick(Sender: TObject);

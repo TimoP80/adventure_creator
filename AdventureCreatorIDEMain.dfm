@@ -356,6 +356,7 @@ object Form1: TForm1
     Height = 25
     Caption = 'Edit choice conditions...'
     TabOrder = 21
+    OnClick = Button3Click
   end
   object DataReader: TXMLDocument
     Left = 240
