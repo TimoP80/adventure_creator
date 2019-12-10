@@ -39,7 +39,6 @@ type
     lbl6: TLabel;
     edtnodename: TEdit;
     chkendgame: TCheckBox;
-    btn5: TButton;
     btn6: TButton;
     dlgSave2: TSaveDialog;
     mmomessages: TMemo;
@@ -111,6 +110,7 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure Button2Click(Sender: TObject);
     procedure ShowNodeLinks1Click(Sender: TObject);
+    procedure About1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -131,7 +131,7 @@ procedure LogMsg(s: string);
 
   implementation
 
-uses MetaData, VarEditor, ChoiceCommandsForm;
+uses MetaData, VarEditor, ChoiceCommandsForm, AboutForm;
 procedure UpdateCaption;
 begin
       Form1.Caption := 'Adventure Creator 1.0 IDE - ['+currentfilename+']';
@@ -390,10 +390,24 @@ if links.Count=0 then
   showmessage(links.Text);
 end;
 
+procedure TForm1.About1Click(Sender: TObject);
+begin
+IDEAboutForm.showmodal;
+end;
+
 procedure TForm1.btn1Click(Sender: TObject);
 begin
+
   thenode := AdventureData.GameNodes.Add;
+  logmsg('Node count: '+inttostr(adventuredata.GameNodes.Count));
+  if adventuredata.GameNodes.Count <= 1 then
+  begin
+  thenode.Name := 'Start';
+  LogMsg('Created start node');
+  end
+  else
   thenode.Name := '<< NEW NODE >>';
+
   UpdateNodeLists;
 end;
 

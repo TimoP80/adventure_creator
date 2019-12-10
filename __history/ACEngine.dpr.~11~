@@ -3,7 +3,12 @@ program ACEngine;
 {$APPTYPE CONSOLE}
 
 uses
-  Windows, AdventureBinary, jclstrings, Console, SysUtils;
+  Windows,
+  AdventureBinary,
+  jclstrings,
+  Console,
+  Inifiles,
+  SysUtils;
 
 const
   alphabets: array[0..10] of char = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
@@ -14,11 +19,15 @@ const
 var
   ch, choice: char;
   currentmoney, numchoices: integer;
-  moneystring, currentnode: string;
-  endgame: boolean;
+  moneystring, currentnode: ansistring;
+  wingame, endgame: boolean;
   moneydisplay, debugmode: boolean;
+  msg_gameover, msg_wrongchoice, msg_pressanykey: ansistring;
+  msgtemp, msg_gamefinished: ansistring;
   savedx, savedy, choiceinteger: integer;
   addedscore, score: integer;
+  config: TIniFile;
+ label start;
 
 function AlphabetToNumber(alpha: char): integer;
 var
@@ -34,23 +43,22 @@ begin
   end;
 end;
 
-function Ansi2Ascii(const s: AnsiString): AnsiString;
+function Ansi2Ascii (const s: AnsiString): AnsiString;
 begin
   Result := s;
   if Result <> '' then
   begin
     UniqueString(Result);
-    CharToOem(Pchar(Result), Pchar(Result));
+    CharToOem(Pchar(Result), Pansichar(Result));
   end;
 end;
 
 function Ascii2Ansi(const s: AnsiString): AnsiString;
 begin
   Result := s;
-  if Result <> '' then
-  begin
+ begin
     UniqueString(Result);
-    OemToChar(Pchar(Result), Pchar(Result));
+    OemToChar(Pansichar(Result), Pchar(Result));
   end;
 end;
 
@@ -79,6 +87,18 @@ begin
   if nodeind <> -1 then
   begin
     result := adventurebindata.gamenodes[nodeind].NodeChoiceCount;
+  end;
+end;
+
+function GetWinGameFlagFromChoice(name: string; ch: integer): boolean;
+var
+  nodeind: integer;
+begin
+  result := false;
+  nodeind := GetNodeIndex(name);
+  if nodeind <> -1 then
+  begin
+    result := adventurebindata.gamenodes[nodeind].NodeChoices[ch].wingame;
   end;
 end;
 
@@ -157,10 +177,82 @@ begin
   end;
 end;
 
+
+procedure ProcessChoiceCommands(name: string; choiceindex: integer);
+var
+  z, nodeind: integer;
+  ch: char;
+  textvaluetemp, txt: widestring;
+  valuetemp: integer;
+  cmd, variable, value: string;
+begin
+
+  nodeind := getnodeindex(name);
+  if nodeind <> -1 then
+  begin
+    // Process node commands here
+    for z := 0 to AdventureBinData.gamenodes[nodeind].NodeChoices[choiceindex].ChoiceCommandCount - 1 do
+    begin
+    cmd := AdventureBinData.gamenodes[nodeind].NodeChoices[choiceindex].ChoiceCommands[z].cmd;
+    variable := AdventureBinData.gamenodes[nodeind].NodeChoices[choiceindex].ChoiceCommands[z].varparam;
+    value := AdventureBinData.gamenodes[nodeind].NodeChoices[choiceindex].ChoiceCommands[z].value;
+
+      if cmd = 'SetVar'
+        then
+      begin
+        SetVarValue(variable, value);
+      end
+      else if cmd =
+        'IncreaseVar' then
+      begin
+        valuetemp :=
+          strtoint(getvarvalue(value));
+        valuetemp := valuetemp +
+          StrToInt(value);
+        setvarvalue(variable, inttostr(valuetemp));
+
+      end
+      else
+      if cmd =
+        'DisplayMessage' then
+      begin
+        writeln;
+        textvaluetemp := value;
+        textvaluetemp := ReplaceVars(textvaluetemp);
+        writeln(textvaluetemp);
+          ch := ReadKey;
+
+      end
+      else if cmd =
+        'TextPrompt' then
+      begin
+        writeln;
+        write(value);
+        readln(textvaluetemp);
+        SetVarValue(variable, textvaluetemp);
+      end
+
+      else if cmd =
+        'DecreaseVar' then
+      begin
+        valuetemp :=
+          strtoint(getvarvalue(variable));
+        valuetemp := valuetemp -
+          StrToInt(value);
+        setvarvalue(variable, inttostr(valuetemp));
+      end;
+
+    end;
+    // end of commands processing code
+  end;
+
+end;
+
 procedure ProcessNodeCommands(name: string);
 var
   z, nodeind: integer;
-  txt: widestring;
+  ch: char;
+  textvaluetemp, txt: widestring;
   valuetemp: integer;
 begin
 
@@ -185,6 +277,26 @@ begin
         setvarvalue(adventurebindata.GameNodes[nodeind].NodeCommands[z].varparam, inttostr(valuetemp));
 
       end
+      else
+      if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd =
+        'DisplayMessage' then
+      begin
+        writeln;
+        textvaluetemp := adventurebindata.GameNodes[nodeind].NodeCommands[z].value;
+        textvaluetemp := ReplaceVars(textvaluetemp);
+        writeln(textvaluetemp);
+          ch := ReadKey;
+
+      end
+      else if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd =
+        'TextPrompt' then
+      begin
+        writeln;
+        write(adventurebindata.GameNodes[nodeind].NodeCommands[z].value);
+        readln(textvaluetemp);
+        SetVarValue(adventurebindata.GameNodes[nodeind].NodeCommands[z].varparam, textvaluetemp);
+      end
+
       else if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd =
         'DecreaseVar' then
       begin
@@ -212,15 +324,15 @@ begin
   begin
     txt := adventurebindata.gamenodes[nodeind].nodetext;
     txt :=  ReplaceVars(txt);
-    txt := Ansi2Ascii(txt);
+   // txt := Ansi2Ascii(txt);
     if txt = '' then
     begin
       writeln('Runtime Engine Error: This node contains no text.');
     end;
     Writeln(txt);
+    writeln;
     if adventurebindata.gamenodes[nodeind].NodeChoiceCount > 0 then
     begin
-      Writeln;
       for z := 0 to adventurebindata.gamenodes[nodeind].NodeChoiceCount - 1 do
       begin
         txt := adventurebindata.gamenodes[nodeind].nodechoices[z].choicetext;
@@ -243,11 +355,12 @@ begin
 end;
 
 begin
+  config :=  TIniFile.Create('.\ACEngine.ini');
   ClrScr;
   TextBackground(blue);
   ClrEol;
   TextColor(Yellow);
-  Writeln(ansi2ascii('Adventure Creator Runtime Engine v1.0 by T. Pitkänen'));
+  Writeln('Adventure Creator Runtime Engine v1.0 by T. Pitkänen');
   textbackground(black);
   textcolor(White);
   writeln;
@@ -268,10 +381,19 @@ begin
       Writeln('File "', paramstr(1), '" not found!');
       halt;
     end;
+   // writeln('Loading '+paramstr(1));
     LoadAdventureBin(ParamStr(1));
-    Writeln('Loaded "' + ansi2ascii(adventurebindata.metatitle) + '" by ' +
-      ansi2ascii(adventurebindata.metaauthor));
+ msg_pressanykey := config.ReadString(GetVarValue('GameLanguage'),'PressAnyKey','');
+ msg_gamefinished := config.ReadString(GetVarValue('GameLanguage'),'FinishedGame','');
+ msg_wrongchoice := config.ReadString(GetVarValue('GameLanguage'),'WrongChoice','');
+ msg_gameover := config.ReadString(GetVarValue('GameLanguage'),'GameOver','');
+
+    Writeln('Loaded "' + adventurebindata.metatitle + '" by ' +
+     adventurebindata.metaauthor);
     Writeln;
+    Start:
+    begin
+
     if GetVarValue('MoneyDisplay') = 'true' then
       moneydisplay := true
     else
@@ -280,22 +402,24 @@ begin
     endgame := false;
     TextColor(lightcyan);
  //   Writeln('MoneyDisplay: ', GetVarValue('MoneyDisplay'));
-    Writeln(ansi2ascii(adventurebindata.metadescription));
+    Writeln(adventurebindata.metadescription);
     Writeln;
     textcolor(lightgray);
-    writeln(ansi2ascii('Paina mitä tahansa näppäintä'));
+    //msgtemp := msg_pressanykey;
+    writeln(msg_pressanykey);
     score := 0;
+    wingame:=false;
     choice := readkey;
 
-    while (endgame = false) and (choice <> 'q') do
+    while ((wingame = false) or (endgame = false)) and (choice <> 'q') do
     begin
       ClrScr;
       TextBackground(blue);
       TextColor(yellow);
       ClrEol;
-      ProcessNodeCommands(currentnode);
-      Writeln(ansi2ascii(adventurebindata.metatitle) + ' by ' +
-        ansi2ascii(adventurebindata.metaauthor));
+
+      Writeln(adventurebindata.metatitle + ' by ' +
+     adventurebindata.metaauthor);
       if debugmode = true then
       begin
         gotoxy(35, 1);
@@ -315,11 +439,17 @@ begin
       writeln;
       TextBackground(black);
       TextColor(white);
-      DisplayNode(currentnode);
+      if wingame = true then
+      begin
+        break;
+      end;
       if endgame = true then
       begin
         break;
       end;
+      DisplayNode(currentnode);
+      ProcessNodeCommands(currentnode);
+
       Write('> ');
       Readln(choice);
       if choice = 'q' then
@@ -331,11 +461,18 @@ begin
         if choiceinteger <= numchoices - 1 then
         begin
           endgame := GetEndGameFlagFromChoice(currentnode, choiceinteger);
+          wingame := GetWinGameFlagFromChoice(currentnode, choiceinteger);
+
           addedscore := GetScoreFromChoice(currentnode, choiceinteger);
+           ProcessChoiceCommands(currentnode, choiceinteger);
           currentnode := GetTargetNodeFromChoice(currentnode,
             choiceinteger);
           Inc(score, addedscore);
-
+           if wingame=true then
+             begin
+               endgame := true;
+               break;
+             end;
           if currentnode = '' then
           begin
             Writeln('Runtime error: Null NODE!');
@@ -344,14 +481,36 @@ begin
         end
         else
         begin
-          Writeln(ansi2ascii('Väärä valinta, yritä uudelleen!'));
+
+          Writeln(msg_wrongchoice);
           ch := readkey;
+          writeln;
         end;
       end;
-      Writeln;
+
     end;
     // display final node
+    if wingame=true then
+    begin
+    writeln;
     DisplayNode(currentnode);
+    writeln;
+    msgtemp := msg_gamefinished;
+    msgtemp := Stringreplace(msgtemp,'%score%',IntToStr(score), [rfReplaceAll]);
+    msgtemp := Stringreplace(msgtemp,'%maxscore%',IntToStr(AdventureBinData.MaxScore), [rfReplaceAll]);
+   writeln(msgtemp);
+
+    //writeln('You finished the game with the score '+inttostr(score)+ ' out of '+inttostr(AdventureBinData.MaxScore));
+    end else
+    begin
+    DisplayNode(currentnode);
+    write (msg_gameover);
+    Readln(choice);
+    if choice='y' then Goto Start;
+
+    end;
+    end;
+
   end;
 
 end.

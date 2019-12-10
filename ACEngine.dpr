@@ -223,7 +223,18 @@ begin
           ch := ReadKey;
 
       end
-      else if cmd =
+      else
+        if cmd =
+        'DisplayMessageDirect' then
+      begin
+        writeln;
+        textvaluetemp := value;
+        textvaluetemp := ReplaceVars(textvaluetemp);
+        writeln(textvaluetemp);
+
+      end
+      else
+      if cmd =
         'TextPrompt' then
       begin
         writeln;
@@ -286,6 +297,16 @@ begin
         textvaluetemp := ReplaceVars(textvaluetemp);
         writeln(textvaluetemp);
           ch := ReadKey;
+
+      end
+      else
+      if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd =
+        'DisplayMessageDirect' then
+      begin
+        writeln;
+        textvaluetemp := adventurebindata.GameNodes[nodeind].NodeCommands[z].value;
+        textvaluetemp := ReplaceVars(textvaluetemp);
+        writeln(textvaluetemp);
 
       end
       else if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd =
