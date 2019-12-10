@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
 
 type
-  TIDEAboutForm = class(TForm)
+  TForm5 = class(TForm)
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
@@ -20,7 +20,7 @@ type
   end;
 
 var
-  IDEAboutForm: TIDEAboutForm;
+  IDEAboutForm: TForm5;
 
 implementation
 

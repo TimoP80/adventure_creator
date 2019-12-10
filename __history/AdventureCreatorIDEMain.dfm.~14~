@@ -101,6 +101,7 @@ object Form1: TForm1
     ItemHeight = 13
     TabOrder = 1
     OnClick = lstchoicelistClick
+    OnMouseUp = lstchoicelistMouseUp
   end
   object edtchoicetext: TEdit
     Left = 432
@@ -170,22 +171,13 @@ object Form1: TForm1
     TabOrder = 9
     OnClick = chkendgameClick
   end
-  object btn5: TButton
-    Left = 208
-    Top = 8
-    Width = 105
-    Height = 25
-    Caption = 'Init booleans'
-    TabOrder = 10
-    OnClick = btn5Click
-  end
   object btn6: TButton
     Left = 840
     Top = 24
     Width = 89
     Height = 25
     Caption = 'Apply changes'
-    TabOrder = 11
+    TabOrder = 10
     OnClick = btn6Click
   end
   object mmomessages: TMemo
@@ -193,14 +185,14 @@ object Form1: TForm1
     Top = 672
     Width = 1105
     Height = 89
-    TabOrder = 12
+    TabOrder = 11
   end
   object edtchoicescore: TEdit
     Left = 328
     Top = 424
     Width = 105
     Height = 21
-    TabOrder = 13
+    TabOrder = 12
     OnKeyUp = edtchoicescoreKeyUp
   end
   object btn7: TButton
@@ -209,7 +201,7 @@ object Form1: TForm1
     Width = 121
     Height = 25
     Caption = 'Insert choice'
-    TabOrder = 14
+    TabOrder = 13
     OnClick = btn7Click
   end
   object grp1: TGroupBox
@@ -218,7 +210,7 @@ object Form1: TForm1
     Width = 529
     Height = 257
     Caption = 'Node commands:'
-    TabOrder = 15
+    TabOrder = 14
     object lbl8: TLabel
       Left = 8
       Top = 24
@@ -284,9 +276,10 @@ object Form1: TForm1
       Items.Strings = (
         'SetVar'
         'DisplayMessage'
-        'WaitForKeyPress'
+        'DisplayMessageDirect'
         'IncreaseVar'
-        'DecreaseVar')
+        'DecreaseVar'
+        'TextPrompt')
     end
     object cbbvarsel: TComboBox
       Left = 240
@@ -310,7 +303,7 @@ object Form1: TForm1
     Top = 379
     Width = 129
     Height = 21
-    TabOrder = 16
+    TabOrder = 15
   end
   object Button1: TButton
     Left = 895
@@ -318,7 +311,7 @@ object Form1: TForm1
     Width = 66
     Height = 24
     Caption = 'Create'
-    TabOrder = 17
+    TabOrder = 16
     OnClick = Button1Click
   end
   object node_parent: TComboBox
@@ -326,7 +319,7 @@ object Form1: TForm1
     Top = 27
     Width = 154
     Height = 21
-    TabOrder = 18
+    TabOrder = 17
     OnClick = node_parentClick
   end
   object nodes_tree: TTreeView
@@ -335,8 +328,26 @@ object Form1: TForm1
     Width = 305
     Height = 583
     Indent = 19
-    TabOrder = 19
+    TabOrder = 18
     OnClick = nodes_treeClick
+  end
+  object gamewinner: TCheckBox
+    Left = 328
+    Top = 476
+    Width = 233
+    Height = 25
+    Caption = 'This choice causes game win condition'
+    TabOrder = 19
+    OnClick = gamewinnerClick
+  end
+  object Button2: TButton
+    Left = 968
+    Top = 319
+    Width = 137
+    Height = 25
+    Caption = 'Edit choice commands...'
+    TabOrder = 20
+    OnClick = Button2Click
   end
   object DataReader: TXMLDocument
     Left = 240
@@ -389,11 +400,16 @@ object Form1: TForm1
         Caption = 'Validate Nodes'
         OnClick = ValidateNodes1Click
       end
+      object ShowNodeLinks1: TMenuItem
+        Caption = 'Show Node Links'
+        OnClick = ShowNodeLinks1Click
+      end
     end
     object Help1: TMenuItem
       Caption = 'Help'
       object About1: TMenuItem
         Caption = 'About'
+        OnClick = About1Click
       end
     end
   end

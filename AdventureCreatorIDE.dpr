@@ -9,8 +9,9 @@ uses
   Vcl.Themes,
   Vcl.Styles,
   ChoiceCommandsForm in 'ChoiceCommandsForm.pas' {Form4},
-  AdventureFile in 'AdventureFile.pas',
-  AboutForm in 'AboutForm.pas' {Form5};
+  AboutForm in 'AboutForm.pas' {IDEAboutForm},
+  ChoiceConditionsForm in 'ChoiceConditionsForm.pas' {Form6},
+  AdventureFile in 'AdventureFile.pas';
 
 {$R *.res}
 
@@ -21,6 +22,8 @@ begin
   Application.CreateForm(TForm2, Form2);
   Application.CreateForm(TForm3, Form3);
   Application.CreateForm(TForm4, Form4);
-  Application.CreateForm(TForm5, IDEAboutForm);
+  Application.CreateForm(TIDEAboutForm, IDEAboutForm);
+  Application.CreateForm(TForm6, Form6);
+  Application.CreateForm(TIDEAboutForm, IDEAboutForm);
   Application.Run;
 end.

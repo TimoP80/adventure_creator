@@ -3,7 +3,16 @@
   <Transactions>
     <Transaction>2019.12.09 19:37:18.613,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
     <Transaction>2019.12.10 14:14:34.669,=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.pas</Transaction>
-    <Transaction>2019.12.10 14:14:43.144,C:\CodeProjects\AdventureCreator\src\adventurecreator\AboutForm.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.dfm</Transaction>
     <Transaction>2019.12.10 14:14:43.144,C:\CodeProjects\AdventureCreator\src\adventurecreator\AboutForm.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.pas</Transaction>
+    <Transaction>2019.12.10 14:14:43.144,C:\CodeProjects\AdventureCreator\src\adventurecreator\AboutForm.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.dfm</Transaction>
+    <Transaction>2019.12.10 19:53:03.698,=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit6.pas</Transaction>
+    <Transaction>2019.12.10 19:56:17.569,C:\CodeProjects\AdventureCreator\src\adventurecreator\ChoiceConditionsForm.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit6.pas</Transaction>
+    <Transaction>2019.12.10 19:56:17.569,C:\CodeProjects\AdventureCreator\src\adventurecreator\ChoiceConditionsForm.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit6.dfm</Transaction>
+    <Transaction>2019.12.10 20:03:31.623,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
+    <Transaction>2019.12.10 20:31:00.272,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
+    <Transaction>2019.12.10 20:31:33.976,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
+    <Transaction>2019.12.10 20:33:46.065,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
+    <Transaction>2019.12.10 20:34:45.262,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
+    <Transaction>2019.12.10 20:36:19.448,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
   </Transactions>
 </BorlandProject>

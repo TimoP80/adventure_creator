@@ -349,6 +349,14 @@ object Form1: TForm1
     TabOrder = 20
     OnClick = Button2Click
   end
+  object Button3: TButton
+    Left = 832
+    Top = 321
+    Width = 121
+    Height = 25
+    Caption = 'Edit choice conditions...'
+    TabOrder = 21
+  end
   object DataReader: TXMLDocument
     Left = 240
     Top = 120
@@ -403,6 +411,10 @@ object Form1: TForm1
       object ShowNodeLinks1: TMenuItem
         Caption = 'Show Node Links'
         OnClick = ShowNodeLinks1Click
+      end
+      object InitnewfieldsinXMLdevonly1: TMenuItem
+        Caption = 'Init new fields in XML (dev only)'
+        OnClick = InitnewfieldsinXMLdevonly1Click
       end
     end
     object Help1: TMenuItem

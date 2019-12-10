@@ -6,7 +6,8 @@ uses
   Windows, Messages, AdventureFile, AdventureBinary, SysUtils, Variants,
   Classes, Graphics,
   Controls, Forms,
-  Dialogs, xmldom, XMLIntf, msxmldom, XMLDoc, StdCtrls, Menus, Vcl.ComCtrls;
+  Dialogs, xmldom, XMLIntf, msxmldom, XMLDoc, StdCtrls, Menus, Vcl.ComCtrls,
+  Vcl.WinXCtrls;
 
 type
   TForm1 = class(TForm)
@@ -70,6 +71,8 @@ type
     gamewinner: TCheckBox;
     Button2: TButton;
     ShowNodeLinks1: TMenuItem;
+    Button3: TButton;
+    InitnewfieldsinXMLdevonly1: TMenuItem;
     procedure LoadAdventureFile1Click(Sender: TObject);
     procedure Quit1Click(Sender: TObject);
     procedure btn3Click(Sender: TObject);
@@ -111,6 +114,7 @@ type
     procedure Button2Click(Sender: TObject);
     procedure ShowNodeLinks1Click(Sender: TObject);
     procedure About1Click(Sender: TObject);
+    procedure InitnewfieldsinXMLdevonly1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -126,6 +130,7 @@ var
   CurrentFilename: string;
   NewNode: IXMLNodeType;
   Commandlist: IXMLCommandListType;
+  ConditionList:IXMLConditionListType;
 
 procedure LogMsg(s: string);
 
@@ -225,6 +230,7 @@ begin
     UpdateVariables;
     currentfilename := extractfilename(dlgopen1.FileName);
    updatecaption;
+
   end;
 end;
 
@@ -288,6 +294,7 @@ begin
 
   thechoice.Addscore:=0;
   Commandlist := thenode.ChoiceCommands.Add;
+  conditionlist := thenode.ChoiceConditions.Add;
 
   UpdateChoices;
 
@@ -297,6 +304,7 @@ procedure TForm1.btn4Click(Sender: TObject);
 begin
   TheNode.Choices.Delete(lstchoicelist.itemindex);
   TheNode.ChoiceCommands.Delete(lstchoicelist.itemindex);
+  TheNode.ChoiceConditions.Delete(lstchoicelist.itemindex);
 
   UpdateChoices;
 
@@ -363,7 +371,6 @@ begin
     DataReader.SaveToFile(dlgsave1.FileName);
     currentfilename := extractfilename(dlgsave1.FileName);
     updatecaption;
-
     //    form1.Caption := 'Adventure Creator 1.0 IDE - ['+extractfilename(dlgsave1.FileName)+']';
 
   end;
@@ -457,6 +464,21 @@ end;
 procedure TForm1.gamewinnerClick(Sender: TObject);
 begin
  thechoice.wingame := gamewinner.Checked;
+end;
+
+procedure TForm1.InitnewfieldsinXMLdevonly1Click(Sender: TObject);
+var z,y: integer;
+cond: IXMLConditionListType;
+begin
+ for y := 0 to AdventureData.GameNodes.Count-1 do
+  begin
+      for z := 0 to adventuredata.GameNodes.Node[y].Choices.Count-1 do
+       begin
+
+        cond := adventuredata.GameNodes.Node[y].ChoiceConditions.Add;
+       end;
+  end;
+  logmsg('Conditions added to existing project!');
 end;
 
 procedure TForm1.chkendgameClick(Sender: TObject);
