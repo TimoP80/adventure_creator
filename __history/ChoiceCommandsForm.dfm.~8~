@@ -89,8 +89,7 @@ object Form4: TForm4
         'DisplayMessageDirect'
         'IncreaseVar'
         'DecreaseVar'
-        'TextPrompt'
-        'RandomNumber')
+        'TextPrompt')
     end
     object cbbvarsel: TComboBox
       Left = 240

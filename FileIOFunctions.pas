@@ -2,9 +2,7 @@ unit FileIOFunctions;
 
 interface
 
-uses
-    
-    SysUtils;
+
 
 procedure WriteStringNoLength(var f: file; Data: ansistring);
 procedure WriteString(var f: file; Data: ansistring);

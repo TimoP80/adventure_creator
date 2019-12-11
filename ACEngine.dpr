@@ -1,7 +1,7 @@
 program ACEngine;
 
 {$APPTYPE CONSOLE}
- {$IFOPT D-}{$WEAKLINKRTTI ON}{$ENDIF}
+{$IFOPT D-}{$WEAKLINKRTTI ON}{$ENDIF}
 {$RTTI EXPLICIT METHODS([]) PROPERTIES([]) FIELDS([])}
 
 uses
@@ -13,13 +13,20 @@ uses
   SysUtils;
 
 const
-  alphabets: array[0..10] of char = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-    'i',
-    'j', 'k');
-  numbers: array[0..10] of integer = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+  alphabets: array [0 .. 10] of char = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+    'i', 'j', 'k');
+  numbers: array [0 .. 10] of integer = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+type
+  choicemapping = record
+    letter: char;
+    number: integer;
+  end;
 
 var
   ch, choice: char;
+  choicemappings: array of choicemapping;
+  choicemappingcount: integer;
   currentmoney, numchoices: integer;
   moneystring, currentnode: ansistring;
   wingame, endgame: boolean;
@@ -30,7 +37,18 @@ var
   savedx, savedy, choiceinteger: integer;
   addedscore, score: integer;
   config: TIniFile;
- label start;
+
+label start;
+
+function ChoiceToNumber (choice: char): integer;
+var y: integer;
+begin
+ for y := 0 to choicemappingcount-1 do
+ begin  
+   if choice = choicemappings[y].letter then
+     result := choicemappings[y].number; 
+ end;
+end;
 
 function AlphabetToNumber(alpha: char): integer;
 var
@@ -46,17 +64,16 @@ begin
   end;
 end;
 
-
 function GetNodeIndex(name: string): integer;
 var
   u: integer;
 begin
-  result := -1;
+  Result := -1;
   for u := 0 to AdventureBinData.GameNodeCount - 1 do
   begin
     if name = AdventureBinData.GameNodes[u].NodeName then
     begin
-      result := u;
+      Result := u;
       exit;
     end;
 
@@ -67,11 +84,11 @@ function GetChoiceCountInNode(name: string): integer;
 var
   nodeind: integer;
 begin
-  result := 0;
+  Result := 0;
   nodeind := GetNodeIndex(name);
   if nodeind <> -1 then
   begin
-    result := adventurebindata.gamenodes[nodeind].NodeChoiceCount;
+    Result := AdventureBinData.GameNodes[nodeind].NodeChoiceCount;
   end;
 end;
 
@@ -79,11 +96,11 @@ function GetWinGameFlagFromChoice(name: string; ch: integer): boolean;
 var
   nodeind: integer;
 begin
-  result := false;
+  Result := false;
   nodeind := GetNodeIndex(name);
   if nodeind <> -1 then
   begin
-    result := adventurebindata.gamenodes[nodeind].NodeChoices[ch].wingame;
+    Result := AdventureBinData.GameNodes[nodeind].NodeChoices[ch].wingame;
   end;
 end;
 
@@ -91,11 +108,11 @@ function GetEndGameFlagFromChoice(name: string; ch: integer): boolean;
 var
   nodeind: integer;
 begin
-  result := false;
+  Result := false;
   nodeind := GetNodeIndex(name);
   if nodeind <> -1 then
   begin
-    result := adventurebindata.gamenodes[nodeind].NodeChoices[ch].endgame;
+    Result := AdventureBinData.GameNodes[nodeind].NodeChoices[ch].endgame;
   end;
 end;
 
@@ -103,11 +120,11 @@ function GetScoreFromChoice(name: string; ch: integer): integer;
 var
   nodeind: integer;
 begin
-  result := 0;
+  Result := 0;
   nodeind := GetNodeIndex(name);
   if nodeind <> -1 then
   begin
-    result := adventurebindata.gamenodes[nodeind].NodeChoices[ch].addscore;
+    Result := AdventureBinData.GameNodes[nodeind].NodeChoices[ch].addscore;
   end;
 end;
 
@@ -118,7 +135,7 @@ begin
   nodeind := GetNodeIndex(name);
   if nodeind <> -1 then
   begin
-    result := adventurebindata.gamenodes[nodeind].NodeChoices[ch].Targetnode;
+    Result := AdventureBinData.GameNodes[nodeind].NodeChoices[ch].Targetnode;
   end;
 end;
 
@@ -144,7 +161,7 @@ begin
   begin
     if varname = AdventureBinData.Variables[u].name then
     begin
-      result := AdventureBinData.Variables[u].value;
+      Result := AdventureBinData.Variables[u].value;
       exit;
     end;
   end;
@@ -154,73 +171,87 @@ function ReplaceVars(str: string): string;
 var
   u: integer;
 begin
-  result := str;
+  Result := str;
   for u := 0 to AdventureBinData.VariableCount - 1 do
   begin
-    result := STringReplace(result, '$' + AdventureBinData.variables[u].name,
-      AdventureBinData.variables[u].value, [rfReplaceAll]);
+    Result := STringReplace(Result, '$' + AdventureBinData.Variables[u].name,
+      AdventureBinData.Variables[u].value, [rfReplaceAll]);
   end;
 end;
-
 
 procedure ProcessChoiceCommands(name: string; choiceindex: integer);
 var
   z, nodeind: integer;
   ch: char;
-  textvaluetemp, txt: widestring;
+  varvaluetemp, textvaluetemp, txt: widestring;
+  randomnumber: integer;
   valuetemp: integer;
   cmd, variable, value: string;
 begin
 
-  nodeind := getnodeindex(name);
+  nodeind := GetNodeIndex(name);
   if nodeind <> -1 then
   begin
     // Process node commands here
-    for z := 0 to AdventureBinData.gamenodes[nodeind].NodeChoices[choiceindex].ChoiceCommandCount - 1 do
+    for z := 0 to AdventureBinData.GameNodes[nodeind].NodeChoices[choiceindex]
+      .ChoiceCommandCount - 1 do
     begin
-    cmd := AdventureBinData.gamenodes[nodeind].NodeChoices[choiceindex].ChoiceCommands[z].cmd;
-    variable := AdventureBinData.gamenodes[nodeind].NodeChoices[choiceindex].ChoiceCommands[z].varparam;
-    value := AdventureBinData.gamenodes[nodeind].NodeChoices[choiceindex].ChoiceCommands[z].value;
+      cmd := AdventureBinData.GameNodes[nodeind].NodeChoices[choiceindex]
+        .ChoiceCommands[z].cmd;
+      variable := AdventureBinData.GameNodes[nodeind].NodeChoices[choiceindex]
+        .ChoiceCommands[z].varparam;
+      value := AdventureBinData.GameNodes[nodeind].NodeChoices[choiceindex]
+        .ChoiceCommands[z].value;
 
-      if cmd = 'SetVar'
-        then
+      if cmd = 'SetVar' then
       begin
         SetVarValue(variable, value);
       end
-      else if cmd =
-        'IncreaseVar' then
+      else if cmd = 'IncreaseVar' then
       begin
-        valuetemp :=
-          strtoint(getvarvalue(value));
-        valuetemp := valuetemp +
-          StrToInt(value);
-        setvarvalue(variable, inttostr(valuetemp));
+        if pos('$', value) <> 0 then
+        begin
+          varvaluetemp := ReplaceVars(value);
+          valuetemp := strtoint(GetVarValue(value));
+
+          valuetemp := valuetemp + strtoint(varvaluetemp);
+        end
+        else
+        begin
+          valuetemp := strtoint(GetVarValue(value));
+
+          valuetemp := valuetemp + strtoint(value);
+          SetVarValue(variable, inttostr(valuetemp));
+        end;
 
       end
-      else
-      if cmd =
-        'DisplayMessage' then
-      begin
-        writeln;
-        textvaluetemp := value;
-        textvaluetemp := ReplaceVars(textvaluetemp);
-        writeln(textvaluetemp);
-          ch := ReadKey;
-
-      end
-      else
-        if cmd =
-        'DisplayMessageDirect' then
+      else if cmd = 'DisplayMessage' then
       begin
         writeln;
         textvaluetemp := value;
         textvaluetemp := ReplaceVars(textvaluetemp);
         writeln(textvaluetemp);
+        ch := ReadKey;
 
       end
-      else
-      if cmd =
-        'TextPrompt' then
+      else if cmd = 'RandomNumber' then
+      begin
+        writeln;
+        valuetemp := strtoint(value);
+        randomnumber := random(valuetemp);
+        SetVarValue(variable, inttostr(randomnumber));
+
+      end
+
+      else if cmd = 'DisplayMessageDirect' then
+      begin
+        writeln;
+        textvaluetemp := value;
+        textvaluetemp := ReplaceVars(textvaluetemp);
+        writeln(textvaluetemp);
+
+      end
+      else if cmd = 'TextPrompt' then
       begin
         writeln;
         write(value);
@@ -228,14 +259,11 @@ begin
         SetVarValue(variable, textvaluetemp);
       end
 
-      else if cmd =
-        'DecreaseVar' then
+      else if cmd = 'DecreaseVar' then
       begin
-        valuetemp :=
-          strtoint(getvarvalue(variable));
-        valuetemp := valuetemp -
-          StrToInt(value);
-        setvarvalue(variable, inttostr(valuetemp));
+        valuetemp := strtoint(GetVarValue(variable));
+        valuetemp := valuetemp - strtoint(value);
+        SetVarValue(variable, inttostr(valuetemp));
       end;
 
     end;
@@ -248,69 +276,112 @@ procedure ProcessNodeCommands(name: string);
 var
   z, nodeind: integer;
   ch: char;
-  textvaluetemp, txt: widestring;
-  valuetemp: integer;
+  varnametemp, textvaluetemp, txt: widestring;
+  varvaluetemp, valuetemp: integer;
 begin
 
-  nodeind := getnodeindex(name);
+  nodeind := GetNodeIndex(name);
   if nodeind <> -1 then
   begin
     // Process node commands here
-    for z := 0 to AdventureBinData.gamenodes[nodeind].NodeCommandCount - 1 do
+    for z := 0 to AdventureBinData.GameNodes[nodeind].NodeCommandCount - 1 do
     begin
-      if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd = 'SetVar'
-        then
+      if AdventureBinData.GameNodes[nodeind].NodeCommands[z].cmd = 'SetVar' then
       begin
-        SetVarValue(adventurebindata.GameNodes[nodeind].NodeCommands[z].varparam, adventurebindata.GameNodes[nodeind].NodeCommands[z].value);
+        SetVarValue(AdventureBinData.GameNodes[nodeind].NodeCommands[z]
+          .varparam, AdventureBinData.GameNodes[nodeind].NodeCommands[z].value);
       end
-      else if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd =
-        'IncreaseVar' then
+      else if AdventureBinData.GameNodes[nodeind].NodeCommands[z].cmd = 'IncreaseVar'
+      then
       begin
-        valuetemp :=
-          strtoint(getvarvalue(adventurebindata.GameNodes[nodeind].NodeCommands[z].varparam));
-        valuetemp := valuetemp +
-          StrToInt(adventurebindata.GameNodes[nodeind].NodeCommands[z].value);
-        setvarvalue(adventurebindata.GameNodes[nodeind].NodeCommands[z].varparam, inttostr(valuetemp));
+        if pos('$', AdventureBinData.GameNodes[nodeind].NodeCommands[z]
+          .value) <> 0 then
+        begin
+
+          varvaluetemp :=
+            strtoint(ReplaceVars(AdventureBinData.GameNodes[nodeind]
+            .NodeCommands[z].value));
+          valuetemp :=
+            strtoint(GetVarValue(AdventureBinData.GameNodes[nodeind]
+            .NodeCommands[z].varparam));
+
+          valuetemp := valuetemp + varvaluetemp;
+          SetVarValue(AdventureBinData.GameNodes[nodeind].NodeCommands[z]
+            .varparam, inttostr(valuetemp));
+        end
+        else
+        begin
+
+          valuetemp :=
+            strtoint(GetVarValue(AdventureBinData.GameNodes[nodeind]
+            .NodeCommands[z].varparam));
+          valuetemp := valuetemp +
+            strtoint(AdventureBinData.GameNodes[nodeind].NodeCommands[z].value);
+          SetVarValue(AdventureBinData.GameNodes[nodeind].NodeCommands[z]
+            .varparam, inttostr(valuetemp));
+        end;
 
       end
-      else
-      if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd =
-        'DisplayMessage' then
+      else if AdventureBinData.GameNodes[nodeind].NodeCommands[z].cmd = 'DisplayMessage'
+      then
       begin
         writeln;
-        textvaluetemp := adventurebindata.GameNodes[nodeind].NodeCommands[z].value;
+        textvaluetemp := AdventureBinData.GameNodes[nodeind]
+          .NodeCommands[z].value;
         textvaluetemp := ReplaceVars(textvaluetemp);
         writeln(textvaluetemp);
-          ch := ReadKey;
+        ch := ReadKey;
 
       end
-      else
-      if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd =
-        'DisplayMessageDirect' then
+      else if AdventureBinData.GameNodes[nodeind].NodeCommands[z].cmd = 'DisplayMessageDirect'
+      then
       begin
         writeln;
-        textvaluetemp := adventurebindata.GameNodes[nodeind].NodeCommands[z].value;
+        textvaluetemp := AdventureBinData.GameNodes[nodeind]
+          .NodeCommands[z].value;
         textvaluetemp := ReplaceVars(textvaluetemp);
         writeln(textvaluetemp);
 
       end
-      else if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd =
-        'TextPrompt' then
+      else if AdventureBinData.GameNodes[nodeind].NodeCommands[z].cmd = 'TextPrompt'
+      then
       begin
         writeln;
-        write(adventurebindata.GameNodes[nodeind].NodeCommands[z].value);
+        write(AdventureBinData.GameNodes[nodeind].NodeCommands[z].value);
         readln(textvaluetemp);
-        SetVarValue(adventurebindata.GameNodes[nodeind].NodeCommands[z].varparam, textvaluetemp);
+        SetVarValue(AdventureBinData.GameNodes[nodeind].NodeCommands[z]
+          .varparam, textvaluetemp);
       end
 
-      else if adventurebindata.GameNodes[nodeind].NodeCommands[z].cmd =
-        'DecreaseVar' then
+      else if AdventureBinData.GameNodes[nodeind].NodeCommands[z].cmd = 'DecreaseVar'
+      then
       begin
-        valuetemp :=
-          strtoint(getvarvalue(adventurebindata.GameNodes[nodeind].NodeCommands[z].varparam));
-        valuetemp := valuetemp -
-          StrToInt(adventurebindata.GameNodes[nodeind].NodeCommands[z].value);
-        setvarvalue(adventurebindata.GameNodes[nodeind].NodeCommands[z].varparam, inttostr(valuetemp));
+        if pos('$', AdventureBinData.GameNodes[nodeind].NodeCommands[z]
+          .value) <> 0 then
+        begin
+
+          varvaluetemp :=
+            strtoint(ReplaceVars(AdventureBinData.GameNodes[nodeind]
+            .NodeCommands[z].value));
+          valuetemp :=
+            strtoint(GetVarValue(AdventureBinData.GameNodes[nodeind]
+            .NodeCommands[z].varparam));
+
+          valuetemp := valuetemp - varvaluetemp;
+          SetVarValue(AdventureBinData.GameNodes[nodeind].NodeCommands[z]
+            .varparam, inttostr(valuetemp));
+        end
+        else
+        begin
+
+          valuetemp :=
+            strtoint(GetVarValue(AdventureBinData.GameNodes[nodeind]
+            .NodeCommands[z].varparam));
+          valuetemp := valuetemp -
+            strtoint(AdventureBinData.GameNodes[nodeind].NodeCommands[z].value);
+          SetVarValue(AdventureBinData.GameNodes[nodeind].NodeCommands[z]
+            .varparam, inttostr(valuetemp));
+        end;
       end;
 
     end;
@@ -319,32 +390,117 @@ begin
 
 end;
 
+function GetNodeVisibilityByCondition(nodeindex: integer;
+  choiceindex: integer): boolean;
+var
+  value, cmd, varparam: string;
+var
+  eval: integer;
+var
+  u: integer;
+var
+  conditions_true, conditions_false: integer;
+var
+  current_condition: boolean;
+
+  begin
+ // by default return true if no conditions are present
+ result := true;
+ 
+  if AdventureBinData.GameNodes[nodeindex].NodeChoices[choiceindex]
+    .ChoiceConditionCount > 0 then
+  begin
+    // choice contains conditions so process it here
+    conditions_true := 0;
+    conditions_false := 0;
+    for u := 0 to AdventureBinData.GameNodes[nodeindex].NodeChoices[choiceindex]
+      .ChoiceConditionCount - 1 do
+    begin
+      value := AdventureBinData.GameNodes[nodeindex].NodeChoices[choiceindex]
+        .ChoiceConditions[u].value;
+      cmd := AdventureBinData.GameNodes[nodeindex].NodeChoices[choiceindex]
+        .ChoiceConditions[u].cmd;
+      varparam := AdventureBinData.GameNodes[nodeindex].NodeChoices[choiceindex]
+        .ChoiceConditions[u].varparam;
+      eval := AdventureBinData.GameNodes[nodeindex].NodeChoices[choiceindex]
+        .ChoiceConditions[u].eval;
+
+      case eval of
+        less_than_or_equal:
+          begin
+            current_condition := strtoint(GetVarValue(varparam)) <= strtoint(value);
+          end;
+        larger_than_or_equal:
+          begin
+            current_condition := strtoint(GetVarValue(varparam)) >= strtoint(value);
+          end;
+        less_than:
+          begin
+            current_condition := strtoint(GetVarValue(varparam)) < strtoint(value);
+          end;
+        larger_than:
+          begin
+            current_condition := strtoint(GetVarValue(varparam)) > strtoint(value);
+          end;
+        is_equal:
+          begin
+            current_condition := strtoint(GetVarValue(varparam)) = strtoint(value);
+          end;
+        not_equal_to:
+          begin
+            current_condition := strtoint(GetVarValue(varparam)) <> strtoint(value);
+          end;
+      end;
+      if current_condition = true then inc(conditions_true);
+      if current_condition = false then inc(conditions_false);
+      
+    end;
+  end;
+
+  result := (conditions_true = AdventureBinData.GameNodes[nodeindex].NodeChoices[choiceindex]
+      .ChoiceConditionCount);
+end;
+
 procedure DisplayNode(name: string);
 var
   z, nodeind: integer;
   txt: widestring;
   valuetemp: integer;
 begin
-  nodeind := getnodeindex(name);
+  nodeind := GetNodeIndex(name);
   if nodeind <> -1 then
   begin
-    txt := adventurebindata.gamenodes[nodeind].nodetext;
-    txt :=  ReplaceVars(txt);
-   // txt := Ansi2Ascii(txt);
+    txt := AdventureBinData.GameNodes[nodeind].nodetext;
+    txt := ReplaceVars(txt);
+    // txt := Ansi2Ascii(txt);
     if txt = '' then
     begin
       writeln('Runtime Engine Error: This node contains no text.');
     end;
-    Writeln(txt);
+    writeln(txt);
     writeln;
-    if adventurebindata.gamenodes[nodeind].NodeChoiceCount > 0 then
+    if AdventureBinData.GameNodes[nodeind].NodeChoiceCount > 0 then
     begin
-      for z := 0 to adventurebindata.gamenodes[nodeind].NodeChoiceCount - 1 do
+      // process node conditions here
+      // map visible choices to a,b,c and the corresponding
+      // number for it
+      choicemappingcount := 0;
+
+      for z := 0 to AdventureBinData.GameNodes[nodeind].NodeChoiceCount - 1 do
       begin
-        txt := adventurebindata.gamenodes[nodeind].nodechoices[z].choicetext;
+       setlength(choicemappings, choicemappingcount+1);
+        txt := AdventureBinData.GameNodes[nodeind].NodeChoices[z].choicetext;
 
         GotoXY(7, wherey);
-        Writeln(alphabets[z], '. ', txt);
+        if GetNodeVisibilityByCondition(nodeind, z)=true then
+        begin
+        writeln(alphabets[z], '. ', txt);
+        choicemappings[choicemappingcount].letter := alphabets[choicemappingcount];
+        choicemappings[choicemappingcount].number := z;
+        end;
+        
+        inc(choicemappingcount);
+        
       end;
       writeln;
     end;
@@ -357,167 +513,175 @@ var
   moneyvar: string;
 begin
   moneyvar := GetVarValue('MoneyVar');
-  currentmoney := StrToInt(GetVarValue(moneyvar));
+  currentmoney := strtoint(GetVarValue(moneyvar));
 end;
 
 begin
-  config :=  TIniFile.Create('.\ACEngine.ini');
+  config := TIniFile.Create('.\ACEngine.ini');
   ClrScr;
   TextBackground(blue);
   ClrEol;
   TextColor(Yellow);
-  Writeln('Adventure Creator Runtime Engine v1.0 by T. Pitkänen');
-  textbackground(black);
-  textcolor(White);
+  writeln('Adventure Creator Runtime Engine v1.0 by T. Pitkänen');
+  TextBackground(black);
+  TextColor(White);
   writeln;
   if lowercase(extractfilename(paramstr(0))) = lowercase('ACEngine.exe') then
   begin
-   writeln('Paramstr(0) == '+extractfilename(paramstr(0)));
-   writeln('Usage: ACEngine.EXE <adventurefile>');
-    Writeln;
-  end else
+    writeln('Paramstr(0) == ' + extractfilename(paramstr(0)));
+    writeln('Usage: ACEngine.EXE <adventurefile>');
+    writeln;
+  end
+  else
   begin
-  datafile := changefileext(extractfilename(paramstr(0)),'.agf');
+    datafile := changefileext(extractfilename(paramstr(0)), '.agf');
   end;
 
   if datafile <> '' then
   begin
     if FileExists(datafile) = false then
     begin
-      Writeln('File "', paramstr(1), '" not found!');
+      writeln('File "', paramstr(1), '" not found!');
       halt;
     end;
-   // writeln('Loading '+paramstr(1));
+    // writeln('Loading '+paramstr(1));
     LoadAdventureBin(datafile);
- msg_pressanykey := config.ReadString(GetVarValue('GameLanguage'),'PressAnyKey','');
- msg_gamefinished := config.ReadString(GetVarValue('GameLanguage'),'FinishedGame','');
- msg_wrongchoice := config.ReadString(GetVarValue('GameLanguage'),'WrongChoice','');
- msg_gameover := config.ReadString(GetVarValue('GameLanguage'),'GameOver','')+' ';
+    msg_pressanykey := config.ReadString(GetVarValue('GameLanguage'),
+      'PressAnyKey', '');
+    msg_gamefinished := config.ReadString(GetVarValue('GameLanguage'),
+      'FinishedGame', '');
+    msg_wrongchoice := config.ReadString(GetVarValue('GameLanguage'),
+      'WrongChoice', '');
+    msg_gameover := config.ReadString(GetVarValue('GameLanguage'),
+      'GameOver', '') + ' ';
 
-    Writeln('Loaded "' + adventurebindata.metatitle + '" by ' +
-     adventurebindata.metaauthor);
-    Writeln;
-    Start:
+    writeln('Loaded "' + AdventureBinData.metatitle + '" by ' +
+      AdventureBinData.metaauthor);
+    writeln;
+  start:
+
     begin
 
-    if GetVarValue('MoneyDisplay') = 'true' then
-      moneydisplay := true
-    else
-      moneydisplay := false;
-    currentnode := 'Start';
-    endgame := false;
-    TextColor(lightcyan);
- //   Writeln('MoneyDisplay: ', GetVarValue('MoneyDisplay'));
-    Writeln(adventurebindata.metadescription);
-    Writeln;
-    textcolor(lightgray);
-    //msgtemp := msg_pressanykey;
-    writeln(msg_pressanykey);
-    score := 0;
-    wingame:=false;
-    choice := readkey;
-
-    while ((wingame = false) or (endgame = false)) and (choice <> 'q') do
-    begin
-      ClrScr;
-      TextBackground(blue);
-      TextColor(yellow);
-      ClrEol;
-
-      Writeln(adventurebindata.metatitle + ' by ' +
-     adventurebindata.metaauthor);
-      if debugmode = true then
-      begin
-        gotoxy(35, 1);
-        write('Node: ' + currentnode);
-      end;
-      if moneydisplay = true then
-      begin
-        gotoxy(38, 1);
-        UpdateMoney;
-        moneystring := GetVarValue('MoneyCaption');
-        moneystring := StringReplace(moneystring, '$Money',
-          IntToStr(currentmoney), [rfReplaceAll]);
-        write(moneystring);
-      end;
-      GotoXY(65, 1);
-      writeln('Score: ', score, ' / ', adventurebindata.maxscore);
+      if GetVarValue('MoneyDisplay') = 'true' then
+        moneydisplay := true
+      else
+        moneydisplay := false;
+      currentnode := 'Start';
+      endgame := false;
+      TextColor(lightcyan);
+      // Writeln('MoneyDisplay: ', GetVarValue('MoneyDisplay'));
+      writeln(AdventureBinData.metadescription);
       writeln;
-      TextBackground(black);
-      TextColor(white);
+      TextColor(lightgray);
+      // msgtemp := msg_pressanykey;
+      writeln(msg_pressanykey);
+      score := 0;
+      wingame := false;
+      choice := ReadKey;
+
+      while ((wingame = false) or (endgame = false)) and (choice <> 'q') do
+      begin
+        ClrScr;
+        TextBackground(blue);
+        TextColor(Yellow);
+        ClrEol;
+
+        writeln(AdventureBinData.metatitle + ' by ' +
+          AdventureBinData.metaauthor);
+        if debugmode = true then
+        begin
+          GotoXY(35, 1);
+          write('Node: ' + currentnode);
+        end;
+        if moneydisplay = true then
+        begin
+          GotoXY(38, 1);
+          UpdateMoney;
+          moneystring := GetVarValue('MoneyCaption');
+          moneystring := STringReplace(moneystring, '$Money',
+            inttostr(currentmoney), [rfReplaceAll]);
+          write(moneystring);
+        end;
+        GotoXY(65, 1);
+        writeln('Score: ', score, ' / ', AdventureBinData.maxscore);
+        writeln;
+        TextBackground(black);
+        TextColor(White);
+        if wingame = true then
+        begin
+          break;
+        end;
+        if endgame = true then
+        begin
+          break;
+        end;
+        DisplayNode(currentnode);
+        ProcessNodeCommands(currentnode);
+
+        Write('> ');
+        readln(choice);
+        if choice = 'q' then
+          halt;
+        if CharIsAlpha(choice) then
+        begin
+          choiceinteger := ChoiceToNumber(choice);
+          numchoices := GetChoiceCountInNode(currentnode);
+          if choiceinteger <= numchoices - 1 then
+          begin
+            endgame := GetEndGameFlagFromChoice(currentnode, choiceinteger);
+            wingame := GetWinGameFlagFromChoice(currentnode, choiceinteger);
+
+            addedscore := GetScoreFromChoice(currentnode, choiceinteger);
+            ProcessChoiceCommands(currentnode, choiceinteger);
+            currentnode := GetTargetNodeFromChoice(currentnode, choiceinteger);
+            Inc(score, addedscore);
+            if wingame = true then
+            begin
+              endgame := true;
+              break;
+            end;
+            if currentnode = '' then
+            begin
+              writeln('Runtime error: Null NODE!');
+              halt;
+            end;
+          end
+          else
+          begin
+
+            writeln(msg_wrongchoice);
+            ch := ReadKey;
+            writeln;
+          end;
+        end;
+
+      end;
+      // display final node
       if wingame = true then
       begin
-        break;
-      end;
-      if endgame = true then
+        writeln;
+        DisplayNode(currentnode);
+        writeln;
+        msgtemp := msg_gamefinished;
+        msgtemp := STringReplace(msgtemp, '%score%', inttostr(score),
+          [rfReplaceAll]);
+        msgtemp := STringReplace(msgtemp, '%maxscore%',
+          inttostr(AdventureBinData.maxscore), [rfReplaceAll]);
+        writeln(msgtemp);
+
+        // writeln('You finished the game with the score '+inttostr(score)+ ' out of '+inttostr(AdventureBinData.MaxScore));
+      end
+      else
       begin
-        break;
+        DisplayNode(currentnode);
+        write(msg_gameover);
+        readln(choice);
+        if choice = 'y' then
+          Goto start;
+
       end;
-      DisplayNode(currentnode);
-      ProcessNodeCommands(currentnode);
-
-      Write('> ');
-      Readln(choice);
-      if choice = 'q' then
-        Halt;
-      if CharIsAlpha(choice) then
-      begin
-        choiceinteger := AlphabetToNumber(choice);
-        numchoices := GetChoiceCountInNode(currentnode);
-        if choiceinteger <= numchoices - 1 then
-        begin
-          endgame := GetEndGameFlagFromChoice(currentnode, choiceinteger);
-          wingame := GetWinGameFlagFromChoice(currentnode, choiceinteger);
-
-          addedscore := GetScoreFromChoice(currentnode, choiceinteger);
-           ProcessChoiceCommands(currentnode, choiceinteger);
-          currentnode := GetTargetNodeFromChoice(currentnode,
-            choiceinteger);
-          Inc(score, addedscore);
-           if wingame=true then
-             begin
-               endgame := true;
-               break;
-             end;
-          if currentnode = '' then
-          begin
-            Writeln('Runtime error: Null NODE!');
-            halt;
-          end;
-        end
-        else
-        begin
-
-          Writeln(msg_wrongchoice);
-          ch := readkey;
-          writeln;
-        end;
-      end;
-
-    end;
-    // display final node
-    if wingame=true then
-    begin
-    writeln;
-    DisplayNode(currentnode);
-    writeln;
-    msgtemp := msg_gamefinished;
-    msgtemp := Stringreplace(msgtemp,'%score%',IntToStr(score), [rfReplaceAll]);
-    msgtemp := Stringreplace(msgtemp,'%maxscore%',IntToStr(AdventureBinData.MaxScore), [rfReplaceAll]);
-   writeln(msgtemp);
-
-    //writeln('You finished the game with the score '+inttostr(score)+ ' out of '+inttostr(AdventureBinData.MaxScore));
-    end else
-    begin
-    DisplayNode(currentnode);
-    write (msg_gameover);
-    Readln(choice);
-    if choice='y' then Goto Start;
-
-    end;
     end;
 
   end;
 
 end.
-
