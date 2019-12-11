@@ -1,10 +1,12 @@
 program ACEngine;
 
 {$APPTYPE CONSOLE}
+ {$IFOPT D-}{$WEAKLINKRTTI ON}{$ENDIF}
+{$RTTI EXPLICIT METHODS([]) PROPERTIES([]) FIELDS([])}
 
 uses
-  Windows,
-  AdventureBinary,
+
+  AdventureBinaryRuntime,
   jclstrings,
   Console,
   Inifiles,
@@ -21,6 +23,7 @@ var
   currentmoney, numchoices: integer;
   moneystring, currentnode: ansistring;
   wingame, endgame: boolean;
+  datafile: string;
   moneydisplay, debugmode: boolean;
   msg_gameover, msg_wrongchoice, msg_pressanykey: ansistring;
   msgtemp, msg_gamefinished: ansistring;
@@ -43,24 +46,6 @@ begin
   end;
 end;
 
-function Ansi2Ascii (const s: AnsiString): AnsiString;
-begin
-  Result := s;
-  if Result <> '' then
-  begin
-    UniqueString(Result);
-    CharToOem(Pchar(Result), Pansichar(Result));
-  end;
-end;
-
-function Ascii2Ansi(const s: AnsiString): AnsiString;
-begin
-  Result := s;
- begin
-    UniqueString(Result);
-    OemToChar(Pansichar(Result), Pchar(Result));
-  end;
-end;
 
 function GetNodeIndex(name: string): integer;
 var
@@ -357,7 +342,7 @@ begin
       for z := 0 to adventurebindata.gamenodes[nodeind].NodeChoiceCount - 1 do
       begin
         txt := adventurebindata.gamenodes[nodeind].nodechoices[z].choicetext;
-        txt := Ansi2Ascii(txt);
+
         GotoXY(7, wherey);
         Writeln(alphabets[z], '. ', txt);
       end;
@@ -385,29 +370,29 @@ begin
   textbackground(black);
   textcolor(White);
   writeln;
-
-  if Paramcount = 0 then
+  if lowercase(extractfilename(paramstr(0))) = lowercase('ACEngine.exe') then
   begin
-    writeln('Usage: ACEngine.EXE <adventurefile>');
+   writeln('Paramstr(0) == '+extractfilename(paramstr(0)));
+   writeln('Usage: ACEngine.EXE <adventurefile>');
     Writeln;
-  end;
-  if ParamStr(2) = '-debug' then
-    debugmode := true
-  else
-    debugmode := false;
-  if ParamStr(1) <> '' then
+  end else
   begin
-    if FileExists(ParamStr(1)) = false then
+  datafile := changefileext(extractfilename(paramstr(0)),'.agf');
+  end;
+
+  if datafile <> '' then
+  begin
+    if FileExists(datafile) = false then
     begin
       Writeln('File "', paramstr(1), '" not found!');
       halt;
     end;
    // writeln('Loading '+paramstr(1));
-    LoadAdventureBin(ParamStr(1));
+    LoadAdventureBin(datafile);
  msg_pressanykey := config.ReadString(GetVarValue('GameLanguage'),'PressAnyKey','');
  msg_gamefinished := config.ReadString(GetVarValue('GameLanguage'),'FinishedGame','');
  msg_wrongchoice := config.ReadString(GetVarValue('GameLanguage'),'WrongChoice','');
- msg_gameover := config.ReadString(GetVarValue('GameLanguage'),'GameOver','');
+ msg_gameover := config.ReadString(GetVarValue('GameLanguage'),'GameOver','')+' ';
 
     Writeln('Loaded "' + adventurebindata.metatitle + '" by ' +
      adventurebindata.metaauthor);

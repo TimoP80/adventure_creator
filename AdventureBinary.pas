@@ -4,24 +4,40 @@ interface
 
 uses FileIOFunctions, AdventureFile;
 
+const
+  is_equal = 1;
+  less_than_or_equal = 2;
+  less_than = 3;
+  larger_than_or_equal = 4;
+  larger_than = 5;
+  not_equal_to = 6;
+
 type
+  NodeCondition = record
+    cmd: ansistring;
+    varparam: ansistring;
+    eval: integer;
+    value: ansistring;
+  end;
+
   NodeCommand = record
     cmd: ansistring;
     varparam: ansistring;
     value: ansistring;
   end;
 
-  type
+type
   NodeChoice = record
     ChoiceText: ansistring;
     Targetnode: ansistring;
     addscore: integer;
     endgame: boolean;
     wingame: boolean;
+    ChoiceConditions: array of NodeCondition;
+    ChoiceConditionCount: integer;
     ChoiceCommands: array of NodeCommand;
     ChoiceCommandCount: integer;
   end;
-
 
 type
   GameNode = record
@@ -32,6 +48,7 @@ type
     NodeChoices: array of NodeChoice;
     NodeChoiceCount: integer;
   end;
+
 type
   GameVariable = record
     name: ansistring;
@@ -52,7 +69,7 @@ type
 
 var
 
-  AdventureBinData: Adventuregame;
+  AdventureBinData: AdventureGame;
   AdventureData: IXMLAdventureGameType;
 
 procedure SaveAdventureBin(filename: string);
@@ -64,7 +81,7 @@ implementation
 procedure LoadAdventureBin(filename: string);
 var
   x: file;
-  y,i, j: integer;
+  y, i, j: integer;
 begin
   AssignFile(x, filename);
   Reset(x, 1);
@@ -77,43 +94,69 @@ begin
   setlength(AdventureBinData.Variables, AdventureBinData.VariableCount + 1);
   for i := 0 to AdventureBinData.VariableCount - 1 do
   begin
-  ReadString(x,AdventureBinData.variables[i].name);
-  ReadString(x,AdventureBinData.variables[i].value);
+    ReadString(x, AdventureBinData.Variables[i].name);
+    ReadString(x, AdventureBinData.Variables[i].value);
   end;
   setlength(AdventureBinData.GameNodes, AdventureBinData.GameNodeCount + 1);
   for i := 0 to AdventureBinData.GameNodeCount - 1 do
   begin
-    ReadString(x, adventurebindata.gamenodes[i].NodeName);
-    ReadString(x, adventurebindata.gamenodes[i].NodeText);
-   BlockRead(x, AdventureBinData.gamenodes[i].NodeCommandCount, 4);
-     setlength(AdventureBinData.gamenodes[i].NodeCommands,
-      AdventureBinData.gamenodes[i].NodeCommandCount + 1);
-    for j := 0 to AdventureBinData.gamenodes[i].NodeCommandCount - 1 do
+    ReadString(x, AdventureBinData.GameNodes[i].NodeName);
+    ReadString(x, AdventureBinData.GameNodes[i].NodeText);
+    BlockRead(x, AdventureBinData.GameNodes[i].NodeCommandCount, 4);
+    setlength(AdventureBinData.GameNodes[i].NodeCommands,
+      AdventureBinData.GameNodes[i].NodeCommandCount + 1);
+    for j := 0 to AdventureBinData.GameNodes[i].NodeCommandCount - 1 do
     begin
-    ReadString(x, AdventureBinData.gamenodes[i].nodecommands[j].cmd);
-    ReadString(x, AdventureBinData.gamenodes[i].nodecommands[j].varparam);
-    ReadString(x, AdventureBinData.gamenodes[i].nodecommands[j].value);
+      ReadString(x, AdventureBinData.GameNodes[i].NodeCommands[j].cmd);
+      ReadString(x, AdventureBinData.GameNodes[i].NodeCommands[j].varparam);
+      ReadString(x, AdventureBinData.GameNodes[i].NodeCommands[j].value);
     end;
-    BlockRead(x, AdventureBinData.gamenodes[i].NodeChoiceCount, 4);
+    BlockRead(x, AdventureBinData.GameNodes[i].NodeChoiceCount, 4);
 
-    setlength(AdventureBinData.gamenodes[i].NodeChoices,
-      AdventureBinData.gamenodes[i].NodeChoiceCount + 1);
-    for j := 0 to AdventureBinData.gamenodes[i].NodeChoiceCount - 1 do
+    setlength(AdventureBinData.GameNodes[i].NodeChoices,
+      AdventureBinData.GameNodes[i].NodeChoiceCount + 1);
+    for j := 0 to AdventureBinData.GameNodes[i].NodeChoiceCount - 1 do
     begin
-      ReadString(x, AdventureBinData.gamenodes[i].nodechoices[j].ChoiceText);
-      ReadString(x, AdventureBinData.gamenodes[i].nodechoices[j].Targetnode);
-      BlockRead(x, AdventureBinData.gamenodes[i].nodechoices[j].endgame, 1);
-      BlockRead(x, AdventureBinData.gamenodes[i].nodechoices[j].wingame, 1);
-      BlockRead(x, AdventureBinData.gamenodes[i].nodechoices[j].addscore, 4);
-       blockread(x,AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommandCount,4);
-setlength(AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommands, AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommandCount+1);
-     for y := 0 to AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommandCount-1 do
+      ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceText);
+      ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j].Targetnode);
+      BlockRead(x, AdventureBinData.GameNodes[i].NodeChoices[j].endgame, 1);
+      BlockRead(x, AdventureBinData.GameNodes[i].NodeChoices[j].wingame, 1);
+      BlockRead(x, AdventureBinData.GameNodes[i].NodeChoices[j].addscore, 4);
+      BlockRead(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceCommandCount, 4);
+      setlength(AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceCommands,
+        AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceCommandCount + 1);
+      for y := 0 to AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceCommandCount - 1 do
       begin
-  ReadString(x, AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommands[y].cmd);
-    ReadString(x, AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommands[y].varparam);
-    ReadString(x, AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommands[y].value);
+        ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceCommands[y].cmd);
+        ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceCommands[y].varparam);
+        ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceCommands[y].value);
+      end;
+
+
+      setlength(AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceConditions,
+        AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceConditionCount + 1);
+
+      BlockRead(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceConditionCount, 4);
+      for y := 0 to AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceConditionCount - 1 do
+      begin
+        ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].cmd);
+        ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].varparam);
+        blockread(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].eval, 4);
+        ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].value);
 
       end;
+
 
     end;
   end;
@@ -124,7 +167,7 @@ end;
 procedure SaveAdventureBin(filename: string);
 var
   x: file;
-  y,i, j: integer;
+  y, i, j: integer;
 begin
   AssignFile(x, filename);
   Rewrite(x, 1);
@@ -136,107 +179,215 @@ begin
   BlockWrite(x, AdventureBinData.VariableCount, 4);
   for i := 0 to AdventureBinData.VariableCount - 1 do
   begin
-  WriteString(x,AdventureBinData.variables[i].name);
-  WriteString(x,AdventureBinData.variables[i].value);
+    WriteString(x, AdventureBinData.Variables[i].name);
+    WriteString(x, AdventureBinData.Variables[i].value);
   end;
   for i := 0 to AdventureBinData.GameNodeCount - 1 do
   begin
-    WriteString(x, adventurebindata.gamenodes[i].NodeName);
-    WriteString(x, adventurebindata.gamenodes[i].NodeText);
-    BlockWrite(x, AdventureBinData.gamenodes[i].NodeCommandCount, 4);
-    for j := 0 to AdventureBinData.gamenodes[i].NodeCommandCount - 1 do
+    WriteString(x, AdventureBinData.GameNodes[i].NodeName);
+    WriteString(x, AdventureBinData.GameNodes[i].NodeText);
+    BlockWrite(x, AdventureBinData.GameNodes[i].NodeCommandCount, 4);
+    for j := 0 to AdventureBinData.GameNodes[i].NodeCommandCount - 1 do
     begin
-    WriteString(x, AdventureBinData.gamenodes[i].nodecommands[j].cmd);
-    WriteString(x, AdventureBinData.gamenodes[i].nodecommands[j].varparam);
-    WriteString(x, AdventureBinData.gamenodes[i].nodecommands[j].value);
+      WriteString(x, AdventureBinData.GameNodes[i].NodeCommands[j].cmd);
+      WriteString(x, AdventureBinData.GameNodes[i].NodeCommands[j].varparam);
+      WriteString(x, AdventureBinData.GameNodes[i].NodeCommands[j].value);
     end;
-    BlockWrite(x, AdventureBinData.gamenodes[i].NodeChoiceCount, 4);
-    for j := 0 to AdventureBinData.gamenodes[i].NodeChoiceCount - 1 do
+    BlockWrite(x, AdventureBinData.GameNodes[i].NodeChoiceCount, 4);
+    for j := 0 to AdventureBinData.GameNodes[i].NodeChoiceCount - 1 do
     begin
-      WriteString(x, AdventureBinData.gamenodes[i].nodechoices[j].ChoiceText);
-      WriteString(x, AdventureBinData.gamenodes[i].nodechoices[j].Targetnode);
-      BlockWrite(x, AdventureBinData.gamenodes[i].nodechoices[j].endgame, 1);
-      BlockWrite(x, AdventureBinData.gamenodes[i].nodechoices[j].wingame, 1);
-      BlockWrite(x, AdventureBinData.gamenodes[i].nodechoices[j].addscore, 4);
-     blockwrite(x,AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommandCount,4);
-     for y := 0 to AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommandCount-1 do
+      WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceText);
+      WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j].Targetnode);
+      BlockWrite(x, AdventureBinData.GameNodes[i].NodeChoices[j].endgame, 1);
+      BlockWrite(x, AdventureBinData.GameNodes[i].NodeChoices[j].wingame, 1);
+      BlockWrite(x, AdventureBinData.GameNodes[i].NodeChoices[j].addscore, 4);
+      BlockWrite(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceCommandCount, 4);
+      for y := 0 to AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceCommandCount - 1 do
       begin
-     WriteString(x, AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommands[y].cmd);
-    WriteString(x, AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommands[y].varparam);
-    WriteString(x, AdventureBinData.gamenodes[i].nodechoices[j].ChoiceCommands[y].value);
+        WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceCommands[y].cmd);
+        WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceCommands[y].varparam);
+        WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceCommands[y].value);
 
       end;
+
+      BlockWrite(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceConditionCount, 4);
+      for y := 0 to AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceConditionCount - 1 do
+      begin
+        WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].cmd);
+        WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].varparam);
+        blockwrite(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].eval, 4);
+        WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].value);
+
+      end;
+
     end;
   end;
   CloseFile(x);
 end;
 
+function eval2enum(eval: string): integer;
+begin
+if eval='is_equal_to' then
+  result := is_equal else
+if eval='less_than_or_equal_to' then
+  result := less_than_or_equal else
+if eval='larger_than_or_equal_to' then
+  result := larger_than_or_equal else
+if eval='larger_than' then
+  result := larger_than else
+if eval='less_than' then
+  result := less_than else
+if eval='not_equal_to' then
+  result := not_equal_to else
+
+
+end;
+
 procedure CompileAdventure;
 var
-  i,z, u: integer;
+  i, z, u: integer;
 begin
   AdventureBinData.MetaTitle := AdventureData.MetaInfo.Title;
   AdventureBinData.MetaAuthor := AdventureData.MetaInfo.Author;
   AdventureBinData.MetaDescription := AdventureData.MetaInfo.Description;
-  SetLength(AdventureBinData.GameNodes, AdventureData.GameNodes.Count + 1);
-  AdventureBinData.gamenodecount := 0;
+  setlength(AdventureBinData.GameNodes, AdventureData.GameNodes.Count + 1);
+  AdventureBinData.GameNodeCount := 0;
   AdventureBinData.MaxScore := 0;
-  SetLength(AdventureBinData.Variables, adventuredata.Variables.Count+1);
-  AdventureBinData.VariableCount:=0;
-  for u:=0 to AdventureData.Variables.count-1 do
+  setlength(AdventureBinData.Variables, AdventureData.Variables.Count + 1);
+  AdventureBinData.VariableCount := 0;
+  for u := 0 to AdventureData.Variables.Count - 1 do
   begin
-    AdventureBinData.Variables[AdventureBinData.VariableCount].name := AdventureData.Variables.Variable[u].Name;
-    AdventureBinData.Variables[AdventureBinData.VariableCount].value := AdventureData.Variables.Variable[u].text;
-  inc(AdventureBinData.VariableCount);
+    AdventureBinData.Variables[AdventureBinData.VariableCount].name :=
+      AdventureData.Variables.Variable[u].name;
+    AdventureBinData.Variables[AdventureBinData.VariableCount].value :=
+      AdventureData.Variables.Variable[u].text;
+    inc(AdventureBinData.VariableCount);
   end;
-  for u := 0 to adventuredata.GameNodes.Count - 1 do
+  for u := 0 to AdventureData.GameNodes.Count - 1 do
   begin
     AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeName :=
-      adventuredata.gamenodes.Node[u].Name;
+      AdventureData.GameNodes.Node[u].name;
     AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeText :=
-      adventuredata.gamenodes.Node[u].DescriptionText;
-    SetLength(AdventureBinData.GameNodes[u].NodeChoices,
-      adventuredata.gamenodes.Node[u].Choices.Count + 1);
-    SetLength(AdventureBinData.GameNodes[u].NodeCommands,
-      adventuredata.gamenodes.Node[u].NodeCommands.Count + 1);
-    AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeCommandCount:=0;
-    for z := 0 to Adventuredata.GameNodes.Node[u].NodeCommands.Count - 1 do
+      AdventureData.GameNodes.Node[u].DescriptionText;
+    setlength(AdventureBinData.GameNodes[u].NodeChoices,
+      AdventureData.GameNodes.Node[u].Choices.Count + 1);
+    setlength(AdventureBinData.GameNodes[u].NodeCommands,
+      AdventureData.GameNodes.Node[u].NodeCommands.Count + 1);
+    AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+      .NodeCommandCount := 0;
+    for z := 0 to AdventureData.GameNodes.Node[u].NodeCommands.Count - 1 do
     begin
-     adventurebindata.gamenodes[AdventureBinData.GameNodeCount].NodeCommands[AdventureBinData.GameNodes[u].NodeCommandCount].cmd := adventuredata.GameNodes.Node[u].NodeCommands.CMD[z].Name;
-     adventurebindata.gamenodes[AdventureBinData.GameNodeCount].NodeCommands[AdventureBinData.GameNodes[u].NodeCommandCount].varparam := adventuredata.GameNodes.Node[u].NodeCommands.CMD[z].Variable;
-     adventurebindata.gamenodes[AdventureBinData.GameNodeCount].NodeCommands[AdventureBinData.GameNodes[u].NodeCommandCount].value := adventuredata.GameNodes.Node[u].NodeCommands.CMD[z].text;
-    inc(AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeCommandCount);
+      AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeCommands
+        [AdventureBinData.GameNodes[u].NodeCommandCount].cmd :=
+        AdventureData.GameNodes.Node[u].NodeCommands.cmd[z].name;
+      AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeCommands
+        [AdventureBinData.GameNodes[u].NodeCommandCount].varparam :=
+        AdventureData.GameNodes.Node[u].NodeCommands.cmd[z].Variable;
+      AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeCommands
+        [AdventureBinData.GameNodes[u].NodeCommandCount].value :=
+        AdventureData.GameNodes.Node[u].NodeCommands.cmd[z].text;
+      inc(AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeCommandCount);
     end;
 
-    AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount
-      := 0;
-    for z := 0 to Adventuredata.GameNodes.Node[u].Choices.Count - 1 do
+    AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+      .NodeChoiceCount := 0;
+    for z := 0 to AdventureData.GameNodes.Node[u].Choices.Count - 1 do
     begin
-      AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount].ChoiceText :=
-        Adventuredata.GameNodes.Node[u].Choices.Choice[z].text;
-      AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount].Targetnode :=
-        Adventuredata.GameNodes.Node[u].Choices.Choice[z].Targetnode;
-      AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount].endgame :=
-        Adventuredata.GameNodes.Node[u].Choices.Choice[z].Endgame;
-           AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount].wingame :=
-        Adventuredata.GameNodes.Node[u].Choices.Choice[z].Wingame;
-      AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount].addscore :=
-        Adventuredata.GameNodes.Node[u].Choices.Choice[z].Addscore;
-      inc(AdventureBinData.MaxScore,
-        Adventuredata.GameNodes.Node[u].Choices.Choice[z].Addscore);
-     adventurebindata.GameNodes[AdventureBinData.GameNodeCount].NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount].ChoiceCommandCount := adventuredata.GameNodes.Node[u].ChoiceCommands[z].Count;
-  setlength(adventurebindata.GameNodes[AdventureBinData.GameNodeCount].NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount].ChoiceCommands, adventurebindata.GameNodes[AdventureBinData.GameNodeCount].NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount].ChoiceCommandCount+1);
-      for i := 0 to adventuredata.GameNodes.Node[u].ChoiceCommands[z].Count-1 do
-        begin
-          adventurebindata.GameNodes[AdventureBinData.GameNodeCount].NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount].ChoiceCommands[i].cmd := adventuredata.GameNodes[u].ChoiceCommands[z].CMD[i].Name;
-          adventurebindata.GameNodes[AdventureBinData.GameNodeCount].NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount].ChoiceCommands[i].varparam := adventuredata.GameNodes[u].ChoiceCommands[z].CMD[i].Variable;
-          adventurebindata.GameNodes[AdventureBinData.GameNodeCount].NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount].ChoiceCommands[i].value := adventuredata.GameNodes[u].ChoiceCommands[z].CMD[i].Text;
-        end;
-      Inc(AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoiceCount);
+      AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+        [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoiceCount].ChoiceText := AdventureData.GameNodes.Node[u]
+        .Choices.Choice[z].text;
+      AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+        [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoiceCount].Targetnode := AdventureData.GameNodes.Node[u]
+        .Choices.Choice[z].Targetnode;
+      AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+        [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoiceCount].endgame := AdventureData.GameNodes.Node[u]
+        .Choices.Choice[z].endgame;
+      AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+        [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoiceCount].wingame := AdventureData.GameNodes.Node[u]
+        .Choices.Choice[z].wingame;
+      AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+        [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoiceCount].addscore := AdventureData.GameNodes.Node[u]
+        .Choices.Choice[z].addscore;
+      inc(AdventureBinData.MaxScore, AdventureData.GameNodes.Node[u]
+        .Choices.Choice[z].addscore);
+      AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+        [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoiceCount].ChoiceCommandCount := AdventureData.GameNodes.Node[u]
+        .ChoiceCommands[z].Count;
+      setlength(AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoiceCount].ChoiceCommands,
+        AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+        [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoiceCount].ChoiceCommandCount + 1);
+      for i := 0 to AdventureData.GameNodes.Node[u].ChoiceCommands[z]
+        .Count - 1 do
+      begin
+        AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+          [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+          .NodeChoiceCount].ChoiceCommands[i].cmd := AdventureData.GameNodes[u]
+          .ChoiceCommands[z].cmd[i].name;
+        AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+          [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+          .NodeChoiceCount].ChoiceCommands[i].varparam :=
+          AdventureData.GameNodes[u].ChoiceCommands[z].cmd[i].Variable;
+        AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+          [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+          .NodeChoiceCount].ChoiceCommands[i].value := AdventureData.GameNodes
+          [u].ChoiceCommands[z].cmd[i].text;
+      end;
+
+        setlength(AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoiceCount].ChoiceConditions,
+        AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+        [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoiceCount].ChoiceConditionCount + 1);
+
+
+      for i := 0 to AdventureData.GameNodes.Node[u].ChoiceConditions[z]
+        .Count - 1 do
+      begin
+        AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+          [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+          .NodeChoiceCount].ChoiceConditions[i].cmd := AdventureData.GameNodes[u]
+          .ChoiceConditions[z].Condition[i].Name;
+        AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+          [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+          .NodeChoiceCount].ChoiceConditions[i].varparam :=
+          AdventureData.GameNodes[u].ChoiceConditions[z].Condition[i].Varname;
+        AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+          [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+          .NodeChoiceCount].ChoiceConditions[i].value := AdventureData.GameNodes[u].ChoiceConditions[z].Condition[i].Text;
+             AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+          [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+          .NodeChoiceCount].ChoiceConditions[i].eval := eval2enum(AdventureData.GameNodes[u].ChoiceConditions[z].Condition[i].Eval);
+      end;
+
+
+
+      inc(AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoiceCount);
     end;
-    Inc(AdventureBinData.GameNodeCount);
+    inc(AdventureBinData.GameNodeCount);
   end;
 end;
 
 end.
-

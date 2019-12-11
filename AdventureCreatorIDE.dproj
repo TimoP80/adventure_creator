@@ -103,7 +103,7 @@
         <DCCReference Include="AdventureCreatorIDEMain.pas">
             <Form>Form1</Form>
         </DCCReference>
-        <DCCReference Include="AdventureBinary.pas"/>
+        <DCCReference Include="AdventureBinaryRuntime.pas"/>
         <DCCReference Include="MetaData.pas">
             <Form>Form2</Form>
         </DCCReference>

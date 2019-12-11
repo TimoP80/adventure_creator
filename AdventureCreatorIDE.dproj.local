@@ -14,5 +14,6 @@
     <Transaction>2019.12.10 20:33:46.065,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
     <Transaction>2019.12.10 20:34:45.262,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
     <Transaction>2019.12.10 20:36:19.448,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
+    <Transaction>2019.12.11 19:11:37.898,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureBinaryRuntime.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureBinary.pas</Transaction>
   </Transactions>
 </BorlandProject>

@@ -3,12 +3,12 @@ program ACCompiler;
 {$APPTYPE CONSOLE}
 
 uses
-  Windows, ActiveX, comobj,AdventureBinary, AdventureFile, SysUtils;
+  Windows, JclFileUtils, ActiveX, comobj,AdventureBinary, AdventureFile, SysUtils;
 
   var outputname: string;
 begin
   CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
-  writeln('Adventure Creator Compiler v1.0 by T. Pitkanen');
+writeln('Adventure Creator Compiler v1.0 by T. Pitkanen');
 writeln;
 if paramcount=0 then
 begin
@@ -23,4 +23,7 @@ outputname := ParamStr(2);
  CompileAdventure;
  writeln('Saving binary to "',outputname,'"');
  SaveAdventureBin(outputname);
-end.
+ writeln ('Creating executable ... ');
+ FileCopy('.\ACEngine.exe', changefileext(paramstr(1),'.exe'),true);
+ writeln ('Bimary file "'+changefileext(paramstr(1),'.exe')+'" created.');
+ end.

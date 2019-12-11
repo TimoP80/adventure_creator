@@ -3,7 +3,7 @@ program AdventureCreatorIDE;
 uses
   Forms,
   AdventureCreatorIDEMain in 'AdventureCreatorIDEMain.pas' {Form1},
-  AdventureBinary in 'AdventureBinary.pas',
+  AdventureBinaryRuntime in 'AdventureBinaryRuntime.pas',
   MetaData in 'MetaData.pas' {Form2},
   VarEditor in 'VarEditor.pas' {Form3},
   Vcl.Themes,

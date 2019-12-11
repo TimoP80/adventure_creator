@@ -1,0 +1,257 @@
+unit AdventureBinaryRuntime;
+
+interface
+
+uses FileIOFunctions;
+
+const
+  is_equal = 1;
+  less_than_or_equal = 2;
+  less_than = 3;
+  larger_than_or_equal = 4;
+  larger_than = 5;
+  not_equal_to = 6;
+
+type
+  NodeCondition = record
+    cmd: ansistring;
+    varparam: ansistring;
+    eval: integer;
+    value: ansistring;
+  end;
+
+  NodeCommand = record
+    cmd: ansistring;
+    varparam: ansistring;
+    value: ansistring;
+  end;
+
+type
+  NodeChoice = record
+    ChoiceText: ansistring;
+    Targetnode: ansistring;
+    addscore: integer;
+    endgame: boolean;
+    wingame: boolean;
+    ChoiceConditions: array of NodeCondition;
+    ChoiceConditionCount: integer;
+    ChoiceCommands: array of NodeCommand;
+    ChoiceCommandCount: integer;
+  end;
+
+type
+  GameNode = record
+    NodeName: ansistring;
+    NodeText: ansistring;
+    NodeCommands: array of NodeCommand;
+    NodeCommandCount: integer;
+    NodeChoices: array of NodeChoice;
+    NodeChoiceCount: integer;
+  end;
+
+type
+  GameVariable = record
+    name: ansistring;
+    value: ansistring;
+  end;
+
+type
+  AdventureGame = record
+    GameNodes: array of GameNode;
+    GameNodeCount: integer;
+    Variables: array of GameVariable;
+    VariableCount: integer;
+    MetaTitle: ansistring;
+    MetaAuthor: ansistring;
+    MetaDescription: ansistring;
+    MaxScore: integer;
+  end;
+
+var
+
+  AdventureBinData: AdventureGame;
+ 
+procedure SaveAdventureBin(filename: string);
+procedure LoadAdventureBin(filename: string);
+
+implementation
+
+procedure LoadAdventureBin(filename: string);
+var
+  x: file;
+  y, i, j: integer;
+begin
+  AssignFile(x, filename);
+  Reset(x, 1);
+  ReadString(x, AdventureBinData.MetaTitle);
+  ReadString(x, AdventureBinData.MetaAuthor);
+  ReadString(x, AdventureBinData.MetaDescription);
+  BlockRead(x, AdventureBinData.MaxScore, 4);
+  BlockRead(x, AdventureBinData.GameNodeCount, 4);
+  BlockRead(x, AdventureBinData.VariableCount, 4);
+  setlength(AdventureBinData.Variables, AdventureBinData.VariableCount + 1);
+  for i := 0 to AdventureBinData.VariableCount - 1 do
+  begin
+    ReadString(x, AdventureBinData.Variables[i].name);
+    ReadString(x, AdventureBinData.Variables[i].value);
+  end;
+  setlength(AdventureBinData.GameNodes, AdventureBinData.GameNodeCount + 1);
+  for i := 0 to AdventureBinData.GameNodeCount - 1 do
+  begin
+    ReadString(x, AdventureBinData.GameNodes[i].NodeName);
+    ReadString(x, AdventureBinData.GameNodes[i].NodeText);
+    BlockRead(x, AdventureBinData.GameNodes[i].NodeCommandCount, 4);
+    setlength(AdventureBinData.GameNodes[i].NodeCommands,
+      AdventureBinData.GameNodes[i].NodeCommandCount + 1);
+    for j := 0 to AdventureBinData.GameNodes[i].NodeCommandCount - 1 do
+    begin
+      ReadString(x, AdventureBinData.GameNodes[i].NodeCommands[j].cmd);
+      ReadString(x, AdventureBinData.GameNodes[i].NodeCommands[j].varparam);
+      ReadString(x, AdventureBinData.GameNodes[i].NodeCommands[j].value);
+    end;
+    BlockRead(x, AdventureBinData.GameNodes[i].NodeChoiceCount, 4);
+
+    setlength(AdventureBinData.GameNodes[i].NodeChoices,
+      AdventureBinData.GameNodes[i].NodeChoiceCount + 1);
+    for j := 0 to AdventureBinData.GameNodes[i].NodeChoiceCount - 1 do
+    begin
+      ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceText);
+      ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j].Targetnode);
+      BlockRead(x, AdventureBinData.GameNodes[i].NodeChoices[j].endgame, 1);
+      BlockRead(x, AdventureBinData.GameNodes[i].NodeChoices[j].wingame, 1);
+      BlockRead(x, AdventureBinData.GameNodes[i].NodeChoices[j].addscore, 4);
+      BlockRead(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceCommandCount, 4);
+      setlength(AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceCommands,
+        AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceCommandCount + 1);
+      for y := 0 to AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceCommandCount - 1 do
+      begin
+        ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceCommands[y].cmd);
+        ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceCommands[y].varparam);
+        ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceCommands[y].value);
+      end;
+
+
+      setlength(AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceConditions,
+        AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceConditionCount + 1);
+
+      BlockRead(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceConditionCount, 4);
+      for y := 0 to AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceConditionCount - 1 do
+      begin
+        ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].cmd);
+        ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].varparam);
+        blockread(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].eval, 4);
+        ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].value);
+
+      end;
+
+
+    end;
+  end;
+  CloseFile(x);
+
+end;
+
+procedure SaveAdventureBin(filename: string);
+var
+  x: file;
+  y, i, j: integer;
+begin
+  AssignFile(x, filename);
+  Rewrite(x, 1);
+  WriteString(x, AdventureBinData.MetaTitle);
+  WriteString(x, AdventureBinData.MetaAuthor);
+  WriteString(x, AdventureBinData.MetaDescription);
+  BlockWrite(x, AdventureBinData.MaxScore, 4);
+  BlockWrite(x, AdventureBinData.GameNodeCount, 4);
+  BlockWrite(x, AdventureBinData.VariableCount, 4);
+  for i := 0 to AdventureBinData.VariableCount - 1 do
+  begin
+    WriteString(x, AdventureBinData.Variables[i].name);
+    WriteString(x, AdventureBinData.Variables[i].value);
+  end;
+  for i := 0 to AdventureBinData.GameNodeCount - 1 do
+  begin
+    WriteString(x, AdventureBinData.GameNodes[i].NodeName);
+    WriteString(x, AdventureBinData.GameNodes[i].NodeText);
+    BlockWrite(x, AdventureBinData.GameNodes[i].NodeCommandCount, 4);
+    for j := 0 to AdventureBinData.GameNodes[i].NodeCommandCount - 1 do
+    begin
+      WriteString(x, AdventureBinData.GameNodes[i].NodeCommands[j].cmd);
+      WriteString(x, AdventureBinData.GameNodes[i].NodeCommands[j].varparam);
+      WriteString(x, AdventureBinData.GameNodes[i].NodeCommands[j].value);
+    end;
+    BlockWrite(x, AdventureBinData.GameNodes[i].NodeChoiceCount, 4);
+    for j := 0 to AdventureBinData.GameNodes[i].NodeChoiceCount - 1 do
+    begin
+      WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceText);
+      WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j].Targetnode);
+      BlockWrite(x, AdventureBinData.GameNodes[i].NodeChoices[j].endgame, 1);
+      BlockWrite(x, AdventureBinData.GameNodes[i].NodeChoices[j].wingame, 1);
+      BlockWrite(x, AdventureBinData.GameNodes[i].NodeChoices[j].addscore, 4);
+      BlockWrite(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceCommandCount, 4);
+      for y := 0 to AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceCommandCount - 1 do
+      begin
+        WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceCommands[y].cmd);
+        WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceCommands[y].varparam);
+        WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceCommands[y].value);
+
+      end;
+
+      BlockWrite(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceConditionCount, 4);
+      for y := 0 to AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceConditionCount - 1 do
+      begin
+        WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].cmd);
+        WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].varparam);
+        blockwrite(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].eval, 4);
+        WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].value);
+
+      end;
+
+    end;
+  end;
+  CloseFile(x);
+end;
+
+function eval2enum(eval: string): integer;
+begin
+if eval='is_equal_to' then
+  result := is_equal else
+if eval='less_than_or_equal_to' then
+  result := less_than_or_equal else
+if eval='larger_than_or_equal_to' then
+  result := larger_than_or_equal else
+if eval='larger_than' then
+  result := larger_than else
+if eval='less_than' then
+  result := less_than else
+if eval='not_equal_to' then
+  result := not_equal_to else
+
+
+end;
+
+
+
+end.
