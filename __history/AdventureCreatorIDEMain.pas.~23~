@@ -6,7 +6,8 @@ uses
   Windows, Messages, AdventureFile, AdventureBinary, SysUtils, Variants,
   Classes, Graphics,
   Controls, Forms,
-  Dialogs, xmldom, XMLIntf, msxmldom, XMLDoc, StdCtrls, Menus, Vcl.ComCtrls;
+  Dialogs, xmldom, XMLIntf, msxmldom, XMLDoc, StdCtrls, Menus, Vcl.ComCtrls,
+  Vcl.WinXCtrls;
 
 type
   TForm1 = class(TForm)
@@ -39,7 +40,6 @@ type
     lbl6: TLabel;
     edtnodename: TEdit;
     chkendgame: TCheckBox;
-    btn5: TButton;
     btn6: TButton;
     dlgSave2: TSaveDialog;
     mmomessages: TMemo;
@@ -70,6 +70,9 @@ type
     nodes_tree: TTreeView;
     gamewinner: TCheckBox;
     Button2: TButton;
+    ShowNodeLinks1: TMenuItem;
+    Button3: TButton;
+    InitnewfieldsinXMLdevonly1: TMenuItem;
     procedure LoadAdventureFile1Click(Sender: TObject);
     procedure Quit1Click(Sender: TObject);
     procedure btn3Click(Sender: TObject);
@@ -109,6 +112,10 @@ type
     procedure lstchoicelistMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure Button2Click(Sender: TObject);
+    procedure ShowNodeLinks1Click(Sender: TObject);
+    procedure About1Click(Sender: TObject);
+    procedure InitnewfieldsinXMLdevonly1Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -124,12 +131,13 @@ var
   CurrentFilename: string;
   NewNode: IXMLNodeType;
   Commandlist: IXMLCommandListType;
+  ConditionList:IXMLConditionListType;
 
 procedure LogMsg(s: string);
 
   implementation
 
-uses MetaData, VarEditor, ChoiceCommandsForm;
+uses MetaData, VarEditor, ChoiceCommandsForm, AboutForm, ChoiceConditionsForm;
 procedure UpdateCaption;
 begin
       Form1.Caption := 'Adventure Creator 1.0 IDE - ['+currentfilename+']';
@@ -149,10 +157,12 @@ var
 begin
   form1.cbbvarsel.items.clear;
   form4.cbbvarsel.items.clear;
+  form6.cbbvarsel.items.clear;
   for U := 0 to AdventureData.Variables.Count - 1 do
   begin
     form1.cbbvarsel.Items.Add(adventuredata.Variables.Variable[u].name);
     form4.cbbvarsel.Items.Add(adventuredata.Variables.Variable[u].name);
+    form6.cbbvarsel.Items.Add(adventuredata.Variables.Variable[u].name);
   end;
 end;
  function TreeItemSearch(TV: TTreeView; SucheItem: string): TTreeNode;
@@ -223,6 +233,7 @@ begin
     UpdateVariables;
     currentfilename := extractfilename(dlgopen1.FileName);
    updatecaption;
+
   end;
 end;
 
@@ -283,7 +294,11 @@ begin
   thechoice.Text := '<< NEW CHOICE >>';
   thechoice.Endgame := false;
   thechoice.Wingame := false;
+
   thechoice.Addscore:=0;
+  Commandlist := thenode.ChoiceCommands.Add;
+  conditionlist := thenode.ChoiceConditions.Add;
+
   UpdateChoices;
 
 end;
@@ -291,6 +306,9 @@ end;
 procedure TForm1.btn4Click(Sender: TObject);
 begin
   TheNode.Choices.Delete(lstchoicelist.itemindex);
+  TheNode.ChoiceCommands.Delete(lstchoicelist.itemindex);
+  TheNode.ChoiceConditions.Delete(lstchoicelist.itemindex);
+
   UpdateChoices;
 
 end;
@@ -356,16 +374,50 @@ begin
     DataReader.SaveToFile(dlgsave1.FileName);
     currentfilename := extractfilename(dlgsave1.FileName);
     updatecaption;
-
     //    form1.Caption := 'Adventure Creator 1.0 IDE - ['+extractfilename(dlgsave1.FileName)+']';
 
   end;
 end;
 
+procedure TForm1.ShowNodeLinks1Click(Sender: TObject);
+var z,u: integer;
+var links: TSTrings;
+begin
+links := TStringlist.Create;
+ for u := 0 to AdventureData.GameNodes.Count-1 do
+  begin
+  for z := 0 to adventuredata.GameNodes[u]. Choices.Count-1 do
+  begin
+    if (AdventureData.GameNodes[u].Name<>thenode.name)
+    and (AdventureData.GameNodes[u].Choices[z].Targetnode = thenode.name) then
+    begin
+      links.Add('Node "'+AdventureData.GameNodes[u].Name+'" choice #'+inttostr(z+1)+' ("'+AdventureData.GameNodes[u].Choices[z].text+'")');
+    end;
+  end;
+    end;
+if links.Count=0 then
+  showmessage('This is the start node.') else
+  showmessage(links.Text);
+end;
+
+procedure TForm1.About1Click(Sender: TObject);
+begin
+IDEAboutForm.showmodal;
+end;
+
 procedure TForm1.btn1Click(Sender: TObject);
 begin
+
   thenode := AdventureData.GameNodes.Add;
+  logmsg('Node count: '+inttostr(adventuredata.GameNodes.Count));
+  if adventuredata.GameNodes.Count <= 1 then
+  begin
+  thenode.Name := 'Start';
+  LogMsg('Created start node');
+  end
+  else
   thenode.Name := '<< NEW NODE >>';
+
   UpdateNodeLists;
 end;
 
@@ -377,7 +429,19 @@ begin
 end;
 
 procedure TForm1.btn6Click(Sender: TObject);
+var oldname: string;
+var u: integer;
 begin
+oldname := thenode.Name;
+for u := 0 to AdventureData.GameNodes.Count-1 do
+   begin
+     if adventuredata.GameNodes.Node[u].NodeParent = oldname then
+      begin
+         LogMsg('Remapped node parent '+oldname +' to '+edtnodename.text);
+         adventuredata.GameNodes.Node[u].NodeParent := edtnodename.Text;
+      end;
+   end;
+// before doing this, remap all node parents to new name;
   TheNode.Name := edtnodename.Text;
   UpdateNodeLists;
 end;
@@ -403,6 +467,21 @@ end;
 procedure TForm1.gamewinnerClick(Sender: TObject);
 begin
  thechoice.wingame := gamewinner.Checked;
+end;
+
+procedure TForm1.InitnewfieldsinXMLdevonly1Click(Sender: TObject);
+var z,y: integer;
+cond: IXMLConditionListType;
+begin
+ for y := 0 to AdventureData.GameNodes.Count-1 do
+  begin
+      for z := 0 to adventuredata.GameNodes.Node[y].Choices.Count-1 do
+       begin
+
+        cond := adventuredata.GameNodes.Node[y].ChoiceConditions.Add;
+       end;
+  end;
+  logmsg('Conditions added to existing project!');
 end;
 
 procedure TForm1.chkendgameClick(Sender: TObject);
@@ -526,10 +605,21 @@ end;
 
 procedure TForm1.Button2Click(Sender: TObject);
 begin
+if lstchoicelist.ItemIndex>thenode.ChoiceCommands.Count-1 then
+begin
+  LogMsg('Choice commands out of sync, adding new!');
+  Commandlist := thenode.ChoiceCommands.Add;
+end;
 Commandlist := thenode.ChoiceCommands.CommandList[lstchoicelist.itemindex];
    updatechoicecommands;
 form4.showmodal;
 
+end;
+
+procedure TForm1.Button3Click(Sender: TObject);
+begin
+ConditionList := thenode.ChoiceConditions.ConditionList[lstchoicelist.itemindex];
+form6.showmodal;
 end;
 
 procedure TForm1.cbbcmdClick(Sender: TObject);

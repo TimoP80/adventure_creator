@@ -57,13 +57,12 @@ object Form6: TForm6
       Caption = 'Evaluation:'
     end
     object lstconditions: TListBox
-      Left = 3
+      Left = 8
       Top = 40
       Width = 209
       Height = 177
       ItemHeight = 13
       TabOrder = 0
-      OnClick = lstconditionsClick
     end
     object btn8: TButton
       Left = 9

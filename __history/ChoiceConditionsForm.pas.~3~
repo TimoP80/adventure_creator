@@ -30,7 +30,6 @@ type
     procedure evallistClick(Sender: TObject);
     procedure mmoparamvalKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure lstconditionsClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -114,15 +113,6 @@ begin
 condition.Eval := evallist.Text;
 UpdateChoiceConditionSel;
 
-end;
-
-procedure TForm6.lstconditionsClick(Sender: TObject);
-begin
-condition := conditionlist.Condition[lstconditions.ItemIndex];
-cbbcmd.ItemIndex := cbbcmd.Items.IndexOf(condition.Name);
-cbbvarsel.ItemIndex := cbbvarsel.Items.IndexOf(condition.Varname);
-evallist.ItemIndex := evallist.Items.IndexOf(condition.Eval);
-mmoparamval.Text := condition.Text;
 end;
 
 procedure TForm6.mmoparamvalKeyUp(Sender: TObject; var Key: Word;

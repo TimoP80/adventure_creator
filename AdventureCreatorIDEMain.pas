@@ -619,6 +619,8 @@ end;
 procedure TForm1.Button3Click(Sender: TObject);
 begin
 ConditionList := thenode.ChoiceConditions.ConditionList[lstchoicelist.itemindex];
+LogMsg('Updating choice conditions, condition list has '+inttostr(conditionlist.count)+ ' conditions.');
+UpdateChoiceConditions;
 form6.showmodal;
 end;
 

@@ -2,7 +2,7 @@ unit AdventureBinary;
 
 interface
 
-uses FileIOFunctions, AdventureFile;
+uses sysutils, FileIOFunctions, AdventureFile;
 
 const
   is_equal = 1;
@@ -238,17 +238,18 @@ end;
 
 function eval2enum(eval: string): integer;
 begin
-if eval='is_equal_to' then
+result:=0;
+if eval='is equal to' then
   result := is_equal else
-if eval='less_than_or_equal_to' then
+if eval='less than or equal to' then
   result := less_than_or_equal else
-if eval='larger_than_or_equal_to' then
+if eval='larger than or equal to' then
   result := larger_than_or_equal else
-if eval='larger_than' then
+if eval='larger than' then
   result := larger_than else
-if eval='less_than' then
+if eval='less than' then
   result := less_than else
-if eval='not_equal_to' then
+if eval='not equal to' then
   result := not_equal_to else
 
 
@@ -361,10 +362,14 @@ begin
         [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
         .NodeChoiceCount].ChoiceConditionCount + 1);
 
-
+        AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+        [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoiceCount].ChoiceConditionCount := AdventureData.GameNodes.Node[u].ChoiceConditions[z]
+      .Count;
       for i := 0 to AdventureData.GameNodes.Node[u].ChoiceConditions[z]
         .Count - 1 do
       begin
+      writeln('Compiling choice condition '+inttostr(i)+ ', node "'+AdventureData.GameNodes.Node[u].Name+'" choice text "'+AdventureData.GameNodes.Node[u].Choices[z].text+'"' );
         AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
           [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
           .NodeChoiceCount].ChoiceConditions[i].cmd := AdventureData.GameNodes[u]
@@ -379,6 +384,8 @@ begin
              AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
           [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
           .NodeChoiceCount].ChoiceConditions[i].eval := eval2enum(AdventureData.GameNodes[u].ChoiceConditions[z].Condition[i].Eval);
+
+
       end;
 
 

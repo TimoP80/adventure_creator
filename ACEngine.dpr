@@ -46,7 +46,7 @@ begin
  for y := 0 to choicemappingcount-1 do
  begin  
    if choice = choicemappings[y].letter then
-     result := choicemappings[y].number; 
+     result := choicemappings[y].number;
  end;
 end;
 
@@ -405,7 +405,7 @@ var
 
   begin
  // by default return true if no conditions are present
- result := true;
+ result := false;
  
   if AdventureBinData.GameNodes[nodeindex].NodeChoices[choiceindex]
     .ChoiceConditionCount > 0 then
@@ -424,7 +424,8 @@ var
         .ChoiceConditions[u].varparam;
       eval := AdventureBinData.GameNodes[nodeindex].NodeChoices[choiceindex]
         .ChoiceConditions[u].eval;
-
+      if cmd='VariableValue' then
+      begin
       case eval of
         less_than_or_equal:
           begin
@@ -451,6 +452,8 @@ var
             current_condition := strtoint(GetVarValue(varparam)) <> strtoint(value);
           end;
       end;
+      end;
+      
       if current_condition = true then inc(conditions_true);
       if current_condition = false then inc(conditions_false);
       
@@ -494,7 +497,7 @@ begin
         GotoXY(7, wherey);
         if GetNodeVisibilityByCondition(nodeind, z)=true then
         begin
-        writeln(alphabets[z], '. ', txt);
+         writeln(alphabets[z], '. ', txt);
         choicemappings[choicemappingcount].letter := alphabets[choicemappingcount];
         choicemappings[choicemappingcount].number := z;
         end;
