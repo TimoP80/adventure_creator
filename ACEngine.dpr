@@ -7,7 +7,7 @@ program ACEngine;
 uses
 
   AdventureBinaryRuntime,
-  jclstrings,
+
   Console,
   Inifiles,
   SysUtils;
@@ -406,7 +406,7 @@ var
   begin
  // by default return true if no conditions are present
  result := false;
- 
+
   if AdventureBinData.GameNodes[nodeindex].NodeChoices[choiceindex]
     .ChoiceConditionCount > 0 then
   begin
@@ -625,8 +625,7 @@ begin
         readln(choice);
         if choice = 'q' then
           halt;
-        if CharIsAlpha(choice) then
-        begin
+
           choiceinteger := ChoiceToNumber(choice);
           numchoices := GetChoiceCountInNode(currentnode);
           if choiceinteger <= numchoices - 1 then
@@ -656,7 +655,7 @@ begin
             ch := ReadKey;
             writeln;
           end;
-        end;
+
 
       end;
       // display final node
