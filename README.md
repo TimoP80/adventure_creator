@@ -25,7 +25,7 @@ The source code is compilable with Delphi 10 Seattle and above. Compiled binarie
 updated regularly.
 
 For compiling the IDE, the Delphi Jedi Code Library is required. Get it from https://github.com/project-jedi/jcl, also 
-the JVCL is recommended to be installed just in case. (In the future there might be some JVCL components used in the IDE)
+the JVCL is recommended to be installed just in case. https://github.com/project-jedi/jvcl (In the future there might be some JVCL components used in the IDE)
 
 WARNING! This project is not fully documented yet, documentation is a work in progress as the engine is 
 being developed to its full form.
