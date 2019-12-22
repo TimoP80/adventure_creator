@@ -297,8 +297,8 @@ begin
 
   thechoice.Addscore:=0;
   Commandlist := thenode.ChoiceCommands.Add;
-  conditionlist := thenode.ChoiceConditions.Add;
 
+  conditionlist := thenode.ChoiceConditions.Add;
   UpdateChoices;
 
 end;
@@ -563,7 +563,12 @@ begin
   thechoice.Targetnode := '';
   thechoice.Text := '<< NEW CHOICE >>';
   thechoice.Endgame := false;
+  thechoice.Wingame := false;
+
   thechoice.Addscore:=0;
+  Commandlist := thenode.ChoiceCommands.Insert(lstchoicelist.itemindex);
+
+  conditionlist := thenode.ChoiceConditions.Insert(lstchoicelist.itemindex);
   UpdateChoices;
 end;
 
