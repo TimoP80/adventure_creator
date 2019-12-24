@@ -90,10 +90,7 @@ object Form4: TForm4
         'IncreaseVar'
         'DecreaseVar'
         'TextPrompt'
-        'RandomNumber'
-        'SetRandomMin'
-        'SetRandomMax'
-        'ExecuteRandom')
+        'RandomNumber')
     end
     object cbbvarsel: TComboBox
       Left = 240

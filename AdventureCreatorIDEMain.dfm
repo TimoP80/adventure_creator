@@ -46,9 +46,9 @@ object Form1: TForm1
   object lbl5: TLabel
     Left = 327
     Top = 379
-    Width = 96
+    Width = 99
     Height = 13
-    Caption = 'Choice target node:'
+    Caption = 'Default target node:'
   end
   object lbl6: TLabel
     Left = 328
@@ -279,7 +279,11 @@ object Form1: TForm1
         'DisplayMessageDirect'
         'IncreaseVar'
         'DecreaseVar'
-        'TextPrompt')
+        'TextPrompt'
+        'RandomNumber'
+        'SetRandomMin'
+        'SetRandomMax'
+        'ExecuteRandom')
     end
     object cbbvarsel: TComboBox
       Left = 240

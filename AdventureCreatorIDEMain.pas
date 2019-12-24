@@ -6,7 +6,7 @@ uses
   Windows, Messages, AdventureFile, AdventureBinary, SysUtils, Variants,
   Classes, Graphics,
   Controls, Forms,
-  Dialogs, xmldom, XMLIntf, msxmldom, XMLDoc, StdCtrls, Menus, Vcl.ComCtrls,
+ JclFileUtils, Dialogs, xmldom, XMLIntf, msxmldom, XMLDoc, StdCtrls, Menus, Vcl.ComCtrls,
   Vcl.WinXCtrls;
 
 type
@@ -505,6 +505,10 @@ begin
     LogMsg('Saving binary data...');
     SaveAdventureBin(dlgsave2.FileName);
     Logmsg('Binary data saved');
+    LogMsg('Copying engine ... ');
+    FileCopy('acengine.exe', changefileext(dlgsave2.FileName,'.exe'), true);
+    LogMsg('Engine copied as '+changefileext(dlgsave2.FileName,'.exe'));
+
   end;
 
 end;

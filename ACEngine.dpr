@@ -30,6 +30,7 @@ var
   currentmoney, numchoices: integer;
   moneystring, currentnode: ansistring;
   wingame, endgame: boolean;
+  random_min, random_max: integer;
   datafile: string;
   moneydisplay, debugmode: boolean;
   msg_gameover, msg_wrongchoice, msg_pressanykey: ansistring;
@@ -236,11 +237,26 @@ begin
       end
       else if cmd = 'RandomNumber' then
       begin
-        writeln;
         valuetemp := strtoint(value);
         randomnumber := random(valuetemp);
         SetVarValue(variable, inttostr(randomnumber));
-
+      end
+      else if cmd = 'ExecuteRandom' then
+      begin
+        randomnumber := random_min + random(random_max-random_min);
+        SetVarValue(variable, inttostr(randomnumber));
+      end
+      else if cmd = 'SetRandomMin' then
+      begin
+        valuetemp := strtoint(value);
+        random_min := valuetemp;
+        SetVarValue(variable, inttostr(randomnumber));
+      end
+      else if cmd = 'SetRandomMax' then
+      begin
+        valuetemp := strtoint(value);
+        random_max := valuetemp;
+        SetVarValue(variable, inttostr(randomnumber));
       end
 
       else if cmd = 'DisplayMessageDirect' then

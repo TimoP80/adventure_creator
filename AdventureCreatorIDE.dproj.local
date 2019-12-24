@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.623,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.613,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.272,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.262,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.144,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AboutForm.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.669,=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.144,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\AboutForm.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.898,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureBinary.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureBinaryRuntime.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.698,=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit6.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.569,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit6.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\ChoiceConditionsForm.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.569,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit6.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\ChoiceConditionsForm.dfm</Transaction>
     <Transaction>1899.12.30 00:00:00.000.065,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.976,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.448,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.144,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\AboutForm.dfm</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.144,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AboutForm.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.669,=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.898,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureBinary.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureBinaryRuntime.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.569,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit6.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\ChoiceConditionsForm.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.698,=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit6.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.569,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit6.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\ChoiceConditionsForm.dfm</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.272,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.623,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.613,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
   </Transactions>
 </BorlandProject>
