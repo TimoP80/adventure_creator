@@ -362,6 +362,15 @@ object Form1: TForm1
     TabOrder = 21
     OnClick = Button3Click
   end
+  object Button4: TButton
+    Left = 328
+    Top = 597
+    Width = 75
+    Height = 25
+    Caption = 'Clone Node'
+    TabOrder = 22
+    OnClick = Button4Click
+  end
   object DataReader: TXMLDocument
     Left = 240
     Top = 120

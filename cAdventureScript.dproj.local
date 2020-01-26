@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2020.01.26 14.51.38.418,=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit1.pas</Transaction>
+    <Transaction>2020.01.26 14.51.50.497,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureScriptCompilerUtils.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit1.pas</Transaction>
+  </Transactions>
+</BorlandProject>

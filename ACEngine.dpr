@@ -4,11 +4,13 @@ program ACEngine;
 {$IFOPT D-}{$WEAKLINKRTTI ON}{$ENDIF}
 {$RTTI EXPLICIT METHODS([]) PROPERTIES([]) FIELDS([])}
 
+
+
 uses
 
   AdventureBinaryRuntime,
-
   Console,
+  classes,
   Inifiles,
   SysUtils;
 
@@ -31,6 +33,7 @@ var
   moneystring, currentnode: ansistring;
   wingame, endgame: boolean;
   random_min, random_max: integer;
+  rcstream: Tresourcestream;
   datafile: string;
   moneydisplay, debugmode: boolean;
   msg_gameover, msg_wrongchoice, msg_pressanykey: ansistring;
@@ -175,7 +178,7 @@ begin
   Result := str;
   for u := 0 to AdventureBinData.VariableCount - 1 do
   begin
-    Result := STringReplace(Result, '$' + AdventureBinData.Variables[u].name,
+   Result := StringReplace(Result, '$' + AdventureBinData.Variables[u].name,
       AdventureBinData.Variables[u].value, [rfReplaceAll]);
   end;
 end;
@@ -213,9 +216,12 @@ begin
         if pos('$', value) <> 0 then
         begin
           varvaluetemp := ReplaceVars(value);
-          valuetemp := strtoint(GetVarValue(value));
+          Delete(value,1,1);
+          valuetemp := strtoint(GetVarValue(variable));
 
           valuetemp := valuetemp + strtoint(varvaluetemp);
+              SetVarValue(variable, inttostr(valuetemp));
+
         end
         else
         begin
@@ -516,10 +522,11 @@ begin
          writeln(alphabets[z], '. ', txt);
         choicemappings[choicemappingcount].letter := alphabets[choicemappingcount];
         choicemappings[choicemappingcount].number := z;
+           inc(choicemappingcount);
         end;
-        
-        inc(choicemappingcount);
-        
+
+
+
       end;
       writeln;
     end;
@@ -545,16 +552,12 @@ begin
   TextBackground(black);
   TextColor(White);
   writeln;
-  if lowercase(extractfilename(paramstr(0))) = lowercase('ACEngine.exe') then
-  begin
-    writeln('Paramstr(0) == ' + extractfilename(paramstr(0)));
-    writeln('Usage: ACEngine.EXE <adventurefile>');
-    writeln;
-  end
-  else
-  begin
-    datafile := changefileext(extractfilename(paramstr(0)), '.agf');
-  end;
+ if fileexists(changefileext(ParamStr(0),'.agf')) then
+    datafile := extractfilename(changefileext(ParamStr(0),'.agf'));
+//  rcstream := TResourceStream.Create(HInstance, 'Resource_1', rt_rcdata);
+//  rcstream.SaveToFile('temp.dat');
+//  datafile := 'temp.dat';
+
 
   if datafile <> '' then
   begin
@@ -577,6 +580,8 @@ begin
     writeln('Loaded "' + AdventureBinData.metatitle + '" by ' +
       AdventureBinData.metaauthor);
     writeln;
+  //  if fileexists('temp.dat') then deletefile('temp.dat');
+
   start:
 
     begin

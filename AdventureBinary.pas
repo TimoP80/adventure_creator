@@ -369,7 +369,6 @@ begin
       for i := 0 to AdventureData.GameNodes.Node[u].ChoiceConditions[z]
         .Count - 1 do
       begin
-      writeln('Compiling choice condition '+inttostr(i)+ ', node "'+AdventureData.GameNodes.Node[u].Name+'" choice text "'+AdventureData.GameNodes.Node[u].Choices[z].text+'"' );
         AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
           [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
           .NodeChoiceCount].ChoiceConditions[i].cmd := AdventureData.GameNodes[u]

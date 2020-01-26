@@ -1,0 +1,160 @@
+COMPILER AdventureScript    
+(*
+
+Parser grammar for adventure creator's scripting language
+  
+  *)
+
+DELPHI
+  PRIVATE
+    fOutputStream : TMemoryStream;
+    fSubSelectDepth : integer;
+    fInNaturalJoin : boolean;
+            
+    procedure Init;
+    procedure Final;
+                
+    property OutputStream : TMemoryStream read fOutputStream write fOutputStream;
+    CREATE 
+    fOutputStream := TMemoryStream.Create;
+  DESTROY                     
+    fOutputStream.Free;
+  ERRORS
+ 
+END_DELPHI
+
+(* Arbitrary Code *)
+
+const
+  PadLen = 20;
+                        
+function PadR(S : string; Ch : char; L : integer) : string;
+var
+  i : integer;
+begin
+  for i := 1 to L - (Length(s)) do
+    s := s + Ch;
+  Result := s;
+end;
+
+procedure T-->Grammar<--.Init;
+begin
+  OutputStream.Clear;
+
+ end;
+
+procedure T-->Grammar<--.Final;
+begin
+   OutputStream.Position := 0;
+  OutputStream.SaveToStream(ListStream);
+  OutputStream.Clear;
+end;
+                                 
+                                 
+function parse_string(zstr: string): string;
+var t:    integer;
+var temp: string;
+var len:  integer;
+begin;
+  len := 0;
+  temp:='';
+  //writeln ('Parsing string: ',zstr);
+  t   := pos('"', zstr) + 1;
+  len := length(zstr);
+  while (zstr[t] <> '"') do
+  begin;
+    //writeln (zstr[t]);
+    if (zstr[t] = '\') and (zstr[t + 1] = '"') then
+    begin;
+      temp := temp + '"';
+      Inc(t, 1);
+    end else
+    if (zstr[t] = '\') and (zstr[t + 1] = 't') then
+    begin;
+      temp := temp + #9;
+      Inc(t, 1);
+    end else
+    if (zstr[t] = '\') and (zstr[t + 1] = 'n') then
+    begin;
+      temp := temp + #13#10;
+      Inc(t, 1);
+    end else
+
+      temp := temp + zstr[t];
+
+    Inc(t);
+  end;
+  Result := temp;
+end;
+
+
+(* End of Arbitrary Code *)
+
+IGNORE CASE
+
+CHARACTERS
+  letter   = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" .
+  digit    = "0123456789" .
+  hexdigit = digit + "ABCDEFabcdef" .
+  tab      = CHR(9) .
+  lf       = CHR(10) .
+  eol      = CHR(13) .
+  files    = letter + digit + ":\." .
+  chars    = CHR(32) .. CHR(255) - "'" .
+  strings  = CHR(32) .. CHR(255) - '"'.
+  macros   = ANY - eol .
+
+COMMENTS FROM "/*" TO "*/"
+
+IGNORE
+  tab + eol + lf
+
+TOKENS
+  identifier = ( "_" | letter) { "_" | letter | digit } .
+  number     = digit { digit } [ "." { digit }] [ "U" | "u" | "L" | "l" ] .
+  hexnumber  = "0" ( "x" | "X" ) hexdigit { hexdigit } [ "U" | "u" | "L" | "l" ] .
+  string     = '"' { strings } '"' .
+  char       = "'" [ "\" ] chars "'" .
+  library    = "<" files { files } ">" .
+
+IGNORE CHR(1)..CHR(32)
+
+PRODUCTIONS
+
+Condition = (. write('Condition: '); .) "(" identifier (. write(lexstring) .) ("==" | "!=" | ">" | ">=" | "<=" | "<") (.write(' Operator: '+lexstring) .) (string (. writeln('String value: '+parse_string(lexstring)) .)| number (. writeln('Number value: '+lexstring) .) | identifier (. writeln('Variable: '+lexstring); .)) ")".
+
+                         
+Conditions = Condition {("&&" | "|") Condition}. 
+IfStatement = "if" (. writeln('If statement'); .) Conditions "{" (. writeln('If Main Begin'); .) {Command} "}" (. writeln('If Main End'); .) ["else" "{" (. writeln('If Else Begin');  .) {Command} "}" ](. writeln('If Else End'); .) .
+
+Param = (string (. writeln('Command param [string]: '+parse_string(lexstring)); .) | number (.writeln('Command param [number]: '+lexstring); .)| identifier (. writeln('Command param [identifier]: '+lexstring); .) ) .
+RandomChance = "RandomChance" (. write('RandomChance: '); .) "(" number (. write(' Probability='+lexstring); .) ")" "set" "target_node" string (.writeln(', Target node = '+parse_string(lexstring)); .) .
+
+RegularCommand = identifier (. writeln('RegularCommand: '+lexstring).) "(" [Param {"," Param}] ")"  .              
+
+RegularData = identifier (. writeln('RegularData [identifier]": '+lexstring); .) | number  (. writeln('RegularData [number]: '+lexstring); .) | string (. writeln ('RegularData [string]: '+lexstring).) .
+
+Expression = "+" (.writeln('Expression: [+]'); .) |"-"| (.writeln('Expression: [+]'); .)| "/" (.writeln('Expression: [/]'); .) |"*" (. writeln('Expression: [*]'); .) .
+
+RegularExp = RegularData {Expression RegularData}.
+
+SetVar = "SetVar" "$" identifier (.writeln('SetVar: '+lexstring)  .) "=" (RegularCommand | RegularExp).
+
+
+                         
+
+Command = (RegularCommand | SetVar | RandomChance)  ";" .
+
+    
+FuncDefinition = ("int" (. writeln('INT FUNC!'); .) | "void" (. writeln('VOID FUNC!'); .)| "str" (. writeln('STR FUNC!'); .)) identifier (.writeln('Name = '+lexstring) .)  "{"  {(Command|IfStatement)} "}" .
+
+
+
+
+    AdventureScript = "ScriptName" 
+                          string (.writeln('"Script name definition = "'+parse_string(lexstring)+'"'); .) "(" string (. writeln('Filename = '+lexstring); .) ")"
+                          "Author" string (. writeln('Author: '+parse_string(lexstring)); .)
+                         FuncDefinition {FuncDefinition} 
+                          .
+                                                           
+END AdventureScript.

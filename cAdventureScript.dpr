@@ -1,0 +1,96 @@
+program cAdventureScript;
+{$APPTYPE CONSOLE}
+
+uses
+  SysUtils,
+  AdventureScript,
+  AdventureScriptCompilerUtils in 'AdventureScriptCompilerUtils.pas';
+
+const
+  ResultStr = 'Results can be found in ';
+
+type
+  TDisplayObj = class(TObject)
+  private
+    function CustomErrorEvent(Sender : TObject; const ErrorCode : integer;
+      const Data : ansistring) : ansistring;
+    procedure OnSuccess(Sender : TObject);
+    procedure OnFailure(Sender : TObject; NumErrors : integer);
+  end; // DisplayObj
+
+var
+  AdventureScript1 : TAdventureScript;
+  DisplayObj : TDisplayObj;
+
+{ TDisplayObj }
+
+function TDisplayObj.CustomErrorEvent(Sender: TObject;
+  const ErrorCode: integer; const Data : ansistring): ansistring;
+  var errordata: ansistring;
+  begin
+  AdventureScript1.ErrorStr(errorcode, data);
+writeln('Error: '+Inttostr(errorcode)+': '+errordata);
+  Result := 'Error: ' + IntToStr(ErrorCode);
+end;
+
+procedure TDisplayObj.OnSuccess(Sender : TObject);
+begin
+  Writeln('Compile sucessful');
+  Writeln(ResultStr + ChangeFileExt(ParamStr(1),'.lst'));
+end;
+
+procedure TDisplayObj.OnFailure(Sender : TObject; NumErrors : integer);
+begin
+  Write('Compile completed with ' + IntToStr(NumErrors) + ' error');
+  if NumErrors <> 1 then
+    Writeln('s')
+  else
+    Writeln;
+  Writeln(ResultStr + ChangeFileExt(ParamStr(1),'.lst'));
+end;
+
+procedure ShowVersion;
+begin
+  Write('AdventureScript');
+  Writeln;
+  Writeln;
+end;
+
+procedure ShowHelp;
+begin
+  Writeln('Usage: cAdventureScript [filename]');
+  Writeln('Example: cAdventureScript Test.txt');
+end;
+
+begin
+  ShowVersion;
+  if ParamCount = 0 then
+  begin
+    ShowHelp;
+    Exit;
+  end;
+  AdventureScript1 := TAdventureScript.Create(nil);
+  try
+    DisplayObj := TDisplayObj.Create;
+    try
+      if NOT FileExists(ParamStr(1)) then
+      begin
+        Writeln('File: ' + ParamStr(1) + ' not found.');
+        Exit;
+      end;
+      AdventureScript1.OnCustomError := DisplayObj.CustomErrorEvent;
+      AdventureScript1.OnSuccess := DisplayObj.OnSuccess;
+      AdventureScript1.OnFailure := DisplayObj.OnFailure;
+
+      AdventureScript1.SourceFileName := ParamStr(1);
+      AdventureScript1.Execute;
+      AdventureScript1.ListStream.SaveToFile(ChangeFileExt(ParamStr(1),'.lst'));
+  writeln('Script contains '+inttostr(currentscript.instruction_count)+' instructions.');
+    finally
+      DisplayObj.Free;
+    end;
+  finally
+    AdventureScript1.Free;
+  end;
+
+end.    
