@@ -37,9 +37,7 @@ procedure TDisplayObj.OnSuccess(Sender : TObject);
 begin
   Writeln('Compile sucessful');
   Writeln(ResultStr + ChangeFileExt(ParamStr(1),'.lst'));
-  writeln('Script contains '+inttostr(currentscript.instruction_count)+' instructions.');
-  savescript(CurrentScript, ChangeFileExt(paramstr(1),'.asb'));
-  end;
+end;
 
 procedure TDisplayObj.OnFailure(Sender : TObject; NumErrors : integer);
 begin
@@ -85,9 +83,9 @@ begin
       AdventureScript1.OnFailure := DisplayObj.OnFailure;
 
       AdventureScript1.SourceFileName := ParamStr(1);
-      InitBuiltInFunctions;
       AdventureScript1.Execute;
       AdventureScript1.ListStream.SaveToFile(ChangeFileExt(ParamStr(1),'.lst'));
+  writeln('Script contains '+inttostr(currentscript.instruction_count)+' instructions.');
     finally
       DisplayObj.Free;
     end;

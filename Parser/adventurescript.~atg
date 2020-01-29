@@ -84,7 +84,7 @@ begin;
 
     Inc(t);
   end;
-  Result := temp;
+   Result := utf8tostring(temp);
 end;
 
 
@@ -121,24 +121,222 @@ IGNORE CHR(1)..CHR(32)
 
 PRODUCTIONS
 
-Condition = (. write('Condition: '); .) "(" identifier (. write(lexstring) .) ("==" | "!=" | ">" | ">=" | "<=" | "<") (.write(' Operator: '+lexstring) .) (string (. writeln('String value: '+parse_string(lexstring)) .)| number (. writeln('Number value: '+lexstring) .) | identifier (. writeln('Variable: '+lexstring); .)) ")".
+Condition = (. 
+instruction_temp := AddInstruction(CurrentScript, OP_CONDITION);
+   .) "(" identifier 
+(. 
+
+ AddParam(instruction_temp, LexString, DATA_TYPE_IF_VARIABLE);
+  
+.) ("==" 
+(. 
+  AddParam(instruction_temp, IF_EVAL_EQUALS, DATA_TYPE_IF_EVAL);
+.)
+| 
+"!=" 
+(.
+
+  AddParam(instruction_temp, IF_EVAL_NOT_EQUAL, DATA_TYPE_IF_EVAL);
+    
+
+.)
+|
+ ">" 
+ 
+ (.
+ 
+   AddParam(instruction_temp, IF_EVAL_LARGER, DATA_TYPE_IF_EVAL);
+  
+ .)
+ 
+| 
+">="
+(.
+  AddParam(instruction_temp, IF_EVAL_LARGER_OR_EQUAL, DATA_TYPE_IF_EVAL);
+  
+.) |
+  "<="
+(.
+
+  AddParam(instruction_temp, IF_EVAL_LESS_OR_EQUAL, DATA_TYPE_IF_EVAL);
+  
+.)
+   |
+    "<"
+(.
+  AddParam(instruction_temp, IF_EVAL_LESS, DATA_TYPE_IF_EVAL);
+  
+.)
+    ) 
+ (string 
+(. 
+  AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_IF_VALUE);
+  
+.)|
+ number (. 
+  AddParam(instruction_temp, strtoint(lexstring), DATA_TYPE_IF_VALUE);
+  
+.) | identifier (. 
+  AddParam(instruction_temp, lexstring, DATA_TYPE_IF_VALUE);
+  
+.) ) ")" (. 
+ NextInstruction(currentscript, instruction_temp);
+
+.).
 
                          
-Conditions = Condition {("&&" | "|") Condition}. 
-IfStatement = "if" (. writeln('If statement'); .) Conditions "{" (. writeln('If Main Begin'); .) {Command} "}" (. writeln('If Main End'); .) ["else" "{" (. writeln('If Else Begin');  .) {Command} "}" ](. writeln('If Else End'); .) .
+Conditions = Condition 
+{
+("&&" 
+(.
 
-Param = (string (. writeln('Command param [string]: '+parse_string(lexstring)); .) | number (.writeln('Command param [number]: '+lexstring); .)| identifier (. writeln('Command param [identifier]: '+lexstring); .) ) .
-RandomChance = "RandomChance" (. write('RandomChance: '); .) "(" number (. write(' Probability='+lexstring); .) ")" "set" "target_node" string (.writeln(', Target node = '+parse_string(lexstring)); .) .
+     instruction_temp := AddInstruction(CurrentScript, OP_IF_CONNECTOR);
+     AddParam(instruction_temp, IF_CONNECT_AND, DATA_TYPE_IF_CONNECTOR);
+     NextInstruction(CurrentScript, instruction_temp);
 
-RegularCommand = identifier (. writeln('RegularCommand: '+lexstring).) "(" [Param {"," Param}] ")"  .              
+.)
+| "|"
+(.
+     instruction_temp := AddInstruction(CurrentScript, OP_IF_CONNECTOR);
+     AddParam(instruction_temp, IF_CONNECT_OR, DATA_TYPE_IF_CONNECTOR);
+     NextInstruction(CurrentScript, instruction_temp);
 
-RegularData = identifier (. writeln('RegularData [identifier]": '+lexstring); .) | number  (. writeln('RegularData [number]: '+lexstring); .) | string (. writeln ('RegularData [string]: '+lexstring).) .
+.)
 
-Expression = "+" (.writeln('Expression: [+]'); .) |"-"| (.writeln('Expression: [+]'); .)| "/" (.writeln('Expression: [/]'); .) |"*" (. writeln('Expression: [*]'); .) .
+) 
+Condition}. 
 
-RegularExp = RegularData {Expression RegularData}.
+IfStatement = "if" 
+(. 
+  instruction_temp := AddInstruction(CurrentScript, OP_IF);
+  NextInstruction(currentscript, instruction_temp);
+.) Conditions "{" 
+(. 
+  instruction_temp := AddInstruction(CurrentScript, OP_IFBEGIN);
+  NextInstruction(currentscript, instruction_temp);
 
-SetVar = "SetVar" "$" identifier (.writeln('SetVar: '+lexstring)  .) "=" (RegularCommand | RegularExp).
+.) {Command} "}" 
+(. 
+  instruction_temp := AddInstruction(CurrentScript, OP_IFEND);
+  NextInstruction(currentscript, instruction_temp);
+
+.) ["else" "{" 
+(. 
+  instruction_temp := AddInstruction(CurrentScript, OP_IFELSEBEGIN);
+  NextInstruction(currentscript, instruction_temp);
+
+.) {Command} "}" ]
+
+(. 
+
+  instruction_temp := AddInstruction(CurrentScript, OP_IFELSEEND);
+  NextInstruction(currentscript, instruction_temp);
+
+.) .
+
+Param = (string 
+(. 
+ AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_PARAMETER);
+  .) | number 
+ (.
+  AddParam(instruction_temp, strtoint(lexstring), DATA_TYPE_PARAMETER);
+ 
+ .) |
+  identifier 
+  (. 
+  AddParam(instruction_temp, lexstring, DATA_TYPE_PARAMETER);
+ 
+  .) ) .
+RandomChance = "RandomChance" 
+(. 
+ instruction_temp := AddInstruction(CurrentScript, OP_RANDOMCHANCE);
+
+.) "(" number 
+(. 
+ AddParam(instruction_temp, strtoint(lexstring), DATA_TYPE_PROBABILITY);
+ 
+.) 
+")" "set" "target_node" string 
+(.
+ AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_TARGETNODE);
+ NextInstruction(currentscript,instruction_temp);
+
+.) .
+
+RegularCommand = identifier 
+(. 
+
+  instruction_temp := AddInstruction(currentscript, OP_FUNCTIONCALL);
+  if (isValidFunctionName(CurrentScript,lexstring)=false) then
+  begin
+   SemError(47, lexstring);
+  end;
+  AddParam(instruction_temp, lexstring, DATA_TYPE_FUNCTION_NAME);
+
+.) "(" [Param {"," Param}] ")"  .              
+
+RegularData = (.
+  instruction_temp := AddInstruction(currentscript, OP_EXPRESSIONDATA);
+
+ .) identifier 
+(. 
+  AddParam(instruction_temp, lexstring, DATA_TYPE_REGULARDATA);
+  NextInstruction(currentscript, instruction_temp);
+
+.) | number  
+(. 
+  AddParam(instruction_temp, VarAsType(strtoint(lexstring), VarInteger), DATA_TYPE_REGULARDATA);
+  NextInstruction(currentscript, instruction_temp);
+
+.) | string 
+(. 
+  AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_REGULARDATA);
+  NextInstruction(currentscript, instruction_temp);
+
+.) .
+
+Expression = "+" 
+(.
+    instruction_temp := AddInstruction(currentscript, OP_ADD);
+.) |"-"| 
+(.
+    instruction_temp := AddInstruction(currentscript, OP_SUBTRACT);
+
+.)
+| "/" 
+(.
+    instruction_temp := AddInstruction(currentscript, OP_DIVIDE);
+
+.) |"*" 
+(. 
+    instruction_temp := AddInstruction(currentscript, OP_MULTIPLY);
+
+.) .
+
+RegularExp = RegularData {
+Expression (.     
+NextInstruction(currentscript, instruction_temp);
+.)
+ RegularData}.
+
+SetVar = "SetVar" "$" identifier 
+(.
+
+  instruction_temp := AddInstruction(currentscript, OP_BEGININSTRUCTION);
+  NextInstruction(CurrentScript, instruction_temp);
+  name_temp := lexstring;
+  instruction_temp :=AddInstruction(currentscript, OP_SETVAR);
+  AddParam(instruction_temp, name_temp, DATA_TYPE_VAR_NAME);
+  NextInstruction(CurrentScript, instruction_temp);
+
+.)
+ "=" (RegularCommand 
+ (. 
+   instruction_temp := AddInstruction(currentscript, OP_ENDINSTRUCTION);
+  NextInstruction(CurrentScript, instruction_temp);
+
+ .) | 
+ RegularExp).
 
 
                          
@@ -146,14 +344,49 @@ SetVar = "SetVar" "$" identifier (.writeln('SetVar: '+lexstring)  .) "=" (Regula
 Command = (RegularCommand | SetVar | RandomChance)  ";" .
 
     
-FuncDefinition = ("int" (. writeln('INT FUNC!'); .) | "void" (. writeln('VOID FUNC!'); .)| "str" (. writeln('STR FUNC!'); .)) identifier (.writeln('Name = '+lexstring) .)  "{"  {(Command|IfStatement)} "}" .
+FuncDefinition = ("int" 
+(. 
+    return_type_temp := RETURN_TYPE_INTEGER;
+
+.) 
+| "void" 
+(. 
+    return_type_temp := RETURN_TYPE_VOID;
+
+.)
+| "str" 
+(.
+    return_type_temp := RETURN_TYPE_STRING;
+
+ .)
+) identifier 
+(.
+  name_temp := lexstring;
+  instruction_temp := AddInstruction(CurrentScript, OP_FUNCTIONDEF);
+  AddParam(instruction_temp, name_temp, DATA_TYPE_FUNCTION_NAME);
+  AddParam(instruction_temp, return_type_temp, DATA_TYPE_RETURN_TYPE);
+  NextInstruction(CurrentScript, instruction_temp);
+
+.)  "{"  {(Command|IfStatement)} "}" .
 
 
 
 
     AdventureScript = "ScriptName" 
-                          string (.writeln('"Script name definition = "'+parse_string(lexstring)+'"'); .) "(" string (. writeln('Filename = '+lexstring); .) ")"
-                          "Author" string (. writeln('Author: '+parse_string(lexstring)); .)
+                          string 
+                          (.
+  name_temp := parse_string(lexstring);
+                          .) "(" string 
+                          (. 
+  filename_temp := parse_string(lexstring);
+                          .) ")"
+                          "Author" 
+                          string 
+                          (. 
+                            author_temp := parse_string(lexstring);
+  initscriptdata(CurrentScript, name_temp, filename_temp, author_temp);
+
+                          .)
                          FuncDefinition {FuncDefinition} 
                           .
                                                            

@@ -11,7 +11,7 @@ unit AdventureScript;
 
 interface
 
-uses Variants, SysUtils, AdventureScriptCompilerUtils, Classes, CocoBase;
+uses SysUtils, AdventureScriptCompilerUtils, Classes, CocoBase;
 
 const
   maxT = 38;
@@ -1169,8 +1169,7 @@ begin
       Result := 'invalid Condition';
     46:
       Result := 'invalid Condition';
-    47:
-      Result := 'Unknown function '+Data;
+
   else
     if Assigned(OnCustomError) then
       Result := OnCustomError(self, ErrorCode, Data)
@@ -1248,13 +1247,16 @@ begin
   Expect(stringSym);
   name_temp := parse_string(lexstring);
 
+  writeln('"Script name definition: "' + name_temp + '"');
   Expect(_lparenSym);
   Expect(stringSym);
-  filename_temp := parse_string(lexstring);
+  filename_temp := lexstring;
+  writeln('Filename: ' + filename_temp);
   Expect(_rparenSym);
   Expect(AUTHORSym);
   Expect(stringSym);
   author_temp := parse_string(lexstring);
+  writeln('Author: ' + author_temp);
   initscriptdata(CurrentScript, name_temp, filename_temp, author_temp);
   _FuncDefinition;
   while (fCurrentInputSymbol = INTSym) OR (fCurrentInputSymbol = VOIDSym) OR
@@ -1287,14 +1289,17 @@ begin
   end;
   Expect(identifierSym);
 
+  writeln('Name  =  ' + lexstring);
   name_temp := lexstring;
   instruction_temp := AddInstruction(CurrentScript, OP_FUNCTIONDEF);
   AddParam(instruction_temp, name_temp, DATA_TYPE_FUNCTION_NAME);
   AddParam(instruction_temp, return_type_temp, DATA_TYPE_RETURN_TYPE);
-  NextInstruction(CurrentScript, instruction_temp);
+
+  // AddParam(instruction_temp,
+  NextInstruction(CurrentScript);
   Expect(_lbraceSym);
   instruction_temp := AddInstruction(CurrentScript, OP_FUNCTIONBEGIN);
-  NextInstruction(CurrentScript, instruction_temp);
+  NextInstruction(CurrentScript);
 
   while (fCurrentInputSymbol = identifierSym) OR (fCurrentInputSymbol = IFSym)
     OR (fCurrentInputSymbol = RANDOMCHANCESym) OR
@@ -1313,8 +1318,8 @@ begin
   end;
   Expect(_rbraceSym);
   instruction_temp := addinstruction(CurrentScript, OP_FUNCTIONEND);
-NextInstruction(CurrentScript, instruction_temp);
-  end;
+  NextInstruction(CurrentScript);
+end;
 
 procedure TAdventureScript._SetVar;
 begin
@@ -1322,17 +1327,18 @@ begin
   Expect(_dollarSym);
   Expect(identifierSym);
   instruction_temp := AddInstruction(currentscript, OP_BEGININSTRUCTION);
-  NextInstruction(CurrentScript, instruction_temp);
+  NextInstruction(CurrentScript);
+  writeln('SetVar:  ' + lexstring);
   name_temp := lexstring;
   instruction_temp :=AddInstruction(currentscript, OP_SETVAR);
   AddParam(instruction_temp, name_temp, DATA_TYPE_VAR_NAME);
-  NextInstruction(CurrentScript, instruction_temp);
+  NextInstruction(currentscript);
   Expect(_equalSym);
   if (fCurrentInputSymbol = identifierSym) then
   begin
     _RegularCommand;
   instruction_temp := AddInstruction(currentscript, OP_ENDINSTRUCTION);
-  NextInstruction(CurrentScript, instruction_temp);
+  NextInstruction(CurrentScript);
 
   end
   else if (fCurrentInputSymbol = identifierSym) OR
@@ -1352,9 +1358,9 @@ begin
   while _In(symSet[1], fCurrentInputSymbol) do
   begin
     _Expression;
-    NextInstruction(currentscript, instruction_temp);
     _RegularData;
   end;
+  NextInstruction(currentscript);
 end;
 
 procedure TAdventureScript._Expression;
@@ -1362,12 +1368,14 @@ begin
   if (fCurrentInputSymbol = _plusSym) then
   begin
     Get;
+    writeln('Expression:  [+]');
     instruction_temp := AddInstruction(currentscript, OP_ADD);
   end
   else if (fCurrentInputSymbol = _minusSym) then
   begin
-    Get;
+    writeln('Expression:  [-]');
     instruction_temp := AddInstruction(currentscript, OP_SUBTRACT);
+    Get;
   end
   else if (fCurrentInputSymbol = identifierSym) OR
     (fCurrentInputSymbol = numberSym) OR (fCurrentInputSymbol = stringSym) then
@@ -1377,11 +1385,13 @@ begin
   else if (fCurrentInputSymbol = _slashSym) then
   begin
     Get;
+    writeln('Expression:  [/]');
     instruction_temp := AddInstruction(currentscript, OP_DIVIDE);
   end
   else if (fCurrentInputSymbol = _starSym) then
   begin
     Get;
+    writeln('Expression:  [*]');
     instruction_temp := AddInstruction(currentscript, OP_MULTIPLY);
   end
   else
@@ -1392,24 +1402,23 @@ end;
 
 procedure TAdventureScript._RegularData;
 begin
-  instruction_temp := AddInstruction(currentscript, OP_EXPRESSIONDATA);
   if (fCurrentInputSymbol = identifierSym) then
   begin
     Get;
+    writeln('RegularData  [identifier]":  ' + lexstring);
   AddParam(instruction_temp, lexstring, DATA_TYPE_REGULARDATA);
-  NextInstruction(currentscript, instruction_temp);
   end
   else if (fCurrentInputSymbol = numberSym) then
   begin
     Get;
-  AddParam(instruction_temp, VarAsType(strtoint(lexstring), VarInteger), DATA_TYPE_REGULARDATA);
-  NextInstruction(currentscript, instruction_temp);
+    writeln('RegularData  [number]:  ' + lexstring);
+  AddParam(instruction_temp, strtoint(lexstring), DATA_TYPE_REGULARDATA);
   end
   else if (fCurrentInputSymbol = stringSym) then
   begin
     Get;
+    writeln('RegularData  [string]:  ' + lexstring);
   AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_REGULARDATA);
-  NextInstruction(currentscript, instruction_temp);
   end
   else
   begin
@@ -1420,12 +1429,8 @@ end;
 procedure TAdventureScript._RegularCommand;
 begin
   Expect(identifierSym);
-  instruction_temp := AddInstruction(currentscript, OP_FUNCTIONCALL);
-  if (isValidFunctionName(CurrentScript,lexstring)=false) then
-  begin
-   SemError(47, lexstring);
-  end;
-  AddParam(instruction_temp, lexstring, DATA_TYPE_FUNCTION_NAME);
+  AddInstruction(currentscript, OP_FUNCTIONCALL);
+  writeln('RegularCommand:  ' + lexstring);
   Expect(_lparenSym);
   if (fCurrentInputSymbol = identifierSym) OR (fCurrentInputSymbol = numberSym)
     OR (fCurrentInputSymbol = stringSym) then
@@ -1438,23 +1443,20 @@ begin
     end;
   end;
   Expect(_rparenSym);
-  NextInstruction(currentscript, instruction_temp);
 end;
 
 procedure TAdventureScript._RandomChance;
 begin
   Expect(RANDOMCHANCESym);
-  instruction_temp := AddInstruction(CurrentScript, OP_RANDOMCHANCE);
-
+  write('RandomChance:  ');
   Expect(_lparenSym);
   Expect(numberSym);
-  AddParam(instruction_temp, strtoint(lexstring), DATA_TYPE_PROBABILITY);
+  write('  Probability=' + lexstring);
   Expect(_rparenSym);
   Expect(SETSym);
   Expect(TARGET_underscoreNODESym);
   Expect(stringSym);
-  AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_TARGETNODE);
-  NextInstruction(currentscript,instruction_temp);
+  writeln(',  Target  node  =  ' + parse_string(lexstring));
 end;
 
 procedure TAdventureScript._Param;
@@ -1462,17 +1464,17 @@ begin
   if (fCurrentInputSymbol = stringSym) then
   begin
     Get;
-  AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_PARAMETER);
+    writeln('Command  param  [string]:  ' + parse_string(lexstring));
   end
   else if (fCurrentInputSymbol = numberSym) then
   begin
     Get;
-  AddParam(instruction_temp, strtoint(lexstring), DATA_TYPE_PARAMETER);
+    writeln('Command  param  [number]:  ' + lexstring);
   end
   else if (fCurrentInputSymbol = identifierSym) then
   begin
     Get;
-  AddParam(instruction_temp, lexstring, DATA_TYPE_PARAMETER);
+    writeln('Command  param  [identifier]:  ' + lexstring);
   end
   else
   begin
@@ -1504,12 +1506,10 @@ end;
 procedure TAdventureScript._IfStatement;
 begin
   Expect(IFSym);
-  instruction_temp := AddInstruction(CurrentScript, OP_IF);
-  NextInstruction(currentscript, instruction_temp);
+  writeln('If  statement');
   _Conditions;
   Expect(_lbraceSym);
-  instruction_temp := AddInstruction(CurrentScript, OP_IFBEGIN);
-  NextInstruction(currentscript, instruction_temp);
+  writeln('If  Main  Begin');
   while (fCurrentInputSymbol = identifierSym) OR
     (fCurrentInputSymbol = RANDOMCHANCESym) OR
     (fCurrentInputSymbol = SETVARSym) do
@@ -1517,14 +1517,12 @@ begin
     _Command;
   end;
   Expect(_rbraceSym);
-  instruction_temp := AddInstruction(CurrentScript, OP_IFEND);
-  NextInstruction(currentscript, instruction_temp);
+  writeln('If  Main  End');
   if (fCurrentInputSymbol = ELSESym) then
   begin
     Get;
     Expect(_lbraceSym);
-  instruction_temp := AddInstruction(CurrentScript, OP_IFELSEBEGIN);
-  NextInstruction(currentscript, instruction_temp);
+    writeln('If  Else  Begin');
     while (fCurrentInputSymbol = identifierSym) OR
       (fCurrentInputSymbol = RANDOMCHANCESym) OR
       (fCurrentInputSymbol = SETVARSym) do
@@ -1532,9 +1530,8 @@ begin
       _Command;
     end;
     Expect(_rbraceSym);
-  instruction_temp := AddInstruction(CurrentScript, OP_IFELSEEND);
-  NextInstruction(currentscript, instruction_temp);
   end;
+  writeln('If  Else  End');
 end;
 
 procedure TAdventureScript._Conditions;
@@ -1545,18 +1542,11 @@ begin
   begin
     if (fCurrentInputSymbol = _and_andSym) then
     begin
-
       Get;
-     instruction_temp := AddInstruction(CurrentScript, OP_IF_CONNECTOR);
-     AddParam(instruction_temp, IF_CONNECT_AND, DATA_TYPE_IF_CONNECTOR);
-     NextInstruction(CurrentScript, instruction_temp);
     end
     else
     begin
       Get;
-     instruction_temp := AddInstruction(CurrentScript, OP_IF_CONNECTOR);
-     AddParam(instruction_temp, IF_CONNECT_OR, DATA_TYPE_IF_CONNECTOR);
-     NextInstruction(CurrentScript, instruction_temp);
     end;
     _Condition;
   end;
@@ -1564,69 +1554,62 @@ end;
 
 procedure TAdventureScript._Condition;
 begin
-  instruction_temp := AddInstruction(CurrentScript, OP_CONDITION);
+  write('Condition:  ');
   Expect(_lparenSym);
   Expect(identifierSym);
-  AddParam(instruction_temp, LexString, DATA_TYPE_IF_VARIABLE);
+  write(lexstring);
   case fCurrentInputSymbol of
     _equal_equalSym:
       begin
-       Get;
-    AddParam(instruction_temp, IF_EVAL_EQUALS, DATA_TYPE_IF_EVAL);
+        Get;
       end;
     _bang_equalSym:
       begin
         Get;
-    AddParam(instruction_temp, IF_EVAL_NOT_EQUAL, DATA_TYPE_IF_EVAL);
       end;
     _greaterSym:
       begin
         Get;
-    AddParam(instruction_temp, IF_EVAL_LARGER, DATA_TYPE_IF_EVAL);
       end;
     _greater_equalSym:
       begin
         Get;
-    AddParam(instruction_temp, IF_EVAL_LARGER_OR_EQUAL, DATA_TYPE_IF_EVAL);
       end;
     _less_equalSym:
       begin
         Get;
-    AddParam(instruction_temp, IF_EVAL_LESS_OR_EQUAL, DATA_TYPE_IF_EVAL);
       end;
     _lessSym:
       begin
         Get;
-    AddParam(instruction_temp, IF_EVAL_LESS, DATA_TYPE_IF_EVAL);
       end;
   else
     begin
       SynError(45);
     end;
   end;
+  write('  Operator:  ' + lexstring);
   if (fCurrentInputSymbol = stringSym) then
   begin
     Get;
-    AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_IF_VALUE);
+    writeln('String  value:  ' + parse_string(lexstring))
   end
   else if (fCurrentInputSymbol = numberSym) then
   begin
     Get;
-    AddParam(instruction_temp, strtoint(lexstring), DATA_TYPE_IF_VALUE);
+    writeln('Number  value:  ' + lexstring)
   end
   else if (fCurrentInputSymbol = identifierSym) then
   begin
     Get;
-    AddParam(instruction_temp, lexstring, DATA_TYPE_IF_VALUE);
+    writeln('Variable:  ' + lexstring);
   end
   else
   begin
     SynError(46);
   end;
   Expect(_rparenSym);
- NextInstruction(currentscript, instruction_temp);
-
-  end;
+end;
 
 procedure TAdventureScript.Parse;
 begin
