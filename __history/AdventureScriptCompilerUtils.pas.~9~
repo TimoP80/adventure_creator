@@ -154,7 +154,7 @@ begin
   built_in_functions.add('Random');
   built_in_functions.add('ExecuteRandomChance');
   built_in_functions.add('ReadInput');
-  built_in_functions.add('Return');
+
 end;
 
 function ParamTypeToStr(paramtype: integer): string;

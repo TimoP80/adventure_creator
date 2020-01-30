@@ -11,7 +11,8 @@ uses
   ChoiceCommandsForm in 'ChoiceCommandsForm.pas' {Form4},
   AboutForm in 'AboutForm.pas' {IDEAboutForm},
   ChoiceConditionsForm in 'ChoiceConditionsForm.pas' {Form6},
-  AdventureFile in 'AdventureFile.pas';
+  ScriptEditorForm in 'ScriptEditorForm.pas' {Form5},
+  AdventureFIle in 'AdventureFile.pas';
 
 {$R *.res}
 
@@ -26,5 +27,6 @@ begin
   Application.CreateForm(TIDEAboutForm, IDEAboutForm);
   Application.CreateForm(TForm6, Form6);
   Application.CreateForm(TIDEAboutForm, IDEAboutForm);
+  Application.CreateForm(TForm5, Form5);
   Application.Run;
 end.

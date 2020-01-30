@@ -75,6 +75,7 @@ type
     Button3: TButton;
     InitnewfieldsinXMLdevonly1: TMenuItem;
     Button4: TButton;
+    Scripts1: TMenuItem;
     procedure LoadAdventureFile1Click(Sender: TObject);
     procedure Quit1Click(Sender: TObject);
     procedure btn3Click(Sender: TObject);
@@ -119,6 +120,7 @@ type
     procedure InitnewfieldsinXMLdevonly1Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
+    procedure Scripts1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -145,7 +147,8 @@ procedure LogMsg(s: string);
 
 implementation
 
-uses MetaData, VarEditor, ChoiceCommandsForm, AboutForm, ChoiceConditionsForm;
+uses MetaData, VarEditor, ChoiceCommandsForm, AboutForm, ChoiceConditionsForm,
+  ScriptEditorForm;
 
 procedure UpdateCaption;
 begin
@@ -243,6 +246,7 @@ begin
     LogMsg('Adventuregame: "' + AdventureData.MetaInfo.Title + '" by ' +
       AdventureData.MetaInfo.Author);
     LogMsg('Node count: ' + inttostr(AdventureData.GameNodes.Count));
+    LogMsg('Script count: '+inttostr(AdventureData.Scripts.Count));
     UpdateNodeLists;
     UpdateVariables;
     CurrentFilename := extractfilename(dlgOpen1.FileName);
@@ -406,6 +410,13 @@ begin
     // form1.Caption := 'Adventure Creator 1.0 IDE - ['+extractfilename(dlgsave1.FileName)+']';
 
   end;
+end;
+
+procedure TForm1.Scripts1Click(Sender: TObject);
+begin
+updatescripts;
+form5.showmodal;
+
 end;
 
 procedure TForm1.ShowNodeLinks1Click(Sender: TObject);

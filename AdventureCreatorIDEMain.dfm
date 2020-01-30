@@ -430,6 +430,10 @@ object Form1: TForm1
         Caption = 'Init new fields in XML (dev only)'
         OnClick = InitnewfieldsinXMLdevonly1Click
       end
+      object Scripts1: TMenuItem
+        Caption = 'Scripts...'
+        OnClick = Scripts1Click
+      end
     end
     object Help1: TMenuItem
       Caption = 'Help'

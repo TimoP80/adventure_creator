@@ -101,17 +101,10 @@ function OpcodeToStr(opcode: integer): string;
 procedure InitBuiltInFunctions;
 function IsValidFunctionName(TheScript: Script; str: string): boolean;
 procedure LoadScript(TheScript: Script; filename: string);
-procedure SaveScriptToAGF(var f: file; TheScript: Script);
-procedure LoadScriptFromAGF(var f: file;var TheScript: Script);
+procedure SaveScriptToAGF(var f: file; TheScript: Script; filename: string);
+procedure LoadScriptFromAGF(var f: file; TheScript: Script; filename: string);
 
 implementation
-
-
-procedure RunScript (TheScript: Script);
-var i: integer;
-begin
-
-end;
 
 function GetIsValidFunctionFromCode(TheScript: Script; str: ansistring)
   : boolean;
@@ -151,10 +144,8 @@ begin
   built_in_functions.add('RandomFromList');
   built_in_functions.add('DisplayMessage');
   built_in_functions.add('WaitForKeyPress');
-  built_in_functions.add('Random');
-  built_in_functions.add('ExecuteRandomChance');
-  built_in_functions.add('ReadInput');
-  built_in_functions.add('Return');
+  built_in_functions.add('RandomNumber');
+
 end;
 
 function ParamTypeToStr(paramtype: integer): string;
@@ -205,8 +196,6 @@ begin
       result := 'OP_IFEND';
     OP_IFELSEBEGIN:
       result := 'OP_IFELSEBEGIN';
-    OP_IFELSEEND:
-      result := 'OP_IFELSEEND';
     OP_CONDITION:
       result := 'OP_CONDITION';
     OP_SETVAR:
@@ -229,11 +218,8 @@ begin
       result := 'OP_MULTIPLY';
     OP_EXPRESSIONDATA:
       result := 'OP_EXPRESSIONDATA';
-    OP_IF_CONNECTOR:
-     result:='OP_IF_CONNECTOR';
-
   else
-    result := 'OP_UNKNOWN ('+format('%0.4x',[opcode])+')';
+    result := 'OP_UNKNOWN';
   end;
 end;
 
@@ -293,7 +279,7 @@ begin
 end;
 
 
-procedure LoadScriptFromAGF(var f: file;var TheScript: Script);
+procedure LoadScriptFromAGF(var f: file; TheScript: Script; filename: string);
 var
   j, i: integer;
   lengths: array of integer;
@@ -303,12 +289,12 @@ var
   stringtemp: ansistring;
   length_temp: integer;
   vartype_temp: integer;
+  F: file;
 begin
   ReadHeader(F, 'AdventureScript v1.0');
   ReadString(F, TheScript.script_name);
   ReadString(F, TheScript.script_filename);
   ReadString(F, TheScript.script_author);
- // writeln('Load script: '+thescript.script_name+' ('+thescript.script_filename+')');
   blockread(F, TheScript.instruction_count, 4);
   setlength(TheScript.instructions, TheScript.instruction_count + 1);
   for i := 0 to TheScript.instruction_count - 1 do
@@ -451,11 +437,12 @@ begin
   closefile(F);
 end;
 
-procedure SaveScriptToAGF(var f: file; TheScript: Script);
+procedure SaveScriptToAGF(var f: file; TheScript: Script; filename: string);
 var
   j, i: integer;
   length_temp: integer;
   vartype_temp: integer;
+  F: file;
 begin
   WriteStringNoLength(F, 'AdventureScript v1.0');
   WriteString(F, TheScript.script_name);
@@ -558,6 +545,7 @@ function AddInstruction(var TheScript: Script; inst_type: integer): instruction;
 begin
   instruction_ended := false;
   instruction_created := true;
+  // writeln('AddInstruction('+opcodetostr(inst_type)+')');
   setlength(TheScript.instructions, TheScript.instruction_count + 1);
   TheScript.instructions[TheScript.instruction_count].inst_type := inst_type;
   result.inst_paramcount := 0;
@@ -588,7 +576,6 @@ end;
 procedure InitScriptData(var TheScript: Script; name: ansistring;
   filename: ansistring; author: ansistring);
 begin
- thescript.instruction_count := 0;
   TheScript.script_name := name;
   TheScript.script_filename := filename;
   TheScript.script_author := author;

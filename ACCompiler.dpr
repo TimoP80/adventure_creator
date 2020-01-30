@@ -30,5 +30,5 @@ begin
   writeln('Creating executable ... ');
   FileCopy('.\ACEngine.exe', changefileext(ParamStr(1), '.exe'), true);
   writeln('Bimary file "' + changefileext(ParamStr(1), '.exe') + '" created.');
-
+  writeln;
 end.

@@ -3,7 +3,7 @@
 {                                                                            }
 {                              XML Data Binding                              }
 {                                                                            }
-{         Generated on: 8.12.2019 20:50:21                                   }
+{         Generated on: 30.1.2020 12.12.19                                   }
 {       Generated from: C:\CodeProjects\AdventureCreator\AdventureFIle.xml   }
 {   Settings stored in: C:\CodeProjects\AdventureCreator\AdventureFIle.xdb   }
 {                                                                            }
@@ -13,7 +13,7 @@ unit AdventureFIle;
 
 interface
 
-uses xmldom, XMLDoc, XMLIntf;
+uses Xml.xmldom, Xml.XMLDoc, Xml.XMLIntf;
 
 type
 
@@ -21,6 +21,9 @@ type
 
   IXMLAdventureGameType = interface;
   IXMLMetaInfoType = interface;
+  IXMLScriptsType = interface;
+  IXMLScriptType = interface;
+  IXMLScriptTypeList = interface;
   IXMLVariablesType = interface;
   IXMLVariableType = interface;
   IXMLGameNodesType = interface;
@@ -30,20 +33,28 @@ type
   IXMLChoiceCommandsType = interface;
   IXMLCommandListType = interface;
   IXMLCMDType = interface;
-  IXMLCMDTypeList = interface;
+  IXMLChoiceConditionsType = interface;
+  IXMLConditionListType = interface;
+  IXMLConditionListTypeList = interface;
+  IXMLConditionType = interface;
+  IXMLConditionTypeList = interface;
+  IXMLNodeCommandsType = interface;
   IXMLCommandListType2 = interface;
+  IXMLNodeCommandsType2 = interface;
   IXMLChoicesType2 = interface;
 
 { IXMLAdventureGameType }
 
   IXMLAdventureGameType = interface(IXMLNode)
-    ['{CEA28F20-832B-40EB-812A-3A4EEFBDF993}']
+    ['{C6AFBDFA-FBA8-4DCC-BDD5-6BEA70E3248A}']
     { Property Accessors }
     function Get_MetaInfo: IXMLMetaInfoType;
+    function Get_Scripts: IXMLScriptsType;
     function Get_Variables: IXMLVariablesType;
     function Get_GameNodes: IXMLGameNodesType;
     { Methods & Properties }
     property MetaInfo: IXMLMetaInfoType read Get_MetaInfo;
+    property Scripts: IXMLScriptsType read Get_Scripts;
     property Variables: IXMLVariablesType read Get_Variables;
     property GameNodes: IXMLGameNodesType read Get_GameNodes;
   end;
@@ -51,7 +62,7 @@ type
 { IXMLMetaInfoType }
 
   IXMLMetaInfoType = interface(IXMLNode)
-    ['{8B830070-46F2-442A-BD93-780348A05E52}']
+    ['{2313F95E-0855-4E39-ABCD-1BE5A70360B3}']
     { Property Accessors }
     function Get_Title: UnicodeString;
     function Get_Author: UnicodeString;
@@ -65,10 +76,51 @@ type
     property Description: UnicodeString read Get_Description write Set_Description;
   end;
 
+{ IXMLScriptsType }
+
+  IXMLScriptsType = interface(IXMLNodeCollection)
+    ['{1C3CA949-65D2-4F49-9FCA-1D3479BA2F4C}']
+    { Property Accessors }
+    function Get_Script(Index: Integer): IXMLScriptType;
+    { Methods & Properties }
+    function Add: IXMLScriptType;
+    function Insert(const Index: Integer): IXMLScriptType;
+    property Script[Index: Integer]: IXMLScriptType read Get_Script; default;
+  end;
+
+{ IXMLScriptType }
+
+  IXMLScriptType = interface(IXMLNode)
+    ['{651502C9-31DA-401D-9D61-8F30DAAAAAF9}']
+    { Property Accessors }
+    function Get_Name: UnicodeString;
+    function Get_Filename: UnicodeString;
+    function Get_Author: UnicodeString;
+    procedure Set_Name(Value: UnicodeString);
+    procedure Set_Filename(Value: UnicodeString);
+    procedure Set_Author(Value: UnicodeString);
+    { Methods & Properties }
+    property Name: UnicodeString read Get_Name write Set_Name;
+    property Filename: UnicodeString read Get_Filename write Set_Filename;
+    property Author: UnicodeString read Get_Author write Set_Author;
+  end;
+
+{ IXMLScriptTypeList }
+
+  IXMLScriptTypeList = interface(IXMLNodeCollection)
+    ['{06C140C5-0CFC-4EB6-8676-070A6A40F748}']
+    { Methods & Properties }
+    function Add: IXMLScriptType;
+    function Insert(const Index: Integer): IXMLScriptType;
+
+    function Get_Item(Index: Integer): IXMLScriptType;
+    property Items[Index: Integer]: IXMLScriptType read Get_Item; default;
+  end;
+
 { IXMLVariablesType }
 
   IXMLVariablesType = interface(IXMLNodeCollection)
-    ['{867378DF-4E21-43EA-87F5-90754CB51E53}']
+    ['{D6DBEEBB-1F2F-447A-A197-40B6A760EFD8}']
     { Property Accessors }
     function Get_Variable(Index: Integer): IXMLVariableType;
     { Methods & Properties }
@@ -80,7 +132,7 @@ type
 { IXMLVariableType }
 
   IXMLVariableType = interface(IXMLNode)
-    ['{F750FC8D-5BC6-4695-8E70-8668E35CED69}']
+    ['{ED4DFEBE-F161-4771-A122-5BD984BB48E5}']
     { Property Accessors }
     function Get_Name: UnicodeString;
     procedure Set_Name(Value: UnicodeString);
@@ -91,7 +143,7 @@ type
 { IXMLGameNodesType }
 
   IXMLGameNodesType = interface(IXMLNodeCollection)
-    ['{A121B25C-8B94-4286-B395-76FC98186835}']
+    ['{CB95E8CB-364D-4C1A-A784-BED781CDF95C}']
     { Property Accessors }
     function Get_Node(Index: Integer): IXMLNodeType;
     { Methods & Properties }
@@ -103,31 +155,32 @@ type
 { IXMLNodeType }
 
   IXMLNodeType = interface(IXMLNode)
-    ['{4A3A6077-E502-4801-8129-B47B65EE5DA0}']
+    ['{6F8A7B4A-4D3E-4E9B-B980-88D6A365BB83}']
     { Property Accessors }
     function Get_Name: UnicodeString;
     function Get_DescriptionText: UnicodeString;
     function Get_Choices: IXMLChoicesType;
     function Get_ChoiceCommands: IXMLChoiceCommandsType;
-    function Get_NodeCommands: UnicodeString;
+    function Get_ChoiceConditions: IXMLChoiceConditionsType;
+    function Get_NodeCommands: IXMLNodeCommandsType;
     function Get_NodeParent: UnicodeString;
     procedure Set_Name(Value: UnicodeString);
     procedure Set_DescriptionText(Value: UnicodeString);
-    procedure Set_NodeCommands(Value: UnicodeString);
     procedure Set_NodeParent(Value: UnicodeString);
     { Methods & Properties }
     property Name: UnicodeString read Get_Name write Set_Name;
     property DescriptionText: UnicodeString read Get_DescriptionText write Set_DescriptionText;
     property Choices: IXMLChoicesType read Get_Choices;
     property ChoiceCommands: IXMLChoiceCommandsType read Get_ChoiceCommands;
-    property NodeCommands: UnicodeString read Get_NodeCommands write Set_NodeCommands;
+    property ChoiceConditions: IXMLChoiceConditionsType read Get_ChoiceConditions;
+    property NodeCommands: IXMLNodeCommandsType read Get_NodeCommands;
     property NodeParent: UnicodeString read Get_NodeParent write Set_NodeParent;
   end;
 
 { IXMLChoicesType }
 
   IXMLChoicesType = interface(IXMLNodeCollection)
-    ['{7F56CCEB-6BBC-4338-A5BB-0FE9EDC22C7B}']
+    ['{FD108B96-B1ED-4858-BD7C-1FC304DC34EF}']
     { Property Accessors }
     function Get_Choice(Index: Integer): IXMLChoiceType;
     { Methods & Properties }
@@ -139,27 +192,27 @@ type
 { IXMLChoiceType }
 
   IXMLChoiceType = interface(IXMLNode)
-    ['{C6BAF94E-BABB-42E3-9BA0-AD1BD486EAE1}']
+    ['{D68EC230-C4B6-4E43-A41F-377B5A062A79}']
     { Property Accessors }
-    function Get_Endgame: Boolean;
+    function Get_Endgame: UnicodeString;
     function Get_Targetnode: UnicodeString;
     function Get_Addscore: Integer;
-    function Get_Wingame: Boolean;
-    procedure Set_Endgame(Value: Boolean);
+    function Get_Wingame: UnicodeString;
+    procedure Set_Endgame(Value: UnicodeString);
     procedure Set_Targetnode(Value: UnicodeString);
     procedure Set_Addscore(Value: Integer);
-    procedure Set_Wingame(Value: Boolean);
+    procedure Set_Wingame(Value: UnicodeString);
     { Methods & Properties }
-    property Endgame: Boolean read Get_Endgame write Set_Endgame;
+    property Endgame: UnicodeString read Get_Endgame write Set_Endgame;
     property Targetnode: UnicodeString read Get_Targetnode write Set_Targetnode;
     property Addscore: Integer read Get_Addscore write Set_Addscore;
-    property Wingame: Boolean read Get_Wingame write Set_Wingame;
+    property Wingame: UnicodeString read Get_Wingame write Set_Wingame;
   end;
 
 { IXMLChoiceCommandsType }
 
   IXMLChoiceCommandsType = interface(IXMLNodeCollection)
-    ['{958052D5-30B7-40F6-B10C-EA8992C7E7E1}']
+    ['{F71A9C27-E407-4125-AC48-7B98C29CF7E0}']
     { Property Accessors }
     function Get_CommandList(Index: Integer): IXMLCommandListType;
     { Methods & Properties }
@@ -171,7 +224,7 @@ type
 { IXMLCommandListType }
 
   IXMLCommandListType = interface(IXMLNodeCollection)
-    ['{8D86B694-60B4-4D22-9D9E-451415087AB5}']
+    ['{C8068F59-221A-4BFF-AB9B-43C84FEE1F5E}']
     { Property Accessors }
     function Get_CMD(Index: Integer): IXMLCMDType;
     { Methods & Properties }
@@ -183,7 +236,7 @@ type
 { IXMLCMDType }
 
   IXMLCMDType = interface(IXMLNode)
-    ['{3ED4C544-8AE5-4C84-9D9D-4D0A25861D09}']
+    ['{A764D52A-56AE-4C70-B265-5E7816DEC8F0}']
     { Property Accessors }
     function Get_Name: UnicodeString;
     function Get_Variable: UnicodeString;
@@ -194,34 +247,108 @@ type
     property Variable: UnicodeString read Get_Variable write Set_Variable;
   end;
 
-{ IXMLCMDTypeList }
+{ IXMLChoiceConditionsType }
 
-  IXMLCMDTypeList = interface(IXMLNodeCollection)
-    ['{24AC4EC3-2F1D-49F5-937F-07D9C4F8ADBB}']
+  IXMLChoiceConditionsType = interface(IXMLNodeCollection)
+    ['{0DDE525E-30AB-4E37-BEB1-A82CE828192E}']
+    { Property Accessors }
+    function Get_ConditionList(Index: Integer): IXMLConditionListType;
+    { Methods & Properties }
+    function Add: IXMLConditionListType;
+    function Insert(const Index: Integer): IXMLConditionListType;
+    property ConditionList[Index: Integer]: IXMLConditionListType read Get_ConditionList; default;
+  end;
+
+{ IXMLConditionListType }
+
+  IXMLConditionListType = interface(IXMLNodeCollection)
+    ['{33267419-ADD3-4231-8321-2A8B234D240C}']
+    { Property Accessors }
+    function Get_Condition(Index: Integer): IXMLConditionType;
+    { Methods & Properties }
+    function Add: IXMLConditionType;
+    function Insert(const Index: Integer): IXMLConditionType;
+    property Condition[Index: Integer]: IXMLConditionType read Get_Condition; default;
+  end;
+
+{ IXMLConditionListTypeList }
+
+  IXMLConditionListTypeList = interface(IXMLNodeCollection)
+    ['{24FD26B3-B730-479B-ABCA-83F28FDDBC23}']
+    { Methods & Properties }
+    function Add: IXMLConditionListType;
+    function Insert(const Index: Integer): IXMLConditionListType;
+
+    function Get_Item(Index: Integer): IXMLConditionListType;
+    property Items[Index: Integer]: IXMLConditionListType read Get_Item; default;
+  end;
+
+{ IXMLConditionType }
+
+  IXMLConditionType = interface(IXMLNode)
+    ['{9F1D0E58-C5EE-48E6-9CB7-66350B9197B3}']
+    { Property Accessors }
+    function Get_Name: UnicodeString;
+    function Get_Varname: UnicodeString;
+    function Get_Eval: UnicodeString;
+    procedure Set_Name(Value: UnicodeString);
+    procedure Set_Varname(Value: UnicodeString);
+    procedure Set_Eval(Value: UnicodeString);
+    { Methods & Properties }
+    property Name: UnicodeString read Get_Name write Set_Name;
+    property Varname: UnicodeString read Get_Varname write Set_Varname;
+    property Eval: UnicodeString read Get_Eval write Set_Eval;
+  end;
+
+{ IXMLConditionTypeList }
+
+  IXMLConditionTypeList = interface(IXMLNodeCollection)
+    ['{13554740-5BED-4C70-B094-DF66967A2B07}']
+    { Methods & Properties }
+    function Add: IXMLConditionType;
+    function Insert(const Index: Integer): IXMLConditionType;
+
+    function Get_Item(Index: Integer): IXMLConditionType;
+    property Items[Index: Integer]: IXMLConditionType read Get_Item; default;
+  end;
+
+{ IXMLNodeCommandsType }
+
+  IXMLNodeCommandsType = interface(IXMLNodeCollection)
+    ['{5C56E99E-8BEA-4882-BD5C-4BFB4F46EEFC}']
+    { Property Accessors }
+    function Get_CMD(Index: Integer): IXMLCMDType;
     { Methods & Properties }
     function Add: IXMLCMDType;
     function Insert(const Index: Integer): IXMLCMDType;
-
-    function Get_Item(Index: Integer): IXMLCMDType;
-    property Items[Index: Integer]: IXMLCMDType read Get_Item; default;
+    property CMD[Index: Integer]: IXMLCMDType read Get_CMD; default;
   end;
 
 { IXMLCommandListType2 }
 
   IXMLCommandListType2 = interface(IXMLNode)
-    ['{62A15B07-DD65-47F0-90A4-04DFF2E285C3}']
+    ['{2C7101C6-2E83-426A-A0A9-425B3311FF5E}']
+  end;
+
+{ IXMLNodeCommandsType2 }
+
+  IXMLNodeCommandsType2 = interface(IXMLNode)
+    ['{7B23CD2E-AFA1-42F8-812E-F4051EE90BEE}']
   end;
 
 { IXMLChoicesType2 }
 
   IXMLChoicesType2 = interface(IXMLNode)
-    ['{03A4A76C-5046-4768-AA73-C2EF49388441}']
+    ['{E252F466-6C6A-411D-89DD-67D4ED8D41A8}']
   end;
 
 { Forward Decls }
 
   TXMLAdventureGameType = class;
   TXMLMetaInfoType = class;
+  TXMLScriptsType = class;
+  TXMLScriptType = class;
+  TXMLScriptTypeList = class;
   TXMLVariablesType = class;
   TXMLVariableType = class;
   TXMLGameNodesType = class;
@@ -231,8 +358,14 @@ type
   TXMLChoiceCommandsType = class;
   TXMLCommandListType = class;
   TXMLCMDType = class;
-  TXMLCMDTypeList = class;
+  TXMLChoiceConditionsType = class;
+  TXMLConditionListType = class;
+  TXMLConditionListTypeList = class;
+  TXMLConditionType = class;
+  TXMLConditionTypeList = class;
+  TXMLNodeCommandsType = class;
   TXMLCommandListType2 = class;
+  TXMLNodeCommandsType2 = class;
   TXMLChoicesType2 = class;
 
 { TXMLAdventureGameType }
@@ -241,6 +374,7 @@ type
   protected
     { IXMLAdventureGameType }
     function Get_MetaInfo: IXMLMetaInfoType;
+    function Get_Scripts: IXMLScriptsType;
     function Get_Variables: IXMLVariablesType;
     function Get_GameNodes: IXMLGameNodesType;
   public
@@ -258,6 +392,42 @@ type
     procedure Set_Title(Value: UnicodeString);
     procedure Set_Author(Value: UnicodeString);
     procedure Set_Description(Value: UnicodeString);
+  end;
+
+{ TXMLScriptsType }
+
+  TXMLScriptsType = class(TXMLNodeCollection, IXMLScriptsType)
+  protected
+    { IXMLScriptsType }
+    function Get_Script(Index: Integer): IXMLScriptType;
+    function Add: IXMLScriptType;
+    function Insert(const Index: Integer): IXMLScriptType;
+  public
+    procedure AfterConstruction; override;
+  end;
+
+{ TXMLScriptType }
+
+  TXMLScriptType = class(TXMLNode, IXMLScriptType)
+  protected
+    { IXMLScriptType }
+    function Get_Name: UnicodeString;
+    function Get_Filename: UnicodeString;
+    function Get_Author: UnicodeString;
+    procedure Set_Name(Value: UnicodeString);
+    procedure Set_Filename(Value: UnicodeString);
+    procedure Set_Author(Value: UnicodeString);
+  end;
+
+{ TXMLScriptTypeList }
+
+  TXMLScriptTypeList = class(TXMLNodeCollection, IXMLScriptTypeList)
+  protected
+    { IXMLScriptTypeList }
+    function Add: IXMLScriptType;
+    function Insert(const Index: Integer): IXMLScriptType;
+
+    function Get_Item(Index: Integer): IXMLScriptType;
   end;
 
 { TXMLVariablesType }
@@ -302,11 +472,11 @@ type
     function Get_DescriptionText: UnicodeString;
     function Get_Choices: IXMLChoicesType;
     function Get_ChoiceCommands: IXMLChoiceCommandsType;
-    function Get_NodeCommands: UnicodeString;
+    function Get_ChoiceConditions: IXMLChoiceConditionsType;
+    function Get_NodeCommands: IXMLNodeCommandsType;
     function Get_NodeParent: UnicodeString;
     procedure Set_Name(Value: UnicodeString);
     procedure Set_DescriptionText(Value: UnicodeString);
-    procedure Set_NodeCommands(Value: UnicodeString);
     procedure Set_NodeParent(Value: UnicodeString);
   public
     procedure AfterConstruction; override;
@@ -329,14 +499,14 @@ type
   TXMLChoiceType = class(TXMLNode, IXMLChoiceType)
   protected
     { IXMLChoiceType }
-    function Get_Endgame: Boolean;
+    function Get_Endgame: UnicodeString;
     function Get_Targetnode: UnicodeString;
     function Get_Addscore: Integer;
-    function Get_Wingame: Boolean;
-    procedure Set_Endgame(Value: Boolean);
+    function Get_Wingame: UnicodeString;
+    procedure Set_Endgame(Value: UnicodeString);
     procedure Set_Targetnode(Value: UnicodeString);
     procedure Set_Addscore(Value: Integer);
-    procedure Set_Wingame(Value: Boolean);
+    procedure Set_Wingame(Value: UnicodeString);
   end;
 
 { TXMLChoiceCommandsType }
@@ -374,15 +544,75 @@ type
     procedure Set_Variable(Value: UnicodeString);
   end;
 
-{ TXMLCMDTypeList }
+{ TXMLChoiceConditionsType }
 
-  TXMLCMDTypeList = class(TXMLNodeCollection, IXMLCMDTypeList)
+  TXMLChoiceConditionsType = class(TXMLNodeCollection, IXMLChoiceConditionsType)
   protected
-    { IXMLCMDTypeList }
+    { IXMLChoiceConditionsType }
+    function Get_ConditionList(Index: Integer): IXMLConditionListType;
+    function Add: IXMLConditionListType;
+    function Insert(const Index: Integer): IXMLConditionListType;
+  public
+    procedure AfterConstruction; override;
+  end;
+
+{ TXMLConditionListType }
+
+  TXMLConditionListType = class(TXMLNodeCollection, IXMLConditionListType)
+  protected
+    { IXMLConditionListType }
+    function Get_Condition(Index: Integer): IXMLConditionType;
+    function Add: IXMLConditionType;
+    function Insert(const Index: Integer): IXMLConditionType;
+  public
+    procedure AfterConstruction; override;
+  end;
+
+{ TXMLConditionListTypeList }
+
+  TXMLConditionListTypeList = class(TXMLNodeCollection, IXMLConditionListTypeList)
+  protected
+    { IXMLConditionListTypeList }
+    function Add: IXMLConditionListType;
+    function Insert(const Index: Integer): IXMLConditionListType;
+
+    function Get_Item(Index: Integer): IXMLConditionListType;
+  end;
+
+{ TXMLConditionType }
+
+  TXMLConditionType = class(TXMLNode, IXMLConditionType)
+  protected
+    { IXMLConditionType }
+    function Get_Name: UnicodeString;
+    function Get_Varname: UnicodeString;
+    function Get_Eval: UnicodeString;
+    procedure Set_Name(Value: UnicodeString);
+    procedure Set_Varname(Value: UnicodeString);
+    procedure Set_Eval(Value: UnicodeString);
+  end;
+
+{ TXMLConditionTypeList }
+
+  TXMLConditionTypeList = class(TXMLNodeCollection, IXMLConditionTypeList)
+  protected
+    { IXMLConditionTypeList }
+    function Add: IXMLConditionType;
+    function Insert(const Index: Integer): IXMLConditionType;
+
+    function Get_Item(Index: Integer): IXMLConditionType;
+  end;
+
+{ TXMLNodeCommandsType }
+
+  TXMLNodeCommandsType = class(TXMLNodeCollection, IXMLNodeCommandsType)
+  protected
+    { IXMLNodeCommandsType }
+    function Get_CMD(Index: Integer): IXMLCMDType;
     function Add: IXMLCMDType;
     function Insert(const Index: Integer): IXMLCMDType;
-
-    function Get_Item(Index: Integer): IXMLCMDType;
+  public
+    procedure AfterConstruction; override;
   end;
 
 { TXMLCommandListType2 }
@@ -390,6 +620,13 @@ type
   TXMLCommandListType2 = class(TXMLNode, IXMLCommandListType2)
   protected
     { IXMLCommandListType2 }
+  end;
+
+{ TXMLNodeCommandsType2 }
+
+  TXMLNodeCommandsType2 = class(TXMLNode, IXMLNodeCommandsType2)
+  protected
+    { IXMLNodeCommandsType2 }
   end;
 
 { TXMLChoicesType2 }
@@ -409,6 +646,8 @@ const
   TargetNamespace = '';
 
 implementation
+
+uses Xml.xmlutil;
 
 { Global Functions }
 
@@ -432,6 +671,7 @@ end;
 procedure TXMLAdventureGameType.AfterConstruction;
 begin
   RegisterChildNode('MetaInfo', TXMLMetaInfoType);
+  RegisterChildNode('Scripts', TXMLScriptsType);
   RegisterChildNode('Variables', TXMLVariablesType);
   RegisterChildNode('GameNodes', TXMLGameNodesType);
   inherited;
@@ -440,6 +680,11 @@ end;
 function TXMLAdventureGameType.Get_MetaInfo: IXMLMetaInfoType;
 begin
   Result := ChildNodes['MetaInfo'] as IXMLMetaInfoType;
+end;
+
+function TXMLAdventureGameType.Get_Scripts: IXMLScriptsType;
+begin
+  Result := ChildNodes['Scripts'] as IXMLScriptsType;
 end;
 
 function TXMLAdventureGameType.Get_Variables: IXMLVariablesType;
@@ -482,6 +727,80 @@ end;
 procedure TXMLMetaInfoType.Set_Description(Value: UnicodeString);
 begin
   ChildNodes['Description'].NodeValue := Value;
+end;
+
+{ TXMLScriptsType }
+
+procedure TXMLScriptsType.AfterConstruction;
+begin
+  RegisterChildNode('Script', TXMLScriptType);
+  ItemTag := 'Script';
+  ItemInterface := IXMLScriptType;
+  inherited;
+end;
+
+function TXMLScriptsType.Get_Script(Index: Integer): IXMLScriptType;
+begin
+  Result := List[Index] as IXMLScriptType;
+end;
+
+function TXMLScriptsType.Add: IXMLScriptType;
+begin
+  Result := AddItem(-1) as IXMLScriptType;
+end;
+
+function TXMLScriptsType.Insert(const Index: Integer): IXMLScriptType;
+begin
+  Result := AddItem(Index) as IXMLScriptType;
+end;
+
+{ TXMLScriptType }
+
+function TXMLScriptType.Get_Name: UnicodeString;
+begin
+  Result := AttributeNodes['name'].Text;
+end;
+
+procedure TXMLScriptType.Set_Name(Value: UnicodeString);
+begin
+  SetAttribute('name', Value);
+end;
+
+function TXMLScriptType.Get_Filename: UnicodeString;
+begin
+  Result := AttributeNodes['filename'].Text;
+end;
+
+procedure TXMLScriptType.Set_Filename(Value: UnicodeString);
+begin
+  SetAttribute('filename', Value);
+end;
+
+function TXMLScriptType.Get_Author: UnicodeString;
+begin
+  Result := AttributeNodes['author'].Text;
+end;
+
+procedure TXMLScriptType.Set_Author(Value: UnicodeString);
+begin
+  SetAttribute('author', Value);
+end;
+
+{ TXMLScriptTypeList }
+
+function TXMLScriptTypeList.Add: IXMLScriptType;
+begin
+  Result := AddItem(-1) as IXMLScriptType;
+end;
+
+function TXMLScriptTypeList.Insert(const Index: Integer): IXMLScriptType;
+begin
+  Result := AddItem(Index) as IXMLScriptType;
+end;
+
+function TXMLScriptTypeList.Get_Item(Index: Integer): IXMLScriptType;
+begin
+  Result := List[Index] as IXMLScriptType;
 end;
 
 { TXMLVariablesType }
@@ -552,6 +871,8 @@ procedure TXMLNodeType.AfterConstruction;
 begin
   RegisterChildNode('Choices', TXMLChoicesType);
   RegisterChildNode('ChoiceCommands', TXMLChoiceCommandsType);
+  RegisterChildNode('ChoiceConditions', TXMLChoiceConditionsType);
+  RegisterChildNode('NodeCommands', TXMLNodeCommandsType);
   inherited;
 end;
 
@@ -585,14 +906,14 @@ begin
   Result := ChildNodes['ChoiceCommands'] as IXMLChoiceCommandsType;
 end;
 
-function TXMLNodeType.Get_NodeCommands: UnicodeString;
+function TXMLNodeType.Get_ChoiceConditions: IXMLChoiceConditionsType;
 begin
-  Result := ChildNodes['NodeCommands'].Text;
+  Result := ChildNodes['ChoiceConditions'] as IXMLChoiceConditionsType;
 end;
 
-procedure TXMLNodeType.Set_NodeCommands(Value: UnicodeString);
+function TXMLNodeType.Get_NodeCommands: IXMLNodeCommandsType;
 begin
-  ChildNodes['NodeCommands'].NodeValue := Value;
+  Result := ChildNodes['NodeCommands'] as IXMLNodeCommandsType;
 end;
 
 function TXMLNodeType.Get_NodeParent: UnicodeString;
@@ -632,12 +953,12 @@ end;
 
 { TXMLChoiceType }
 
-function TXMLChoiceType.Get_Endgame: Boolean;
+function TXMLChoiceType.Get_Endgame: UnicodeString;
 begin
-  Result := AttributeNodes['endgame'].NodeValue;
+  Result := AttributeNodes['endgame'].Text;
 end;
 
-procedure TXMLChoiceType.Set_Endgame(Value: Boolean);
+procedure TXMLChoiceType.Set_Endgame(Value: UnicodeString);
 begin
   SetAttribute('endgame', Value);
 end;
@@ -662,12 +983,12 @@ begin
   SetAttribute('addscore', Value);
 end;
 
-function TXMLChoiceType.Get_Wingame: Boolean;
+function TXMLChoiceType.Get_Wingame: UnicodeString;
 begin
-  Result := AttributeNodes['wingame'].NodeValue;
+  Result := AttributeNodes['wingame'].Text;
 end;
 
-procedure TXMLChoiceType.Set_Wingame(Value: Boolean);
+procedure TXMLChoiceType.Set_Wingame(Value: UnicodeString);
 begin
   SetAttribute('wingame', Value);
 end;
@@ -744,24 +1065,150 @@ begin
   SetAttribute('variable', Value);
 end;
 
-{ TXMLCMDTypeList }
+{ TXMLChoiceConditionsType }
 
-function TXMLCMDTypeList.Add: IXMLCMDType;
+procedure TXMLChoiceConditionsType.AfterConstruction;
 begin
-  Result := AddItem(-1) as IXMLCMDType;
+  RegisterChildNode('ConditionList', TXMLConditionListType);
+  ItemTag := 'ConditionList';
+  ItemInterface := IXMLConditionListType;
+  inherited;
 end;
 
-function TXMLCMDTypeList.Insert(const Index: Integer): IXMLCMDType;
+function TXMLChoiceConditionsType.Get_ConditionList(Index: Integer): IXMLConditionListType;
 begin
-  Result := AddItem(Index) as IXMLCMDType;
+  Result := List[Index] as IXMLConditionListType;
 end;
 
-function TXMLCMDTypeList.Get_Item(Index: Integer): IXMLCMDType;
+function TXMLChoiceConditionsType.Add: IXMLConditionListType;
+begin
+  Result := AddItem(-1) as IXMLConditionListType;
+end;
+
+function TXMLChoiceConditionsType.Insert(const Index: Integer): IXMLConditionListType;
+begin
+  Result := AddItem(Index) as IXMLConditionListType;
+end;
+
+{ TXMLConditionListType }
+
+procedure TXMLConditionListType.AfterConstruction;
+begin
+  RegisterChildNode('Condition', TXMLConditionType);
+  ItemTag := 'Condition';
+  ItemInterface := IXMLConditionType;
+  inherited;
+end;
+
+function TXMLConditionListType.Get_Condition(Index: Integer): IXMLConditionType;
+begin
+  Result := List[Index] as IXMLConditionType;
+end;
+
+function TXMLConditionListType.Add: IXMLConditionType;
+begin
+  Result := AddItem(-1) as IXMLConditionType;
+end;
+
+function TXMLConditionListType.Insert(const Index: Integer): IXMLConditionType;
+begin
+  Result := AddItem(Index) as IXMLConditionType;
+end;
+
+{ TXMLConditionListTypeList }
+
+function TXMLConditionListTypeList.Add: IXMLConditionListType;
+begin
+  Result := AddItem(-1) as IXMLConditionListType;
+end;
+
+function TXMLConditionListTypeList.Insert(const Index: Integer): IXMLConditionListType;
+begin
+  Result := AddItem(Index) as IXMLConditionListType;
+end;
+
+function TXMLConditionListTypeList.Get_Item(Index: Integer): IXMLConditionListType;
+begin
+  Result := List[Index] as IXMLConditionListType;
+end;
+
+{ TXMLConditionType }
+
+function TXMLConditionType.Get_Name: UnicodeString;
+begin
+  Result := AttributeNodes['Name'].Text;
+end;
+
+procedure TXMLConditionType.Set_Name(Value: UnicodeString);
+begin
+  SetAttribute('Name', Value);
+end;
+
+function TXMLConditionType.Get_Varname: UnicodeString;
+begin
+  Result := AttributeNodes['varname'].Text;
+end;
+
+procedure TXMLConditionType.Set_Varname(Value: UnicodeString);
+begin
+  SetAttribute('varname', Value);
+end;
+
+function TXMLConditionType.Get_Eval: UnicodeString;
+begin
+  Result := AttributeNodes['eval'].Text;
+end;
+
+procedure TXMLConditionType.Set_Eval(Value: UnicodeString);
+begin
+  SetAttribute('eval', Value);
+end;
+
+{ TXMLConditionTypeList }
+
+function TXMLConditionTypeList.Add: IXMLConditionType;
+begin
+  Result := AddItem(-1) as IXMLConditionType;
+end;
+
+function TXMLConditionTypeList.Insert(const Index: Integer): IXMLConditionType;
+begin
+  Result := AddItem(Index) as IXMLConditionType;
+end;
+
+function TXMLConditionTypeList.Get_Item(Index: Integer): IXMLConditionType;
+begin
+  Result := List[Index] as IXMLConditionType;
+end;
+
+{ TXMLNodeCommandsType }
+
+procedure TXMLNodeCommandsType.AfterConstruction;
+begin
+  RegisterChildNode('CMD', TXMLCMDType);
+  ItemTag := 'CMD';
+  ItemInterface := IXMLCMDType;
+  inherited;
+end;
+
+function TXMLNodeCommandsType.Get_CMD(Index: Integer): IXMLCMDType;
 begin
   Result := List[Index] as IXMLCMDType;
 end;
 
+function TXMLNodeCommandsType.Add: IXMLCMDType;
+begin
+  Result := AddItem(-1) as IXMLCMDType;
+end;
+
+function TXMLNodeCommandsType.Insert(const Index: Integer): IXMLCMDType;
+begin
+  Result := AddItem(Index) as IXMLCMDType;
+end;
+
 { TXMLCommandListType2 }
+
+{ TXMLNodeCommandsType2 }
 
 { TXMLChoicesType2 }
 

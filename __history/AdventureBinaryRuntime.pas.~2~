@@ -2,7 +2,7 @@ unit AdventureBinaryRuntime;
 
 interface
 
-uses AdventureScriptCompilerUtils,FileIOFunctions;
+uses FileIOFunctions;
 
 const
   is_equal = 1;
@@ -61,8 +61,6 @@ type
     GameNodeCount: integer;
     Variables: array of GameVariable;
     VariableCount: integer;
-    Scripts: array of Script;
-    ScriptCount: integer;
     MetaTitle: ansistring;
     MetaAuthor: ansistring;
     MetaDescription: ansistring;
@@ -160,18 +158,6 @@ begin
 
     end;
   end;
-
-  BlockRead(x, adventurebindata.ScriptCount, 4);
-
-  setlength(adventurebindata.Scripts, adventurebindata.ScriptCount+1);
-
-  for y := 0 to adventurebindata.ScriptCount-1 do
-  begin
-
-  LoadScriptFromAGF(x, adventurebindata.Scripts[y]);
-  writeln('Loaded script '+adventurebindata.Scripts[y].script_name);
-  end;
-
   CloseFile(x);
 
 end;

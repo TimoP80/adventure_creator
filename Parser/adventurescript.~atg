@@ -273,7 +273,9 @@ RegularCommand = identifier
   end;
   AddParam(instruction_temp, lexstring, DATA_TYPE_FUNCTION_NAME);
 
-.) "(" [Param {"," Param}] ")"  .              
+.) "(" [Param {"," Param}] ")"  (. 
+NextInstruction(CurrentScript,instruction_temp);
+.) .              
 
 RegularData = (.
   instruction_temp := AddInstruction(currentscript, OP_EXPRESSIONDATA);
@@ -372,22 +374,7 @@ FuncDefinition = ("int"
 
 
 
-    AdventureScript = "ScriptName" 
-                          string 
-                          (.
-  name_temp := parse_string(lexstring);
-                          .) "(" string 
-                          (. 
-  filename_temp := parse_string(lexstring);
-                          .) ")"
-                          "Author" 
-                          string 
-                          (. 
-                            author_temp := parse_string(lexstring);
-  initscriptdata(CurrentScript, name_temp, filename_temp, author_temp);
-
-                          .)
-                         FuncDefinition {FuncDefinition} 
+    AdventureScript =  FuncDefinition {FuncDefinition} 
                           .
                                                            
 END AdventureScript.

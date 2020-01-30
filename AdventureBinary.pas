@@ -2,7 +2,7 @@ unit AdventureBinary;
 
 interface
 
-uses sysutils, FileIOFunctions, AdventureFile;
+uses sysutils, jclstrings,JclFileUtils, FileIOFunctions, AdventureScript, AdventureScriptCompilerUtils,AdventureFile;
 
 const
   is_equal = 1;
@@ -61,6 +61,8 @@ type
     GameNodeCount: integer;
     Variables: array of GameVariable;
     VariableCount: integer;
+    Scripts: array of Script;
+    ScriptCount: integer;
     MetaTitle: ansistring;
     MetaAuthor: ansistring;
     MetaDescription: ansistring;
@@ -70,6 +72,7 @@ type
 var
 
   AdventureBinData: AdventureGame;
+  ScriptParser: TAdventureScript;
   AdventureData: IXMLAdventureGameType;
 
 procedure SaveAdventureBin(filename: string);
@@ -160,6 +163,18 @@ begin
 
     end;
   end;
+
+  BlockRead(x, adventurebindata.ScriptCount, 4);
+
+  setlength(adventurebindata.Scripts, adventurebindata.ScriptCount+1);
+
+  for y := 0 to adventurebindata.ScriptCount-1 do
+  begin
+
+  writeln('Load script '+adventurebindata.Scripts[y].script_name);
+  LoadScriptFromAGF(x, adventurebindata.Scripts[y]);
+  end;
+
   CloseFile(x);
 
 end;
@@ -232,6 +247,15 @@ begin
       end;
 
     end;
+
+  end;
+
+  BlockWrite(x, adventurebindata.ScriptCount, 4);
+
+  for y := 0 to adventurebindata.ScriptCount-1 do
+  begin
+  writeln('Save script '+adventurebindata.Scripts[y].script_name);
+  SaveScriptToAGF(x, adventurebindata.Scripts[y]);
   end;
   CloseFile(x);
 end;
@@ -394,6 +418,36 @@ begin
     end;
     inc(AdventureBinData.GameNodeCount);
   end;
+
+  // compile scripts
+  ScriptParser :=TAdventureScript.Create(nil);
+  writeln('Compiling scripts ... ');
+InitBuiltInFunctions;
+  for i := 0 to Adventuredata.Scripts.Count-1 do
+  begin
+  CurrentScript.instruction_count := 0;
+   stringtofile('temp.as',AdventureData.Scripts.Script[i].Text);
+   Scriptparser.SourceFileName := 'temp.as';
+   ScriptParser.execute;
+   setlength(adventurebindata.Scripts, adventurebindata.ScriptCount+1);
+
+   if scriptparser.Successful=true then
+   begin
+     CurrentScript.script_name := adventuredata.Scripts[i].Name;
+     CurrentScript.script_filename := adventuredata.Scripts[i].Filename;
+     CurrentScript.script_author := adventuredata.Scripts[i].Author;
+    writeln('Compiled successfully: '+Currentscript.script_name);
+     AdventureBinData.Scripts[adventurebindata.ScriptCount] := CurrentScript;
+   DeleteFile('temp.as');
+     inc(adventurebindata.scriptcount);
+   end else
+   begin
+     writeln('Error compiling script: '+AdventureData.Scripts.Script[i].Filename);
+     Scriptparser.ListStream.SaveToFile(changefileext(AdventureData.Scripts.Script[i].Filename, '.lst'));
+   end;
+  end;
+
+
 end;
 
 end.
