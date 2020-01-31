@@ -35,13 +35,10 @@ end;
 
 procedure TDisplayObj.OnSuccess(Sender : TObject);
 begin
-  Writeln('Compile successful');
+  Writeln('Compile sucessful');
   Writeln(ResultStr + ChangeFileExt(ParamStr(1),'.lst'));
   writeln('Script contains '+inttostr(currentscript.instruction_count)+' instructions.');
-    Randomize;
-    InitColorTable;
-    savescript(CurrentScript, ChangeFileExt(paramstr(1),'.asb'));
-    RunScript(currentscript, 'Main');
+  savescript(CurrentScript, ChangeFileExt(paramstr(1),'.asb'));
   end;
 
 procedure TDisplayObj.OnFailure(Sender : TObject; NumErrors : integer);

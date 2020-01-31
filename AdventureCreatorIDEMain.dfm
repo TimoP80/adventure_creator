@@ -283,7 +283,8 @@ object Form1: TForm1
         'RandomNumber'
         'SetRandomMin'
         'SetRandomMax'
-        'ExecuteRandom')
+        'ExecuteRandom'
+        'RunScript')
     end
     object cbbvarsel: TComboBox
       Left = 240
@@ -300,6 +301,16 @@ object Form1: TForm1
       Height = 105
       TabOrder = 5
       OnKeyUp = mmoparamvalKeyUp
+    end
+    object ScriptSelector: TComboBox
+      Left = 240
+      Top = 136
+      Width = 273
+      Height = 21
+      TabOrder = 6
+      Text = 'ScriptSelector'
+      Visible = False
+      OnClick = ScriptSelectorClick
     end
   end
   object newnodename: TEdit

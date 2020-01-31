@@ -40,8 +40,8 @@ begin
   writeln('Script contains '+inttostr(currentscript.instruction_count)+' instructions.');
     Randomize;
     InitColorTable;
-    savescript(CurrentScript, ChangeFileExt(paramstr(1),'.asb'));
     RunScript(currentscript, 'Main');
+    savescript(CurrentScript, ChangeFileExt(paramstr(1),'.asb'));
   end;
 
 procedure TDisplayObj.OnFailure(Sender : TObject; NumErrors : integer);

@@ -20,7 +20,6 @@ type
     cbbvarsel: TComboBox;
     mmoparamval: TMemo;
     Button1: TButton;
-    ScriptSelector: TComboBox;
     procedure btn8Click(Sender: TObject);
     procedure btn9Click(Sender: TObject);
     procedure cbbcmdClick(Sender: TObject);
@@ -88,15 +87,7 @@ end;
 procedure TForm4.cbbcmdClick(Sender: TObject);
 begin
 command.Name := cbbcmd.Text;
-if command.Name='RunScript' then
-begin
-  ScriptSelector.Visible:=true;
-  mmoparamval.Visible:=false;
-end else
-begin
-  ScriptSelector.Visible:=false;
-  mmoparamval.Visible:=true;
-end;
+
 UpdateChoiceCommandSel;
 end;
 

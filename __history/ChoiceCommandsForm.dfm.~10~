@@ -93,8 +93,7 @@ object Form4: TForm4
         'RandomNumber'
         'SetRandomMin'
         'SetRandomMax'
-        'ExecuteRandom'
-        'RunScript')
+        'ExecuteRandom')
     end
     object cbbvarsel: TComboBox
       Left = 240
@@ -106,20 +105,11 @@ object Form4: TForm4
     end
     object mmoparamval: TMemo
       Left = 240
-      Top = 139
+      Top = 136
       Width = 273
-      Height = 102
+      Height = 105
       TabOrder = 5
       OnKeyUp = mmoparamvalKeyUp
-    end
-    object ScriptSelector: TComboBox
-      Left = 240
-      Top = 139
-      Width = 273
-      Height = 21
-      TabOrder = 6
-      Text = 'ScriptSelector'
-      Visible = False
     end
   end
   object Button1: TButton

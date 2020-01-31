@@ -1,6 +1,6 @@
 [Frames]
 Ancestor=$(CocoR)\Frames\CocoBase.pas
-Parser=$(CocoR)\Frames\component.frm
+Parser=$(CocoR)\Frames\adventurescript.frm
 Test Project=$(CocoR)\Frames\Test.dpr.frm
 Test Form=$(CocoR)\Frames\Test.pas.frm
 Test DFM=$(CocoR)\Frames\Test.dfm.frm
@@ -44,4 +44,4 @@ T=0
 X=0
 [Version Info]
 Version Number=0.0.0.0
-Last Build=29.1.2020 21.09.13
+Last Build=31.1.2020 21.10.48

@@ -220,7 +220,11 @@ IfStatement = "if"
   instruction_temp := AddInstruction(CurrentScript, OP_IFEND);
   NextInstruction(currentscript, instruction_temp);
 
-.) ["else" "{" 
+.) ["else" ["if" (. 
+  instruction_temp := AddInstruction(CurrentScript, OP_IF);
+  NextInstruction(currentscript, instruction_temp);
+
+.) Conditions] "{" 
 (. 
   instruction_temp := AddInstruction(CurrentScript, OP_IFELSEBEGIN);
   NextInstruction(currentscript, instruction_temp);
@@ -234,17 +238,37 @@ IfStatement = "if"
 
 .) .
 
-Param = (string 
+
+FunctionParam =  ("int"  (. 
+AddParam(instruction_temp, PARAM_TYPE_INT, DATA_TYPE_FUNCTION_PARAMETER_TYPE);
+ 
+.) | "str" (. 
+AddParam(instruction_temp, PARAM_TYPE_STRING, DATA_TYPE_FUNCTION_PARAMETER_TYPE);
+.) ) (string 
 (. 
- AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_PARAMETER);
+ AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_FUNCTION_PARAMETER);
   .) | number 
  (.
-  AddParam(instruction_temp, strtoint(lexstring), DATA_TYPE_PARAMETER);
+  AddParam(instruction_temp, strtoint(lexstring), DATA_TYPE_FUNCTION_PARAMETER);
  
  .) |
   identifier 
   (. 
-  AddParam(instruction_temp, lexstring, DATA_TYPE_PARAMETER);
+  AddParam(instruction_temp, lexstring, DATA_TYPE_FUNCTION_PARAMETER);
+ 
+  .) ) .
+
+Param = (string 
+(. 
+ AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_PARAMETER_STRING);
+  .) | number 
+ (.
+  AddParam(instruction_temp, strtoint(lexstring), DATA_TYPE_PARAMETER_INT);
+ 
+ .) |
+  identifier 
+  (. 
+  AddParam(instruction_temp, lexstring, DATA_TYPE_PARAMETER_VARIABLEDEF);
  
   .) ) .
 RandomChance = "RandomChance" 
@@ -277,10 +301,7 @@ RegularCommand = identifier
 NextInstruction(CurrentScript,instruction_temp);
 .) .              
 
-RegularData = (.
-  instruction_temp := AddInstruction(currentscript, OP_EXPRESSIONDATA);
-
- .) identifier 
+RegularData =  identifier 
 (. 
   AddParam(instruction_temp, lexstring, DATA_TYPE_REGULARDATA);
   NextInstruction(currentscript, instruction_temp);
@@ -315,11 +336,17 @@ Expression = "+"
 
 .) .
 
-RegularExp = RegularData {
+RegularExp = (.
+   instruction_temp := AddInstruction(currentscript, OP_EXPRESSIONDATA);
+
+ .) RegularData {
 Expression (.     
 NextInstruction(currentscript, instruction_temp);
 .)
- RegularData}.
+ (.
+   instruction_temp := AddInstruction(currentscript, OP_EXPRESSIONDATA);
+
+ .)RegularData}.
 
 SetVar = "SetVar" "$" identifier 
 (.
@@ -330,7 +357,11 @@ SetVar = "SetVar" "$" identifier
   instruction_temp :=AddInstruction(currentscript, OP_SETVAR);
   AddParam(instruction_temp, name_temp, DATA_TYPE_VAR_NAME);
   NextInstruction(CurrentScript, instruction_temp);
+ 
+   if VariableExists(currentscript, name_temp)=false then
+  AddVariable(currentscript, name_temp);
 
+  
 .)
  "=" (RegularCommand 
  (. 
@@ -369,12 +400,39 @@ FuncDefinition = ("int"
   AddParam(instruction_temp, return_type_temp, DATA_TYPE_RETURN_TYPE);
   NextInstruction(CurrentScript, instruction_temp);
 
-.)  "{"  {(Command|IfStatement)} "}" .
+.) "(" [FunctionParam {"," FunctionParam}] ")"  "{" 
+(.
+  instruction_temp := AddInstruction(CurrentScript, OP_FUNCTIONBEGIN);
+  NextInstruction(CurrentScript, instruction_temp);
+ .)
+
+  {(Command|IfStatement)} "}" 
+  (.
+  instruction_temp := AddInstruction(CurrentScript, OP_FUNCTIONEND);
+  NextInstruction(CurrentScript, instruction_temp);
+ .).
+
+   VariableDefinition = identifier (. 
+ name_temp:=lexstring;
+ AddVariable(CurrentScript, name_temp); 
+ .) ["=" (string 
+ (. 
+ SetVariableValue(CurrentScript, name_temp, parse_string(lexstring))); 
+ .) |number 
+ 
+ (. 
+ SetVariableValue(CurrentScript, name_temp, strtoint(lexstring)); 
+  .)| hexnumber 
+  (. 
+  SetVariableValue(CurrentScript, name_temp, strtoint(lexstring)); 
+  .) )] ";"  .
+
+  
+  
+    GlobalVars = "var" VariableDefinition {VariableDefinition}.
 
 
-
-
-    AdventureScript =  FuncDefinition {FuncDefinition} 
-                          .
+    AdventureScript = ["GlobalVariables" ":" GlobalVars] "Functions" ":" FuncDefinition {FuncDefinition} .
+                          
                                                            
 END AdventureScript.

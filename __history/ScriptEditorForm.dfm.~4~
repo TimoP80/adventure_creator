@@ -146,23 +146,4 @@ object Form5: TForm5
     Left = 800
     Top = 440
   end
-  object SynCompletionProposal1: TSynCompletionProposal
-    EndOfTokenChr = '()[]. '
-    TriggerChars = '.'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'MS Sans Serif'
-    Font.Style = []
-    TitleFont.Charset = DEFAULT_CHARSET
-    TitleFont.Color = clBtnText
-    TitleFont.Height = -11
-    TitleFont.Name = 'MS Sans Serif'
-    TitleFont.Style = [fsBold]
-    Columns = <>
-    ShortCut = 16416
-    Editor = SynEdit1
-    Left = 864
-    Top = 56
-  end
 end

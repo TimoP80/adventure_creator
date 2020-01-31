@@ -1,4 +1,4 @@
-  unit AdventureScriptCompilerUtils;
+unit AdventureScriptCompilerUtils;
 
 interface
 
@@ -41,7 +41,6 @@ const
   OP_MULTIPLY = $8011;
   OP_EXPRESSIONDATA = $8012;
   OP_IF_CONNECTOR = $8013;
-  OP_END_CONDITIONLIST = $8014;
 
   RETURN_TYPE_VOID = $4000;
   RETURN_TYPE_INTEGER = $4001;
@@ -153,9 +152,7 @@ procedure RunScript(TheScript: Script; FunctionName: string);
 procedure InitColorTable;
 function VariableExists(TheScript: Script; varname: string): boolean;
 procedure AddVariable(var TheScript: Script; varname: string);
-procedure SetVariableValue(var TheScript: Script; varname: string;
-  varvalue: variant);
-function GetVariableValue(TheScript: Script; varname: string): variant;
+
 implementation
 
 // Run a script starting from the function named FunctionName e.g. 'Main'
@@ -276,32 +273,16 @@ begin
   end;
 end;
 
-function IsVariable(var TheScript: Script; varname: string): boolean;
+function GetVariableValue(var TheScript: Script; varname: string): string;
 var
   i: integer;
 begin
-  result := false;
   for i := 0 to TheScript.variablecnt - 1 do
   begin
     if TheScript.variables[i].name = varname then
     begin
-      result := true;
-      // TheScript.variables[i].value := varvalue;
-      exit;
-    end;
-  end;
-end;
-
-function GetVariableValue(TheScript: Script; varname: string): variant;
-var
-   i: integer;
-begin
-  for i := 0 to TheScript.variablecnt - 1 do
-  begin
-    if TheScript.variables[i].name = varname then
-    begin
-      result := TheScript.variables[i].value;
-      // TheScript.variables[i].value := varvalue;
+      result := thescript.variables[i].value;
+      //TheScript.variables[i].value := varvalue;
       exit;
     end;
   end;
@@ -343,8 +324,8 @@ begin
   inc(RandomChanceCnt);
 end;
 
-procedure CallBuiltInFunction(TheScript: Script; instr: instruction;
-  funcname: string; var resultstorage: variant);
+procedure CallBuiltInFunction(TheScript: script; instr: instruction; funcname: string;
+  var resultstorage: variant);
 var
   ch: char;
   z: integer;
@@ -354,8 +335,7 @@ var
   finalindex, index: integer;
   i: integer;
   throw: integer;
-  varvalue: variant;
-  temp, randomchancefinalresult: string;
+  randomchancefinalresult: string;
   output: string;
 begin
   if funcname = 'DisplayMessage' then
@@ -364,39 +344,12 @@ begin
     for z := 1 to instr.inst_paramcount - 1 do
     begin
       if instr.inst_params[z].data_type = DATA_TYPE_PARAMETER_VARIABLEREF then
-       begin
-        varvalue:= GetVariableValue(TheScript,
-          instr.inst_params[z].data);
-        if VarType(varvalue)=varInteger then
-        output := output + inttostr(varvalue) else
-        if  (VarType(varvalue)=varString) or (VarType(varvalue)=varUString) then
-                output := output + varvalue;
-
-      end else
+        output := output + GetVariableValue(thescript, instr.inst_params[z].data)
+      else
         output := output + instr.inst_params[z].data;
     end;
     writeln(output);
-  end else
-  if funcname = 'DisplayMessageNoLN' then
-  begin
-    output := '';
-    for z := 1 to instr.inst_paramcount - 1 do
-    begin
-      if instr.inst_params[z].data_type = DATA_TYPE_PARAMETER_VARIABLEREF then
-       begin
-        varvalue:= GetVariableValue(TheScript,
-          instr.inst_params[z].data);
-        if VarType(varvalue)=varInteger then
-        output := output + inttostr(varvalue) else
-        if  (VarType(varvalue)=varString) or (VarType(varvalue)=varUString) then
-                output := output + varvalue;
-
-      end else
-        output := output + instr.inst_params[z].data;
-    end;
-    write(output);
   end
-
   else if funcname = 'WaitForKeyPress' then
   begin
     ch := readkey;
@@ -409,11 +362,6 @@ begin
   else if funcname = 'GotoXY' then
   begin
     GotoXY(instr.inst_params[1].data, instr.inst_params[2].data);
-  end
-  else if funcname = 'ReadInput' then
-  begin
-   Readln(temp);
-   resultstorage:=temp;
   end
   else if funcname = 'TextColor' then
   begin
@@ -443,7 +391,6 @@ begin
     index := random(listcnt);
     finalindex := list[index];
     randomchancefinalresult := RandomChanceTable[finalindex].targetnode;
-    resultstorage := randomchancefinalresult;
   end
   else
 
@@ -505,19 +452,11 @@ var
   last_mode: integer;
   condition_result: boolean;
   numconditions: integer;
-  numconditionstrue: integer;
-  numconditionsfalse: integer;
   funcresult: variant;
   finaldata: variant;
-  condition_variable: string;
-  condition_value: variant;
-  condition_eval: integer;
-  condition_eval_value: variant;
   intermediatedata: variant;
-  instruction_param_data: variant;
   if_position: integer;
   if_else_position: integer;
-  jump_position: integer;
   finalresult: integer;
   function_called: boolean;
   current_instruction: integer;
@@ -535,68 +474,17 @@ begin
     case current_instruction of
       OP_IF:
         begin
-        execution_mode := EXEC_MODE_CONDITION;
-          if_position := FindOpcode(TheScript, x + 1, OP_IFBEGIN);
+          if_position := x;
           if_else_position := FindOpcode(TheScript, x + 1, OP_IFELSEBEGIN);
-          jump_position := FindOpcode(thescript, x+1, OP_IFELSEEND);
           numconditions := 0;
 
         end;
       OP_CONDITION:
         begin
-
-          condition_variable := TheScript.instructions[x].inst_params[0].data;
-          condition_eval := TheScript.instructions[x].inst_params[1].data;
-          condition_eval_value := TheScript.instructions[x].inst_params[2].data;
-          condition_value := GetVariableValue(thescript, condition_variable);
-          case condition_eval of
-               IF_EVAL_EQUALS:
-               condition_result := (condition_value = condition_eval_value);
-
-               IF_EVAL_LARGER_OR_EQUAL:
-               condition_result := (condition_value >= condition_eval_value);
-               IF_EVAL_LESS_OR_EQUAL:
-               condition_result := (condition_value <= condition_eval_value);
-               IF_EVAL_LARGER:
-               condition_result := (condition_value > condition_eval_value);
-               IF_EVAL_LESS:
-               condition_result := (condition_value < condition_eval_value);
-               IF_EVAL_NOT_EQUAL:
-               condition_result := (condition_value <> condition_eval_value);
-
-          end;
-          if condition_result = True  then
-          inc(numconditionstrue) else
-          if condition_result = False  then
-          inc(numconditionsfalse);
-
-          inc(numconditions);
-
+          writeln('Condition! ', TheScript.instructions[x].inst_params[0].data +
+            ' ', EvalTypeToStr(TheScript.instructions[x].inst_params[1].data),
+            ' ', TheScript.instructions[x].inst_params[2].data);
         end;
-      OP_END_CONDITIONLIST:
-      begin
-        if numconditionstrue=numconditions then
-        x:=if_position else
-        if numconditionsfalse=numconditions then
-        x:=if_else_position;
-        writeln('Jumping to position ',x);
-      end;
-      OP_IFEND:
-      begin
-        execution_mode:=EXEC_MODE_NORMAL;
-
-      end;
-      OP_IFELSEBEGIN:
-      begin
-        if numconditionsfalse=0 then
-         begin
-           x:=jump_position;
-         end;
-      end;
-      OP_IFELSEEND:
-      begin
-        execution_mode := EXEC_MODE_NORMAL;
-      end;
       OP_FUNCTIONEND:
         begin
 
@@ -625,29 +513,22 @@ begin
         begin
           last_mode := MODE_DIVIDE;
         end;
-      //
-      // note: if the parameter is not number or string, then it is a variable reference
-      // in this case, the variable value must be resolved before manipulating the intermediate data
-      //
-      //
       OP_EXPRESSIONDATA:
         begin
-          if IsVariable(TheScript, TheScript.instructions[x].inst_params[0].data)
-          then
-            instruction_param_data := GetVariableValue(TheScript,
-              TheScript.instructions[x].inst_params[0].data)
-          else
-
-            instruction_param_data := TheScript.instructions[x]
-              .inst_params[0].data;
+          writeln('Expression data: intermediate=', intermediatedata,
+            ' instruction=', TheScript.instructions[x].inst_params[0].data);
           case last_mode of
             MODE_ASSIGN:
               begin
+                writeln('Assign value ',
+                  TheScript.instructions[x].inst_params[0].data);
                 intermediatedata := TheScript.instructions[x]
                   .inst_params[0].data;
               end;
             MODE_ADD:
               begin
+                writeln('Add to value: ',
+                  TheScript.instructions[x].inst_params[0].data);
                 intermediatedata := intermediatedata + TheScript.instructions[x]
                   .inst_params[0].data;
               end;
@@ -670,10 +551,12 @@ begin
         end;
       OP_SETVAR:
         begin
+          // writeln('Operation SetVar started');
           execution_mode := EXEC_MODE_SETVAR;
           last_mode := MODE_ASSIGN;
           variable_to_manipulate := TheScript.instructions[x]
             .inst_params[0].data;
+          // writeln('Setting value of variable: ',variable_to_manipulate);
         end;
       OP_RANDOMCHANCE:
         begin
@@ -697,6 +580,13 @@ begin
 
           if execution_mode = EXEC_MODE_SETVAR then
           begin
+            // This is where the variable value should be set
+            //
+            // The variable data comes from the XML structure so
+            // it cannot be used in this test program
+            //
+            // Variable name: variable_to_manipulate
+            // Result of Function Call: funcresult
             SetVariableValue(TheScript, variable_to_manipulate, finaldata);
           end;
           execution_mode := EXEC_MODE_NORMAL;
@@ -765,7 +655,6 @@ begin
   built_in_functions.add('TextBackground');
   built_in_functions.add('RandomFromList');
   built_in_functions.add('DisplayMessage');
-  built_in_functions.add('DisplayMessageNoLN');
   built_in_functions.add('WaitForKeyPress');
   built_in_functions.add('Random');
   built_in_functions.add('InitRandomChance');
@@ -939,19 +828,7 @@ begin
   for i := 0 to TheScript.variablecnt - 1 do
   begin
     ReadString(f, TheScript.variables[i].name);
-    blockread(f, vartype_temp, 4);
-    if vartype_temp <> varNull then
-    begin;
-      if (vartype_temp = varString) or (vartype_temp = varUString) then
-      begin
-        ReadString(f, stringtemp);
-        thescript.variables[i].value := stringtemp;
-      end else
-
-        if (vartype_temp = VarInteger) then
-        blockread(f, TheScript.variables[i].value, 4);
-    end;
-
+    TheScript.variables[i].value := Null;
   end;
 
   // writeln('Load script: '+thescript.script_name+' ('+thescript.script_filename+')');
@@ -1039,19 +916,7 @@ begin
   for i := 0 to TheScript.variablecnt - 1 do
   begin
     ReadString(f, TheScript.variables[i].name);
-    blockread(f, vartype_temp, 4);
-    if vartype_temp <> varNull then
-    begin;
-      if (vartype_temp = varString) or (vartype_temp = varUString) then
-      begin
-        ReadString(f, stringtemp);
-        thescript.variables[i].value := stringtemp;
-      end else
-
-        if (vartype_temp = VarInteger) then
-        blockread(f, TheScript.variables[i].value, 4);
-    end;
-
+    TheScript.variables[i].value := Null;
   end;
 
   blockread(f, TheScript.instruction_count, 4);
@@ -1131,19 +996,6 @@ begin
   for i := 0 to TheScript.variablecnt - 1 do
   begin
     WriteString(f, TheScript.variables[i].name);
-
-    vartype_temp := vartype(TheScript.variables[i].value);
-    blockwrite(f, vartype_temp, 4);
-    if vartype_temp <> varNull then
-    begin;
-      if (vartype_temp = varString) or (vartype_temp = varUString) then
-        WriteString(f, TheScript.variables[i].value)
-      else
-
-        if (vartype_temp = VarInteger) then
-        blockwrite(f, TheScript.variables[i].value, 4);
-    end;
-
   end;
 
   blockwrite(f, TheScript.instruction_count, 4);
@@ -1201,20 +1053,7 @@ begin
   blockwrite(f, TheScript.variablecnt, 4);
   for i := 0 to TheScript.variablecnt - 1 do
   begin
-
     WriteString(f, TheScript.variables[i].name);
-    vartype_temp := vartype(TheScript.variables[i].value);
-    blockwrite(f, vartype_temp, 4);
-    if vartype_temp <> varNull then
-    begin;
-      if (vartype_temp = varString) or (vartype_temp = varUString) then
-        WriteString(f, TheScript.variables[i].value)
-      else
-
-        if (vartype_temp = VarInteger) then
-        blockwrite(f, TheScript.variables[i].value, 4);
-    end;
-
   end;
   blockwrite(f, TheScript.instruction_count, 4);
   for i := 0 to TheScript.instruction_count - 1 do

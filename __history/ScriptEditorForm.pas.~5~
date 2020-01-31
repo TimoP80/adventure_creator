@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   AdventureFile, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SynEdit, Vcl.StdCtrls,
-  SynEditHighlighter, AdventureBinary, SynHighlighterCS, SynCompletionProposal;
+  SynEditHighlighter, AdventureBinary, SynHighlighterCS;
 
 type
   TForm5 = class(TForm)
@@ -24,7 +24,6 @@ type
     Label5: TLabel;
     ScriptAuthor: TEdit;
     Button3: TButton;
-    SynCompletionProposal1: TSynCompletionProposal;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure SynEdit1KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -72,7 +71,7 @@ begin
   begin
     Form5.ScriptList.Items.Add(AdventureData.Scripts.Script[u].Name);
   end;
-  updatescriptselectors;
+
 end;
 
 procedure TForm5.Button1Click(Sender: TObject);

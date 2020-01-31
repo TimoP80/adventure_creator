@@ -38,10 +38,8 @@ begin
   Writeln('Compile successful');
   Writeln(ResultStr + ChangeFileExt(ParamStr(1),'.lst'));
   writeln('Script contains '+inttostr(currentscript.instruction_count)+' instructions.');
-    Randomize;
-    InitColorTable;
+    RunScript(currentscript);
     savescript(CurrentScript, ChangeFileExt(paramstr(1),'.asb'));
-    RunScript(currentscript, 'Main');
   end;
 
 procedure TDisplayObj.OnFailure(Sender : TObject; NumErrors : integer);
