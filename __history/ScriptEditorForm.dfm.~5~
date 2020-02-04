@@ -136,15 +136,6 @@ object Form5: TForm5
     ModalResult = 1
     TabOrder = 7
   end
-  object Button4: TButton
-    Left = 1006
-    Top = 73
-    Width = 75
-    Height = 25
-    Caption = 'Run Script'
-    TabOrder = 8
-    OnClick = Button4Click
-  end
   object SynCSSyn1: TSynCSSyn
     Options.AutoDetectEnabled = False
     Options.AutoDetectLineLimit = 0

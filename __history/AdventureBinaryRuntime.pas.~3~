@@ -2,7 +2,7 @@ unit AdventureBinaryRuntime;
 
 interface
 
-uses inifiles, classes,AdventureScriptCompilerUtils, FileIOFunctions;
+uses AdventureScriptCompilerUtils,FileIOFunctions;
 
 const
   is_equal = 1;
@@ -69,40 +69,12 @@ type
     MaxScore: integer;
   end;
 
-const
-  alphabets: array [0 .. 10] of char = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-    'i', 'j', 'k');
-  numbers: array [0 .. 10] of integer = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-
-type
-  choicemapping = record
-    letter: char;
-    number: integer;
-  end;
-
 var
 
   AdventureBinData: AdventureGame;
-
-  ch, choice: char;
-  choicemappings: array of choicemapping;
-  choicemappingcount: integer;
-  currentmoney, numchoices: integer;
-  moneystring, currentnode: ansistring;
-  wingame, endgame: boolean;
-  random_min, random_max: integer;
-  rcstream: Tresourcestream;
-  datafile: string;
-  moneydisplay, debugmode: boolean;
-  msg_gameover, msg_wrongchoice, msg_pressanykey: ansistring;
-  msgtemp, msg_gamefinished: ansistring;
-  savedx, savedy, choiceinteger: integer;
-  addedscore, score: integer;
-  config: TIniFile;
-
+ 
 procedure SaveAdventureBin(filename: string);
 procedure LoadAdventureBin(filename: string);
-function FindScriptByName(name: string): integer;
 
 implementation
 
@@ -165,6 +137,7 @@ begin
           .ChoiceCommands[y].value);
       end;
 
+
       setlength(AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceConditions,
         AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceConditionCount + 1);
 
@@ -177,43 +150,30 @@ begin
           .ChoiceConditions[y].cmd);
         ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
           .ChoiceConditions[y].varparam);
-        BlockRead(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+        blockread(x, AdventureBinData.GameNodes[i].NodeChoices[j]
           .ChoiceConditions[y].eval, 4);
         ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
           .ChoiceConditions[y].value);
 
       end;
 
+
     end;
   end;
 
-  BlockRead(x, AdventureBinData.ScriptCount, 4);
+  BlockRead(x, adventurebindata.ScriptCount, 4);
 
-  setlength(AdventureBinData.Scripts, AdventureBinData.ScriptCount + 1);
+  setlength(adventurebindata.Scripts, adventurebindata.ScriptCount+1);
 
-  for y := 0 to AdventureBinData.ScriptCount - 1 do
+  for y := 0 to adventurebindata.ScriptCount-1 do
   begin
 
-    LoadScriptFromAGF(x, AdventureBinData.Scripts[y]);
+  LoadScriptFromAGF(x, adventurebindata.Scripts[y]);
+  writeln('Loaded script '+adventurebindata.Scripts[y].script_name);
   end;
 
   CloseFile(x);
 
-end;
-
-function FindScriptByName(name: string): integer;
-var
-  i: integer;
-begin
-  Result := -1;
-  for i := 0 to AdventureBinData.ScriptCount - 1 do
-  begin
-    if AdventureBinData.Scripts[i].script_name = name then
-    begin
-      Result := i;
-      exit;
-    end;
-  end;
 end;
 
 procedure SaveAdventureBin(filename: string);
@@ -276,7 +236,7 @@ begin
           .ChoiceConditions[y].cmd);
         WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
           .ChoiceConditions[y].varparam);
-        BlockWrite(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+        blockwrite(x, AdventureBinData.GameNodes[i].NodeChoices[j]
           .ChoiceConditions[y].eval, 4);
         WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
           .ChoiceConditions[y].value);
@@ -290,20 +250,22 @@ end;
 
 function eval2enum(eval: string): integer;
 begin
-  if eval = 'is_equal_to' then
-    Result := is_equal
-  else if eval = 'less_than_or_equal_to' then
-    Result := less_than_or_equal
-  else if eval = 'larger_than_or_equal_to' then
-    Result := larger_than_or_equal
-  else if eval = 'larger_than' then
-    Result := larger_than
-  else if eval = 'less_than' then
-    Result := less_than
-  else if eval = 'not_equal_to' then
-    Result := not_equal_to
-  else
+if eval='is_equal_to' then
+  result := is_equal else
+if eval='less_than_or_equal_to' then
+  result := less_than_or_equal else
+if eval='larger_than_or_equal_to' then
+  result := larger_than_or_equal else
+if eval='larger_than' then
+  result := larger_than else
+if eval='less_than' then
+  result := less_than else
+if eval='not_equal_to' then
+  result := not_equal_to else
+
 
 end;
+
+
 
 end.

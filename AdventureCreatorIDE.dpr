@@ -1,7 +1,7 @@
 program AdventureCreatorIDE;
 
 uses
-  Forms,
+Windows,  Forms,
   AdventureCreatorIDEMain in 'AdventureCreatorIDEMain.pas' {Form1},
   AdventureBinaryRuntime in 'AdventureBinaryRuntime.pas',
   MetaData in 'MetaData.pas' {Form2},
@@ -17,6 +17,7 @@ uses
 {$R *.res}
 
 begin
+
   Application.Initialize;
   Application.Title := 'Adventure Creator IDE';
   TStyleManager.TrySetStyle('Cyan Night');

@@ -874,6 +874,10 @@ procedure InitScreenMode;
 var
   BufferInfo: TConsoleScreenBufferInfo;
 begin
+
+{$IFDEF EDITOR}
+AllocConsole;
+{$ENDIF}
   Reset(Input);
   Rewrite(Output);
   StdIn := TTextRec(Input).Handle;

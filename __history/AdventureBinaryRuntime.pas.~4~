@@ -195,6 +195,7 @@ begin
   begin
 
     LoadScriptFromAGF(x, AdventureBinData.Scripts[y]);
+    writeln('Loaded script ' + AdventureBinData.Scripts[y].script_name);
   end;
 
   CloseFile(x);

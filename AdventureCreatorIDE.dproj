@@ -3,7 +3,7 @@
         <ProjectGuid>{4C725317-BB0E-4115-BD67-AE3C55B73C5F}</ProjectGuid>
         <MainSource>AdventureCreatorIDE.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
@@ -74,7 +74,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
-        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_Define>RELEASE;EDITOR;$(DCC_Define)</DCC_Define>
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
@@ -98,6 +98,8 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <AppDPIAwarenessMode>PerMonitor</AppDPIAwarenessMode>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <DCC_Define>EDITOR;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -115,19 +117,15 @@
         </DCCReference>
         <DCCReference Include="ChoiceCommandsForm.pas">
             <Form>Form4</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="AboutForm.pas">
             <Form>IDEAboutForm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="ChoiceConditionsForm.pas">
             <Form>Form6</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="ScriptEditorForm.pas">
             <Form>Form5</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="AdventureFile.pas"/>
         <None Include="ModelSupport_AdventureCreatorIDE\default.txaPackage"/>

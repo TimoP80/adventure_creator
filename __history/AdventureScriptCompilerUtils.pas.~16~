@@ -45,7 +45,7 @@ const
   OP_EXPRESSIONDATA = $8012;
   OP_IF_CONNECTOR = $8013;
   OP_END_CONDITIONLIST = $8014;
-  OP_IF_CHAINED = $8015;
+  OP_IF_CHAINED=$8015;
   OP_IF_ELSE = $8016;
   OP_CONDITION_BLOCK_START = $8017;
   OP_CONDITION_BLOCK_END = $8018;
@@ -166,7 +166,6 @@ function GetVariableValue(TheScript: Script; varname: string): variant;
 
 implementation
 
-uses AdventureBinaryRuntime;
 // Run a script starting from the function named FunctionName e.g. 'Main'
 procedure AddColor(name: string; color: integer);
 begin
@@ -179,6 +178,31 @@ end;
 
 procedure InitColorTable;
 begin
+  (*
+
+    // Background and foreground colors
+    Black        = 0;
+    Blue         = 1;
+    Green        = 2;
+    Cyan         = 3;
+    Red          = 4;
+    Magenta      = 5;
+    Brown        = 6;
+    LightGray    = 7;
+
+    // Foreground colors
+    DarkGray     = 8;
+    LightBlue    = 9;
+    LightGreen   = 10;
+    LightCyan    = 11;
+    LightRed     = 12;
+    LightMagenta = 13;
+    Yellow       = 14;
+    White        = 15;
+
+
+
+  *)
   AddColor('Black', Black);
   AddColor('Blue', Blue);
   AddColor('Green', Green);
@@ -382,13 +406,6 @@ begin
     end;
     write(output);
   end
-  else if funcname = 'SetCurrentNode' then
-  begin
-    // code here for current node changes
-    // can't do it elsewhere but ACEngine.exe
-    currentnode := instr.inst_params[1].data;
-
-  end
 
   else if funcname = 'WaitForKeyPress' then
   begin
@@ -483,26 +500,25 @@ var
   opcodeindex: integer;
   opcodefound: boolean;
 begin
-  result := -1;
-  i := start;
-  opcodefound := false;
-  writeln('Seek opcode from ', start, ' to find opcode ',
-    OpcodeToStr(opcodetofind), ' stop at opcode ', OpcodeToStr(stop_at_opcode));
-  while (TheScript.instructions[i].inst_type <> stop_at_opcode) do
+  result:=-1;
+  i:=start;
+opcodefound:=false;
+writeln('Seek opcode from ',start,' to find opcode ',opcodetostr(opcodetofind),' stop at opcode ',opcodetostr(stop_at_opcode));
+  while (thescript.instructions[i].inst_type <> stop_at_opcode) do
   begin
-    writeln('I = ', i);
+  writeln('I = ',i);
     if TheScript.instructions[i].inst_type = opcodetofind then
     begin
-      opcodefound := true;
-      opcodeindex := i;
-      break;
+     opcodefound:=true;
+     opcodeindex:=i;
+     break;
     end;
-    inc(i);
+  inc(i);
   end;
 
-  if opcodefound = true then
+  if opcodefound=true then
   begin
-    result := opcodeindex;
+      result := opcodeindex;
   end;
 
 end;
@@ -512,8 +528,8 @@ function FindOpcode(TheScript: Script; start: integer;
 var
   i: integer;
 begin
-  result := -1;
-  for i := start to TheScript.instruction_count - 1 do
+  result:=-1;
+  for i := start to thescript.instruction_count-1 do
   begin
     if TheScript.instructions[i].inst_type = opcodetofind then
     begin
@@ -523,12 +539,6 @@ begin
   end;
 end;
 
-
-// Some opcodes have empty code blocks because they just need to be addressed
-// in the RunScript procedure, otherwise this function will report the
-// unhandled opcode, this is great for checking that all opcodes are
-// accounted for
-//
 procedure RunScript(TheScript: Script; FunctionName: string);
 var
   x, i: integer;
@@ -547,11 +557,7 @@ var
   condition_eval_value: variant;
   condition_eval_string: string;
   condition_eval_integer: integer;
-  if_was_true: boolean;
-  else_was_true: boolean;
-  last_condition_result: boolean;
   else_has_condition: boolean;
-  execute_else: boolean;
   compare_mode: integer;
   intermediatedata: variant;
   instruction_param_data: variant;
@@ -568,56 +574,46 @@ begin
   current_instruction := TheScript.instructions[x].inst_type;
   execution_mode := EXEC_MODE_NORMAL;
   function_called := false;
-  numifopcodes := 0;
+  numifopcodes:=0;
   while (current_instruction <> OP_FUNCTIONEND) do
   begin
     current_instruction := TheScript.instructions[x].inst_type;
+      writeln(format('[%0.4d] opcode = ',[x]),opcodetostr(current_instruction));
     case current_instruction of
-      OP_CONDITION_BLOCK_START:
-      begin
-
-      end;
-      OP_CONDITION_BLOCK_END:
-      begin
-
-      end;
       OP_IF_ELSE:
-        begin
-          else_has_condition := false;
-        end;
+      begin
+        writeln('OP_IF_ELSE');
+        else_has_condition := false;
+      end;
       OP_IF:
-
         begin
-          if_was_true := false;
-          else_was_true := false;
-          execute_else := false;
-          condition_was_true := false;
-          numifopcodes := 0;
+      condition_was_true := false;
+        numifopcodes:=0;
           numconditionstrue := 0;
           numconditionsfalse := 0;
           execution_mode := EXEC_MODE_CONDITION;
           if_position := FindOpcode(TheScript, x + 1, OP_IFBEGIN);
           if_else_position := FindOpcode(TheScript, x + 1, OP_IF_ELSE);
           jump_position := FindOpcode(TheScript, if_else_position + 1,
-            OP_IFELSEEND);
+             OP_IFELSEEND);
           numconditions := 0;
-          inc(numifopcodes);
+            inc(numifopcodes);
 
         end;
       OP_IF_CHAINED:
-        begin
-          condition_was_true := false;
-          else_has_condition := true;
+      begin
+      condition_was_true := false;
+        else_has_condition := true;
           numconditionstrue := 0;
           numconditionsfalse := 0;
           execution_mode := EXEC_MODE_CONDITION;
           if_position := FindOpcode(TheScript, x + 1, OP_IFELSEBEGIN);
-          if_else_position := FindOpcode(TheScript, if_position + 1,
-            OP_IF_ELSE);
-          jump_position := FindOpcode(TheScript, x + 1, OP_CONDITION_BLOCK_END);
+          if_else_position := FindOpcode(TheScript, if_position + 1, OP_IF_ELSE);
+          jump_position := FindOpcode(TheScript, if_else_position + 1,
+             OP_IFELSEEND);
           numconditions := 0;
-          inc(numifopcodes);
-        end;
+            inc(numifopcodes);
+      end;
       OP_CONDITION:
         begin
 
@@ -625,6 +621,7 @@ begin
           condition_eval := TheScript.instructions[x].inst_params[1].data;
           condition_eval_value := TheScript.instructions[x].inst_params[2].data;
           condition_value := GetVariableValue(TheScript, condition_variable);
+
           if (VarType(condition_eval_value) = varString) or
             (VarType(condition_eval_value) = varUString) then
           begin
@@ -662,7 +659,8 @@ begin
             begin
               case condition_eval of
                 IF_EVAL_EQUALS:
-                  condition_result := (condition_value = condition_eval_string);
+                  condition_result :=
+                    (condition_value = condition_eval_string);
                 IF_EVAL_NOT_EQUAL:
                   condition_result :=
                     (condition_value <> condition_eval_string);
@@ -674,11 +672,10 @@ begin
           if condition_result = true then
           begin
             inc(numconditionstrue);
-            if numconditionstrue > 0 then
-              condition_was_true := true;
+          if numconditionstrue>0 then
+      condition_was_true := true;
 
-          end
-          else if condition_result = false then
+          end else if condition_result = false then
             inc(numconditionsfalse);
 
           inc(numconditions);
@@ -686,20 +683,20 @@ begin
         end;
       OP_END_CONDITIONLIST:
         begin
+         writeln('END_CONDITIONLIST');
           if numconditionstrue = numconditions then
-          begin
-            if_was_true := true;
-            x := if_position;
-            last_condition_result := true;
-          end
+           begin
+           x := if_position
+           end
           else if numconditionsfalse = numconditions then
           begin
-            else_was_true := false;
             x := if_else_position;
-            last_condition_result := false;
           end;
 
-        end;
+
+
+
+       end;
       OP_IFBEGIN:
         begin
 
@@ -711,26 +708,18 @@ begin
         end;
       OP_IFELSEBEGIN:
         begin
-          (*
-            debug stuff for later use if things get weird again
-            now this should work as expected with chained if statements
-            writeln('IF ELSE BEGIN');
-            writeln('ELSE_HAS_CONDITION: ',booltostr(else_has_condition ,true));
-            writeln('last condition result: ',BoolToStr(last_condition_result,true));
-            writeln('if_was_true: ',booltostr(if_was_true, true));
-            writeln('else_was_true: ',booltostr(else_was_true, true)); *)
-          if ((last_condition_result = true) or (last_condition_result = false))
-            and (else_was_true = false) and (if_was_true = true) then
-          begin
-            // writeln('Skipping out of else block');
-            // writeln('jump position: ',jump_position);
-            x := jump_position;
+          writeln('Else begin, else_has_condition ',booltostr(else_has_condition,true));
+          writeln('x = ',x,' else position ',if_else_position);
+          writeln('numconditions: ',numconditions);
+          writeln('numtrue: ',numconditionstrue);
+          writeln('numfalse: ',numconditionsfalse);
 
-          end;
+
           execution_mode := EXEC_MODE_CONDITION;
-        end;
+         end;
       OP_IFELSEEND:
         begin
+
           execution_mode := EXEC_MODE_NORMAL;
         end;
       OP_FUNCTIONEND:
@@ -908,7 +897,6 @@ begin
   built_in_functions.add('ExecuteRandomChance');
   built_in_functions.add('ReadInput');
   built_in_functions.add('Return');
-  built_in_functions.add('SetCurrentNode');
 end;
 
 function ParamTypeToStr(paramtype: integer): string;
@@ -1004,7 +992,7 @@ begin
     OP_CONDITION_BLOCK_END:
       result := 'OP_CONDITION_BLOCK_END';
     OP_IF_ELSE:
-      result := 'OP_IF_ELSE';
+      result:='OP_IF_ELSE';
   else
     result := 'OP_UNKNOWN (' + format('%0.4x', [opcode]) + ')';
   end;

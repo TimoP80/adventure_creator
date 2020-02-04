@@ -7,6 +7,7 @@ uses
   Variants,
   Classes, Graphics,
   Controls, Forms,
+ AdventureScriptCompilerUtils,
   JclFileUtils, Dialogs, xmldom, XMLIntf, msxmldom, XMLDoc, StdCtrls, Menus,
   Vcl.ComCtrls,
   Vcl.WinXCtrls;
@@ -433,7 +434,7 @@ procedure TForm1.Scripts1Click(Sender: TObject);
 begin
   updatescripts;
   form5.showmodal;
-
+  UpdateScriptSelectors;
 end;
 
 procedure TForm1.ScriptSelectorClick(Sender: TObject);
@@ -550,7 +551,9 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   AdventureData := NewAdventureGame;
-end;
+  initbuiltinfunctions;
+  InitColorTable;
+  end;
 
 procedure TForm1.gamewinnerClick(Sender: TObject);
 begin

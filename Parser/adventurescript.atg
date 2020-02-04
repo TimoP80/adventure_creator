@@ -210,7 +210,9 @@ IfStatement = "if"
 (. 
   instruction_temp := AddInstruction(CurrentScript, OP_IF);
   NextInstruction(currentscript, instruction_temp);
-.) Conditions "{" 
+.) Conditions (.  instruction_temp := AddInstruction(CurrentScript, OP_END_CONDITIONLIST);
+  NextInstruction(CurrentScript, instruction_temp);
+ .) "{" 
 (. 
   instruction_temp := AddInstruction(CurrentScript, OP_IFBEGIN);
   NextInstruction(currentscript, instruction_temp);
@@ -220,16 +222,20 @@ IfStatement = "if"
   instruction_temp := AddInstruction(CurrentScript, OP_IFEND);
   NextInstruction(currentscript, instruction_temp);
 
-.) ["else" ["if" (. 
-  instruction_temp := AddInstruction(CurrentScript, OP_IF);
+.) [{"else" ["if" (. 
+  instruction_temp := AddInstruction(CurrentScript, OP_IF_CHAINED);
   NextInstruction(currentscript, instruction_temp);
 
-.) Conditions] "{" 
+.) Conditions (. 
+  instruction_temp := AddInstruction(CurrentScript, OP_END_CONDITIONLIST);
+  NextInstruction(CurrentScript, instruction_temp);
+
+.) ] "{" 
 (. 
   instruction_temp := AddInstruction(CurrentScript, OP_IFELSEBEGIN);
   NextInstruction(currentscript, instruction_temp);
 
-.) {Command} "}" ]
+.) {Command} "}" }]
 
 (. 
 

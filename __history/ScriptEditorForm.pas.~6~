@@ -3,10 +3,10 @@ unit ScriptEditorForm;
 interface
 
 uses
-CocoBase,  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   AdventureFile, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SynEdit, Vcl.StdCtrls,
- AdventureScriptCompilerUtils, AdventureScript, SynEditHighlighter, AdventureBinary, SynHighlighterCS, SynCompletionProposal;
+  SynEditHighlighter, AdventureBinary, SynHighlighterCS, SynCompletionProposal;
 
 type
   TForm5 = class(TForm)
@@ -25,7 +25,6 @@ type
     ScriptAuthor: TEdit;
     Button3: TButton;
     SynCompletionProposal1: TSynCompletionProposal;
-    Button4: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure SynEdit1KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -36,7 +35,6 @@ type
       Shift: TShiftState);
     procedure ScriptAuthorKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure Button4Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -46,7 +44,6 @@ type
 var
   Form5: TForm5;
   Script: IXMLScriptType;
-  ScriptParser: TAdventureScript;
 
   procedure UpdateScripts;
 
@@ -92,29 +89,6 @@ begin
   AdventureData.Scripts.Delete(ScriptList.itemindex);
   UpdateScripts;
 
-end;
-
-procedure TForm5.Button4Click(Sender: TObject);
-var i: integer;
-begin
-ScriptParser := TAdventureScript.Create(nil);
-SynEdit1.Lines.SaveToFile('temp.as');
-scriptparser.SourceFileName := 'temp.as';
-InitScriptData(currentscript,'','','');
-ScriptParser.Execute;
-if scriptparser.Successful=true then
-begin
- LogMsg('Successfully compiled the edited script with '+inttostr(currentscript.instruction_count)+' instructions.');
- RunScript(CurrentScript, 'Main');
- end else
- begin
-   //showmessage(Scriptparser.ListStream.ToString);
-   LogMsg('Script has '+inttostr(ScriptParser.ErrorList.Count)+' error(s).');
- for i := 0 to scriptparser.ErrorList.Count-1 do
- begin
-   logmsg('Error #'+inttostr(i)+' line '+inttostr(TCocoError(scriptparser.ErrorList.Items[i]).Line)+', col '+inttostr(TCocoError(scriptparser.ErrorList.Items[i]).Col)+': Code '+inttostr(TCocoError(scriptparser.ErrorList.Items[i]).ErrorCode));
- end;
- end;
 end;
 
 procedure TForm5.ScriptAuthorKeyUp(Sender: TObject; var Key: Word;

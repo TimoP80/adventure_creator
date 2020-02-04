@@ -166,7 +166,6 @@ function GetVariableValue(TheScript: Script; varname: string): variant;
 
 implementation
 
-uses AdventureBinaryRuntime;
 // Run a script starting from the function named FunctionName e.g. 'Main'
 procedure AddColor(name: string; color: integer);
 begin
@@ -386,8 +385,6 @@ begin
   begin
     // code here for current node changes
     // can't do it elsewhere but ACEngine.exe
-    currentnode := instr.inst_params[1].data;
-
   end
 
   else if funcname = 'WaitForKeyPress' then

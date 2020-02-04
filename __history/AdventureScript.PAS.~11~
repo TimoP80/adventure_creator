@@ -1690,8 +1690,6 @@ end;
 
 procedure TAdventureScript._IfStatement;
 begin
-      instruction_temp := AddInstruction(CurrentScript, OP_CONDITION_BLOCK_START);
-      NextInstruction(CurrentScript, instruction_temp);
 
   Expect(IFSym);
 
@@ -1729,6 +1727,7 @@ begin
       if (fCurrentInputSymbol = IFSym) then
       begin
         Get;
+        writeln('Added chained if');
         instruction_temp := AddInstruction(CurrentScript, OP_IF_CHAINED);
         NextInstruction(CurrentScript, instruction_temp);
 
@@ -1754,8 +1753,6 @@ begin
   NextInstruction(CurrentScript, instruction_temp);
   end;
   end;
-      instruction_temp := AddInstruction(CurrentScript, OP_CONDITION_BLOCK_END);
-      NextInstruction(CurrentScript, instruction_temp);
 
 
 end;

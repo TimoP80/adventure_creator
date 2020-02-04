@@ -9,38 +9,14 @@ program ACEngine;
 uses
 
   AdventureBinaryRuntime,
+  AdventureScriptCompilerUtils,
   Console,
   classes,
   Inifiles,
   SysUtils;
 
-const
-  alphabets: array [0 .. 10] of char = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-    'i', 'j', 'k');
-  numbers: array [0 .. 10] of integer = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
-type
-  choicemapping = record
-    letter: char;
-    number: integer;
-  end;
 
-var
-  ch, choice: char;
-  choicemappings: array of choicemapping;
-  choicemappingcount: integer;
-  currentmoney, numchoices: integer;
-  moneystring, currentnode: ansistring;
-  wingame, endgame: boolean;
-  random_min, random_max: integer;
-  rcstream: Tresourcestream;
-  datafile: string;
-  moneydisplay, debugmode: boolean;
-  msg_gameover, msg_wrongchoice, msg_pressanykey: ansistring;
-  msgtemp, msg_gamefinished: ansistring;
-  savedx, savedy, choiceinteger: integer;
-  addedscore, score: integer;
-  config: TIniFile;
 
 label start;
 
@@ -48,7 +24,7 @@ function ChoiceToNumber (choice: char): integer;
 var y: integer;
 begin
  for y := 0 to choicemappingcount-1 do
- begin  
+ begin
    if choice = choicemappings[y].letter then
      result := choicemappings[y].number;
  end;
@@ -190,6 +166,7 @@ var
   varvaluetemp, textvaluetemp, txt: widestring;
   randomnumber: integer;
   valuetemp: integer;
+  script_index: integer;
   cmd, variable, value: string;
 begin
 
@@ -240,6 +217,14 @@ begin
         writeln(textvaluetemp);
         ch := ReadKey;
 
+      end
+      else if cmd = 'RunScript' then
+      begin
+         script_index := FindScriptByName(value);
+         if script_index<>-1 then
+          begin
+            RunScript(adventurebindata.Scripts[script_index], 'Main');
+          end;
       end
       else if cmd = 'RandomNumber' then
       begin
@@ -296,7 +281,7 @@ end;
 
 procedure ProcessNodeCommands(name: string);
 var
-  z, nodeind: integer;
+  z, script_index, nodeind: integer;
   ch: char;
   varnametemp, textvaluetemp, txt: widestring;
   varvaluetemp, valuetemp: integer;
@@ -344,6 +329,15 @@ begin
         end;
 
       end
+else if AdventureBinData.GameNodes[nodeind].NodeCommands[z].cmd = 'RunScript' then
+      begin
+         script_index := FindScriptByName(AdventureBinData.GameNodes[nodeind].NodeCommands[z].value);
+         if script_index<>-1 then
+          begin
+            RunScript(adventurebindata.Scripts[script_index], 'Main');
+          end;
+      end
+
       else if AdventureBinData.GameNodes[nodeind].NodeCommands[z].cmd = 'DisplayMessage'
       then
       begin
@@ -416,13 +410,9 @@ function GetNodeVisibilityByCondition(nodeindex: integer;
   choiceindex: integer): boolean;
 var
   value, cmd, varparam: string;
-var
   eval: integer;
-var
   u: integer;
-var
   conditions_true, conditions_false: integer;
-var
   current_condition: boolean;
 
   begin
@@ -655,8 +645,12 @@ begin
             wingame := GetWinGameFlagFromChoice(currentnode, choiceinteger);
 
             addedscore := GetScoreFromChoice(currentnode, choiceinteger);
-            ProcessChoiceCommands(currentnode, choiceinteger);
             currentnode := GetTargetNodeFromChoice(currentnode, choiceinteger);
+            //
+            // scripts can override the target node by using the random chance system
+            // so currentnode assignment is before choice command processing
+            //
+            ProcessChoiceCommands(currentnode, choiceinteger);
             Inc(score, addedscore);
             if wingame = true then
             begin
