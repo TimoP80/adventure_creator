@@ -83,7 +83,7 @@ object Form5: TForm5
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -13
-    Font.Name = 'DejaVu Sans Mono'
+    Font.Name = 'Courier New'
     Font.Style = []
     TabOrder = 3
     OnKeyUp = SynEdit1KeyUp
@@ -100,11 +100,8 @@ object Form5: TForm5
     Gutter.Font.Height = -11
     Gutter.Font.Name = 'Courier New'
     Gutter.Font.Style = []
-    Gutter.Gradient = True
-    Gutter.GradientEndColor = clSilver
-    Gutter.GradientSteps = 35
     Highlighter = SynCSSyn1
-    FontSmoothing = fsmClearType
+    FontSmoothing = fsmNone
   end
   object ScriptName: TEdit
     Left = 450
@@ -152,9 +149,9 @@ object Form5: TForm5
     Options.AutoDetectEnabled = False
     Options.AutoDetectLineLimit = 0
     Options.Visible = False
-    CommentAttri.Foreground = clGreen
+    CommentAttri.Foreground = clHighlight
     IdentifierAttri.Foreground = clBackground
-    StringAttri.Foreground = clMaroon
+    StringAttri.Foreground = clHotLight
     Left = 800
     Top = 440
   end
