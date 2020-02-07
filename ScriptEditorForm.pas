@@ -27,6 +27,10 @@ type
     Button3: TButton;
     SynCompletionProposal1: TSynCompletionProposal;
     Button4: TButton;
+    Label6: TLabel;
+    compileddataview: TMemo;
+    Button5: TButton;
+    IsBootScript: TCheckBox;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure SynEdit1KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -38,6 +42,8 @@ type
     procedure ScriptAuthorKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure Button4Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
+    procedure IsBootScriptClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -90,6 +96,7 @@ begin
   Script.Name := '<< NEW SCRIPT >>';
   Script.Filename := '';
   Script.Author := AdventureData.MetaInfo.Author;
+  Script.IsBootScript:=false;
   templateloader.LoadFromFile('Script Templates\Script_Template.as');
   Script.Text := templateloader.Text;
   UpdateScripts;
@@ -118,6 +125,7 @@ begin
     LogMsg('Successfully compiled the edited script with ' +
       inttostr(currentscript.instruction_count) + ' instructions.');
     RunScript(currentscript, 'Main');
+   DeleteFile('temp.as');
   end
   else
   begin
@@ -132,7 +140,48 @@ begin
         ScriptParser.ErrorStr(TCocoError(ScriptParser.ErrorList.Items[i])
         .ErrorCode, TCocoError(ScriptParser.ErrorList.Items[i]).Data));
     end;
+   DeleteFile('temp.as');
   end;
+end;
+
+procedure TForm5.Button5Click(Sender: TObject);
+var i: integer;
+scriptdisassembly: TStrings;
+begin
+  ScriptParser := TAdventureScript.Create(nil);
+  SynEdit1.Lines.SaveToFile('temp.as');
+  ScriptParser.SourceFileName := 'temp.as';
+  InitScriptData(currentscript, '', '', '');
+  ScriptParser.Execute;
+  if ScriptParser.Successful = true then
+  begin
+    LogMsg('Successfully compiled the edited script with ' +
+      inttostr(currentscript.instruction_count) + ' instructions.');
+   scriptdisassembly := DisassembleScript(CurrentScript);
+   compileddataview.Text := scriptdisassembly.Text;
+
+   DeleteFile('temp.as');
+  end
+  else
+  begin
+    // showmessage(Scriptparser.ListStream.ToString);
+    LogMsg('Script has ' + inttostr(ScriptParser.ErrorList.Count) +
+      ' error(s).');
+    for i := 0 to ScriptParser.ErrorList.Count - 1 do
+    begin
+      LogMsg('Error #' + inttostr(i) + ' line ' +
+        inttostr(TCocoError(ScriptParser.ErrorList.Items[i]).Line) + ', col ' +
+        inttostr(TCocoError(ScriptParser.ErrorList.Items[i]).Col) + ': ' +
+        ScriptParser.ErrorStr(TCocoError(ScriptParser.ErrorList.Items[i])
+        .ErrorCode, TCocoError(ScriptParser.ErrorList.Items[i]).Data));
+    end;
+   DeleteFile('temp.as');
+  end;
+end;
+
+procedure TForm5.IsBootScriptClick(Sender: TObject);
+begin
+Script.IsBootScript:=isbootscript.Checked;
 end;
 
 procedure TForm5.ScriptAuthorKeyUp(Sender: TObject; var Key: Word;
@@ -154,6 +203,7 @@ begin
   ScriptName.Text := Script.Name;
   ScriptFilename.Text := Script.Filename;
   ScriptAuthor.Text := Script.Author;
+  isbootscript.Checked := Script.IsBootScript;
 
   SynEdit1.Lines.Text := Script.Text;
 

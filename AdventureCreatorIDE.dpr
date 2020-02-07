@@ -1,7 +1,8 @@
 program AdventureCreatorIDE;
 
 uses
-Windows,  Forms,
+  Windows,
+  Forms,
   AdventureCreatorIDEMain in 'AdventureCreatorIDEMain.pas' {Form1},
   AdventureBinaryRuntime in 'AdventureBinaryRuntime.pas',
   MetaData in 'MetaData.pas' {Form2},
@@ -12,7 +13,7 @@ Windows,  Forms,
   AboutForm in 'AboutForm.pas' {IDEAboutForm},
   ChoiceConditionsForm in 'ChoiceConditionsForm.pas' {Form6},
   ScriptEditorForm in 'ScriptEditorForm.pas' {Form5},
-  AdventureFIle in 'AdventureFile.pas';
+  AdventureFile in 'AdventureFile.pas';
 
 {$R *.res}
 
@@ -30,4 +31,5 @@ begin
   Application.CreateForm(TIDEAboutForm, IDEAboutForm);
   Application.CreateForm(TForm5, Form5);
   Application.Run;
+
 end.

@@ -31,10 +31,10 @@ object IDEAboutForm: TIDEAboutForm
   object Label2: TLabel
     Left = 152
     Top = 54
-    Width = 117
+    Width = 128
     Height = 19
     Alignment = taCenter
-    Caption = 'Version 1.0-beta'
+    Caption = 'Version 1.0-stable'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16

@@ -2,7 +2,7 @@ unit AdventureBinary;
 
 interface
 
-uses sysutils, jclstrings,JclFileUtils, FileIOFunctions, AdventureScript, AdventureScriptCompilerUtils,AdventureFile;
+uses sysutils, classes, jclstrings,JclFileUtils, FileIOFunctions, AdventureScript, AdventureScriptCompilerUtils,AdventureFile;
 
 const
   is_equal = 1;
@@ -74,7 +74,7 @@ var
   AdventureBinData: AdventureGame;
   ScriptParser: TAdventureScript;
   AdventureData: IXMLAdventureGameType;
-
+  Script: TStrings;
 procedure SaveAdventureBin(filename: string);
 procedure CompileAdventure;
 procedure LoadAdventureBin(filename: string);
@@ -436,9 +436,13 @@ InitBuiltInFunctions;
      CurrentScript.script_name := adventuredata.Scripts[i].Name;
      CurrentScript.script_filename := adventuredata.Scripts[i].Filename;
      CurrentScript.script_author := adventuredata.Scripts[i].Author;
-    writeln('Compiled successfully: '+Currentscript.script_name);
+     currentscript.is_boot_script := adventuredata.Scripts[i].IsBootScript;
+     if currentscript.is_boot_script=true then
+     writeln('"'+currentscript.script_name+'" will be executed at startup');
+     writeln('Compiled successfully: '+Currentscript.script_name);
      AdventureBinData.Scripts[adventurebindata.ScriptCount] := CurrentScript;
    DeleteFile('temp.as');
+
      inc(adventurebindata.scriptcount);
    end else
    begin

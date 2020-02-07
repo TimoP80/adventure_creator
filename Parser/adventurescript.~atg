@@ -84,7 +84,7 @@ begin;
 
     Inc(t);
   end;
-   Result := utf8tostring(temp);
+   Result := temp;
 end;
 
 
@@ -105,6 +105,7 @@ CHARACTERS
   macros   = ANY - eol .
 
 COMMENTS FROM "/*" TO "*/"
+COMMENTS FROM "//" TO eol
 
 IGNORE
   tab + eol + lf
@@ -113,9 +114,9 @@ TOKENS
   identifier = ( "_" | letter) { "_" | letter | digit } .
   number     = digit { digit } [ "." { digit }] [ "U" | "u" | "L" | "l" ] .
   hexnumber  = "0" ( "x" | "X" ) hexdigit { hexdigit } [ "U" | "u" | "L" | "l" ] .
-  string     = '"' { strings } '"' .
-  char       = "'" [ "\" ] chars "'" .
-  library    = "<" files { files } ">" .
+  _string     = '"' { strings } '"' .
+  _char       = "'" [ "\" ] chars "'" .
+  _library    = "<" files { files } ">" .
 
 IGNORE CHR(1)..CHR(32)
 
@@ -168,7 +169,7 @@ instruction_temp := AddInstruction(CurrentScript, OP_CONDITION);
   
 .)
     ) 
- (string 
+ (_string 
 (. 
   AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_IF_VALUE);
   
@@ -206,7 +207,12 @@ Conditions = Condition
 ) 
 Condition}. 
 
-IfStatement = "if" 
+IfStatement = 
+(. 
+  instruction_temp := AddInstruction(CurrentScript, OP_CONDITION_BLOCK_START);
+  NextInstruction(currentscript, instruction_temp);
+.)
+"if" 
 (. 
   instruction_temp := AddInstruction(CurrentScript, OP_IF);
   NextInstruction(currentscript, instruction_temp);
@@ -223,7 +229,7 @@ IfStatement = "if"
   NextInstruction(currentscript, instruction_temp);
 
 .) [{"else" ["if" (. 
-  instruction_temp := AddInstruction(CurrentScript, OP_IF);
+  instruction_temp := AddInstruction(CurrentScript, OP_IF_CHAINED);
   NextInstruction(currentscript, instruction_temp);
 
 .) Conditions (. 
@@ -235,13 +241,14 @@ IfStatement = "if"
   instruction_temp := AddInstruction(CurrentScript, OP_IFELSEBEGIN);
   NextInstruction(currentscript, instruction_temp);
 
-.) {Command} "}" }]
+.) {Command} "}" (.   instruction_temp := AddInstruction(CurrentScript, OP_IFELSEEND);
+  NextInstruction(currentscript, instruction_temp);
+ .) }]
 
 (. 
 
-  instruction_temp := AddInstruction(CurrentScript, OP_IFELSEEND);
+  instruction_temp := AddInstruction(CurrentScript, OP_CONDITION_BLOCK_END);
   NextInstruction(currentscript, instruction_temp);
-
 .) .
 
 
@@ -250,7 +257,7 @@ AddParam(instruction_temp, PARAM_TYPE_INT, DATA_TYPE_FUNCTION_PARAMETER_TYPE);
  
 .) | "str" (. 
 AddParam(instruction_temp, PARAM_TYPE_STRING, DATA_TYPE_FUNCTION_PARAMETER_TYPE);
-.) ) (string 
+.) ) (_string 
 (. 
  AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_FUNCTION_PARAMETER);
   .) | number 
@@ -264,7 +271,7 @@ AddParam(instruction_temp, PARAM_TYPE_STRING, DATA_TYPE_FUNCTION_PARAMETER_TYPE)
  
   .) ) .
 
-Param = (string 
+Param = (_string 
 (. 
  AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_PARAMETER_STRING);
   .) | number 
@@ -286,7 +293,7 @@ RandomChance = "RandomChance"
  AddParam(instruction_temp, strtoint(lexstring), DATA_TYPE_PROBABILITY);
  
 .) 
-")" "set" "target_node" string 
+")" "set" "target_node" _string 
 (.
  AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_TARGETNODE);
  NextInstruction(currentscript,instruction_temp);
@@ -317,7 +324,7 @@ RegularData =  identifier
   AddParam(instruction_temp, VarAsType(strtoint(lexstring), VarInteger), DATA_TYPE_REGULARDATA);
   NextInstruction(currentscript, instruction_temp);
 
-.) | string 
+.) | _string 
 (. 
   AddParam(instruction_temp, parse_string(lexstring), DATA_TYPE_REGULARDATA);
   NextInstruction(currentscript, instruction_temp);
@@ -423,7 +430,7 @@ FuncDefinition = ("int"
    VariableDefinition = identifier (. 
  name_temp:=lexstring;
  AddVariable(CurrentScript, name_temp); 
- .) ["=" (string 
+ .) ["=" (_string 
  (. 
  SetVariableValue(CurrentScript, name_temp, parse_string(lexstring))); 
  .) |number 

@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, AdventureFile, AdventureBinary, Messages, SysUtils, Variants,
-    Classes, Graphics,
+  Classes, Graphics,
   Controls, Forms,
   Dialogs, StdCtrls;
 
@@ -44,18 +44,18 @@ procedure UpdateVarList;
 var
   u: integer;
 begin
-  form3.lstvarlist.items.clear;
-  for U := 0 to AdventureData.Variables.Count - 1 do
+  Form3.lstvarlist.items.clear;
+  for u := 0 to AdventureData.Variables.Count - 1 do
   begin
-    form3.lstvarlist.Items.Add(adventuredata.Variables.Variable[u].name);
+    Form3.lstvarlist.items.Add(AdventureData.Variables.Variable[u].name);
   end;
 end;
 {$R *.dfm}
 
 procedure TForm3.btn1Click(Sender: TObject);
 begin
-  thevar := AdventureData.Variables.Add;
-  TheVar.Name := '<< NEW VARIABLE >>';
+  TheVar := AdventureData.Variables.Add;
+  TheVar.name := '<< NEW VARIABLE >>';
   UpdateVarList;
 end;
 
@@ -69,22 +69,21 @@ end;
 procedure TForm3.lstvarlistClick(Sender: TObject);
 begin
   TheVar := AdventureData.Variables[lstvarlist.itemindex];
-  edtvarname.Text := thevar.Name;
-  edtstartval.Text := thevar.Text;
+  edtvarname.Text := TheVar.name;
+  edtstartval.Text := TheVar.Text;
 end;
 
 procedure TForm3.edtvarnameKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-TheVar.Name := edtvarname.Text;
-lstvarlist.items[lstvarlist.itemindex] := TheVar.name;
+  TheVar.name := edtvarname.Text;
+  lstvarlist.items[lstvarlist.itemindex] := TheVar.name;
 end;
 
 procedure TForm3.edtstartvalKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-TheVar.Text := edtstartval.text;
+  TheVar.Text := edtstartval.Text;
 end;
 
 end.
-

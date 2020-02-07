@@ -53,14 +53,14 @@ procedure UpdateChoiceConditionSel;
 var
   i: integer;
 begin
-  i := form6.lstconditions.itemindex;
+  i := Form6.lstconditions.itemindex;
   if conditionlist.condition[i].Varname <> '' then
-    form6.lstconditions.items[i] := conditionlist.condition[i].Name + ' (' +
+    Form6.lstconditions.items[i] := conditionlist.condition[i].Name + ' (' +
       conditionlist.condition[i].Varname + ') ' + conditionlist.condition[i]
       .Eval + ' ' + conditionlist.condition[i].Text
   else
 
-    form6.lstconditions.items[i] := conditionlist.condition[i].Name + ' ' +
+    Form6.lstconditions.items[i] := conditionlist.condition[i].Name + ' ' +
       conditionlist.condition[i].Eval + ' ' + conditionlist.condition[i].Text;
 end;
 
@@ -68,16 +68,16 @@ procedure UpdateChoiceConditions;
 var
   i: integer;
 begin
-  form6.lstconditions.items.Clear;
+  Form6.lstconditions.items.Clear;
   for i := 0 to conditionlist.count - 1 do
   begin
     if conditionlist.condition[i].Varname <> '' then
-      form6.lstconditions.items.Add(conditionlist.condition[i].Name + ' (' +
+      Form6.lstconditions.items.Add(conditionlist.condition[i].Name + ' (' +
         conditionlist.condition[i].Varname + ') ' + conditionlist.condition[i]
         .Eval + ' ' + conditionlist.condition[i].Text)
     else
 
-      form6.lstconditions.items.Add(conditionlist.condition[i].Name + ' ' +
+      Form6.lstconditions.items.Add(conditionlist.condition[i].Name + ' ' +
         conditionlist.condition[i].Eval + ' ' + conditionlist.condition
         [i].Text);
   end;
@@ -88,48 +88,48 @@ begin
   condition := conditionlist.Add;
   condition.Name := '<< NEW CONDITION >>';
   UpdateChoiceConditions;
-  end;
+end;
 
 procedure TForm6.btn9Click(Sender: TObject);
 begin
- conditionlist.Delete(lstconditions.itemindex);
- UpdateChoiceConditions;
+  conditionlist.Delete(lstconditions.itemindex);
+  UpdateChoiceConditions;
 end;
 
 procedure TForm6.cbbcmdClick(Sender: TObject);
 begin
-condition.Name := cbbcmd.Text;
-UpdateChoiceConditionSel;
+  condition.Name := cbbcmd.Text;
+  UpdateChoiceConditionSel;
 end;
 
 procedure TForm6.cbbvarselClick(Sender: TObject);
 begin
-condition.Varname := cbbvarsel.Text;
-UpdateChoiceConditionSel;
+  condition.Varname := cbbvarsel.Text;
+  UpdateChoiceConditionSel;
 
 end;
 
 procedure TForm6.evallistClick(Sender: TObject);
 begin
-condition.Eval := evallist.Text;
-UpdateChoiceConditionSel;
+  condition.Eval := evallist.Text;
+  UpdateChoiceConditionSel;
 
 end;
 
 procedure TForm6.lstconditionsClick(Sender: TObject);
 begin
-condition := conditionlist.Condition[lstconditions.ItemIndex];
-cbbcmd.ItemIndex := cbbcmd.Items.IndexOf(condition.Name);
-cbbvarsel.ItemIndex := cbbvarsel.Items.IndexOf(condition.Varname);
-evallist.ItemIndex := evallist.Items.IndexOf(condition.Eval);
-mmoparamval.Text := condition.Text;
+  condition := conditionlist.condition[lstconditions.itemindex];
+  cbbcmd.itemindex := cbbcmd.items.IndexOf(condition.Name);
+  cbbvarsel.itemindex := cbbvarsel.items.IndexOf(condition.Varname);
+  evallist.itemindex := evallist.items.IndexOf(condition.Eval);
+  mmoparamval.Text := condition.Text;
 end;
 
 procedure TForm6.mmoparamvalKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-condition.Text := mmoparamval.Text;
-UpdateChoiceConditionSel;
+  condition.Text := mmoparamval.Text;
+  UpdateChoiceConditionSel;
 
 end;
 

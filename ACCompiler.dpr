@@ -29,6 +29,8 @@ begin
   SaveAdventureBin(outputname);
   writeln('Creating executable ... ');
   FileCopy('.\ACEngine.exe', changefileext(ParamStr(1), '.exe'), true);
+  FileCopy('.\ACEngine.ini', changefileext(ParamStr(1), '.ini'), true);
   writeln('Bimary file "' + changefileext(ParamStr(1), '.exe') + '" created.');
+  writeln('Configuration file "' + changefileext(ParamStr(1), '.ini') + '" created.');
   writeln;
 end.

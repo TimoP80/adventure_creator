@@ -7,7 +7,7 @@ uses
   Variants,
   Classes, Graphics,
   Controls, Forms,
- AdventureScriptCompilerUtils,
+  AdventureScriptCompilerUtils,
   JclFileUtils, Dialogs, xmldom, XMLIntf, msxmldom, XMLDoc, StdCtrls, Menus,
   Vcl.ComCtrls,
   Vcl.WinXCtrls;
@@ -155,6 +155,16 @@ implementation
 uses MetaData, VarEditor, ChoiceCommandsForm, AboutForm, ChoiceConditionsForm,
   ScriptEditorForm;
 
+procedure UpdateScriptEditorCompletion;
+var
+  u: Integer;
+begin
+  for u := 0 to built_in_functions.Count - 1 do
+  begin
+    form5.SynCompletionProposal1.ItemList.Add(built_in_functions[u]);
+  end;
+end;
+
 procedure UpdateCaption;
 begin
   Form1.Caption := 'Adventure Creator 1.0 IDE - [' + CurrentFilename + ']';
@@ -167,11 +177,11 @@ var
   u: Integer;
 begin
   form4.ScriptSelector.Clear;
-form1.ScriptSelector.Clear;
+  Form1.ScriptSelector.Clear;
   for u := 0 to AdventureData.Scripts.Count - 1 do
   begin
     form4.ScriptSelector.Items.Add(AdventureData.Scripts.Script[u].Name);
-    form1.ScriptSelector.Items.Add(AdventureData.Scripts.Script[u].Name);
+    Form1.ScriptSelector.Items.Add(AdventureData.Scripts.Script[u].Name);
   end;
 end;
 
@@ -255,6 +265,22 @@ begin
   Form1.nodes_tree.FullExpand;
 end;
 
+procedure InitScriptEditorCompletion;
+begin
+  form5.SynCompletionProposal1.ItemList.Clear;
+
+end;
+
+procedure UpdateScriptEditorVariables;
+var
+  u: Integer;
+begin
+  for u := 0 to AdventureData.Variables.Count - 1 do
+  begin
+    form5.SynCompletionProposal1.ItemList.Add(AdventureData.Variables[u].Name);
+  end;
+end;
+
 procedure TForm1.LoadAdventureFile1Click(Sender: TObject);
 begin
   if dlgOpen1.Execute then
@@ -267,6 +293,9 @@ begin
     LogMsg('Script count: ' + inttostr(AdventureData.Scripts.Count));
     UpdateNodeLists;
     UpdateVariables;
+    InitScriptEditorCompletion;
+    UpdateScriptEditorVariables;
+    UpdateScriptEditorCompletion;
     CurrentFilename := extractfilename(dlgOpen1.FileName);
     UpdateCaption;
     UpdateScriptSelectors;
@@ -439,7 +468,7 @@ end;
 
 procedure TForm1.ScriptSelectorClick(Sender: TObject);
 begin
- thecmd.Text := ScriptSelector.Text;
+  thecmd.Text := ScriptSelector.Text;
   UpdateNodeCommandSel;
 end;
 
@@ -551,9 +580,10 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   AdventureData := NewAdventureGame;
+
   initbuiltinfunctions;
   InitColorTable;
-  end;
+end;
 
 procedure TForm1.gamewinnerClick(Sender: TObject);
 begin
@@ -565,15 +595,11 @@ var
   z, Y: Integer;
   cond: IXMLConditionListType;
 begin
-  for Y := 0 to AdventureData.GameNodes.Count - 1 do
+  for Y := 0 to AdventureData.Scripts.Count - 1 do
   begin
-    for z := 0 to AdventureData.GameNodes.node[Y].choices.Count - 1 do
-    begin
-
-      cond := AdventureData.GameNodes.node[Y].ChoiceConditions.Add;
-    end;
+   LogMsg('Resetting script "'+AdventureData.Scripts.Script[y].Name+'" Boot script state.');
+    adventuredata.Scripts.Script[y].IsBootScript := false;
   end;
-  LogMsg('Conditions added to existing project!');
 end;
 
 procedure TForm1.chkendgameClick(Sender: TObject);
@@ -599,7 +625,11 @@ begin
     LogMsg('Binary data saved');
     LogMsg('Copying engine ... ');
     FileCopy('acengine.exe', changefileext(dlgSave2.FileName, '.exe'), true);
-    LogMsg('Engine copied as ' + changefileext(dlgSave2.FileName, '.exe'));
+    FileCopy('acengine.ini', changefileext(dlgSave2.FileName, '.ini'), true);
+    LogMsg('Engine copied as ' + extractfilename
+      (changefileext(dlgSave2.FileName, '.exe')));
+    LogMsg('Config copied as ' + extractfilename
+      (changefileext(dlgSave2.FileName, '.ini')));
 
   end;
 
@@ -786,16 +816,16 @@ procedure TForm1.cbbcmdClick(Sender: TObject);
 begin
   thecmd.Name := cbbcmd.Text;
 
-
-if thecmd.Name='RunScript' then
-begin
-  ScriptSelector.Visible:=true;
-  mmoparamval.Visible:=false;
-end else
-begin
-  ScriptSelector.Visible:=false;
-  mmoparamval.Visible:=true;
-end;
+  if thecmd.Name = 'RunScript' then
+  begin
+    ScriptSelector.Visible := true;
+    mmoparamval.Visible := false;
+  end
+  else
+  begin
+    ScriptSelector.Visible := false;
+    mmoparamval.Visible := true;
+  end;
 
   UpdateNodeCommandSel;
 end;

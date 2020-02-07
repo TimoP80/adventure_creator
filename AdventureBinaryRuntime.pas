@@ -2,7 +2,7 @@ unit AdventureBinaryRuntime;
 
 interface
 
-uses inifiles, classes,AdventureScriptCompilerUtils, FileIOFunctions;
+uses inifiles, classes, AdventureScriptCompilerUtils, FileIOFunctions;
 
 const
   is_equal = 1;
@@ -88,7 +88,7 @@ var
   choicemappings: array of choicemapping;
   choicemappingcount: integer;
   currentmoney, numchoices: integer;
-  moneystring, currentnode: ansistring;
+ lastnode, moneystring, currentnode: ansistring;
   wingame, endgame: boolean;
   random_min, random_max: integer;
   rcstream: Tresourcestream;

@@ -2,7 +2,7 @@ object Form5: TForm5
   Left = 0
   Top = 0
   Caption = 'Script Editor'
-  ClientHeight = 538
+  ClientHeight = 670
   ClientWidth = 1089
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -48,18 +48,31 @@ object Form5: TForm5
     Height = 13
     Caption = 'Author:'
   end
+  object Label6: TLabel
+    Left = 383
+    Top = 424
+    Width = 100
+    Height = 14
+    Caption = 'Compiled Data View:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Arial'
+    Font.Style = []
+    ParentFont = False
+  end
   object ScriptList: TListBox
     Left = 8
     Top = 24
     Width = 369
-    Height = 474
+    Height = 607
     ItemHeight = 13
     TabOrder = 0
     OnClick = ScriptListClick
   end
   object Button1: TButton
-    Left = 15
-    Top = 504
+    Left = 8
+    Top = 637
     Width = 75
     Height = 25
     Caption = 'New Script'
@@ -67,8 +80,8 @@ object Form5: TForm5
     OnClick = Button1Click
   end
   object Button2: TButton
-    Left = 96
-    Top = 504
+    Left = 89
+    Top = 637
     Width = 75
     Height = 25
     Caption = 'Delete Script'
@@ -76,10 +89,10 @@ object Form5: TForm5
     OnClick = Button2Click
   end
   object SynEdit1: TSynEdit
-    Left = 384
+    Left = 383
     Top = 120
     Width = 697
-    Height = 378
+    Height = 297
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -13
@@ -132,7 +145,7 @@ object Form5: TForm5
   end
   object Button3: TButton
     Left = 1006
-    Top = 504
+    Top = 640
     Width = 75
     Height = 25
     Caption = 'Close'
@@ -147,6 +160,37 @@ object Form5: TForm5
     Caption = 'Run Script'
     TabOrder = 8
     OnClick = Button4Click
+  end
+  object compileddataview: TMemo
+    Left = 383
+    Top = 444
+    Width = 698
+    Height = 187
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Courier New'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 9
+  end
+  object Button5: TButton
+    Left = 1006
+    Top = 42
+    Width = 75
+    Height = 25
+    Caption = 'Compile Script'
+    TabOrder = 10
+    OnClick = Button5Click
+  end
+  object IsBootScript: TCheckBox
+    Left = 768
+    Top = 24
+    Width = 185
+    Height = 17
+    Caption = 'Execute this script at game start'
+    TabOrder = 11
+    OnClick = IsBootScriptClick
   end
   object SynCSSyn1: TSynCSSyn
     Options.AutoDetectEnabled = False

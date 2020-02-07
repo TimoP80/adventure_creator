@@ -1,8 +1,6 @@
 program ACEngine;
 
 {$APPTYPE CONSOLE}
-{$IFOPT D-}{$WEAKLINKRTTI ON}{$ENDIF}
-{$RTTI EXPLICIT METHODS([]) PROPERTIES([]) FIELDS([])}
 
 
 
@@ -10,13 +8,14 @@ uses
 
   AdventureBinaryRuntime,
   AdventureScriptCompilerUtils,
-  Console,
+  Velthuis.Console,
   classes,
   Inifiles,
   SysUtils;
 
 
-
+var i: integer;
+    strs: tstrings;
 
 label start;
 
@@ -26,7 +25,10 @@ begin
  for y := 0 to choicemappingcount-1 do
  begin
    if choice = choicemappings[y].letter then
+   begin
      result := choicemappings[y].number;
+   exit;
+   end;
  end;
 end;
 
@@ -223,7 +225,10 @@ begin
          script_index := FindScriptByName(value);
          if script_index<>-1 then
           begin
-            RunScript(adventurebindata.Scripts[script_index], 'Main');
+          ImportVariableData(adventurebindata.Scripts[script_index]);
+          RunScript(adventurebindata.Scripts[script_index], 'Main');
+          ExportVariableData(adventurebindata.Scripts[script_index]);
+
           end;
       end
       else if cmd = 'RandomNumber' then
@@ -334,8 +339,10 @@ else if AdventureBinData.GameNodes[nodeind].NodeCommands[z].cmd = 'RunScript' th
          script_index := FindScriptByName(AdventureBinData.GameNodes[nodeind].NodeCommands[z].value);
          if script_index<>-1 then
           begin
-            RunScript(adventurebindata.Scripts[script_index], 'Main');
-          end;
+          ImportVariableData(adventurebindata.Scripts[script_index]);
+          RunScript(adventurebindata.Scripts[script_index], 'Main');
+          ExportVariableData(adventurebindata.Scripts[script_index]);
+         end;
       end
 
       else if AdventureBinData.GameNodes[nodeind].NodeCommands[z].cmd = 'DisplayMessage'
@@ -468,7 +475,7 @@ var
       
       if current_condition = true then inc(conditions_true);
       if current_condition = false then inc(conditions_false);
-      
+
     end;
   end;
 
@@ -492,7 +499,7 @@ begin
     begin
       writeln('Runtime Engine Error: This node contains no text.');
     end;
-    writeln(txt);
+    writeln(WrapText(txt, 80));
     writeln;
     if AdventureBinData.GameNodes[nodeind].NodeChoiceCount > 0 then
     begin
@@ -532,8 +539,35 @@ begin
   currentmoney := strtoint(GetVarValue(moneyvar));
 end;
 
+procedure WriteHeader;
 begin
-  config := TIniFile.Create('.\ACEngine.ini');
+        TextBackground(blue);
+        TextColor(Yellow);
+        ClrEol;
+
+        writeln(AdventureBinData.metatitle + ' by ' +
+          AdventureBinData.metaauthor);
+
+        if moneydisplay = true then
+        begin
+          GotoXY(38, 1);
+          UpdateMoney;
+          moneystring := GetVarValue('MoneyCaption');
+          moneystring := STringReplace(moneystring, '$Money',
+            inttostr(currentmoney), [rfReplaceAll]);
+          write(moneystring);
+        end;
+        GotoXY(65, 1);
+        writeln('Score: ', score, ' / ', AdventureBinData.maxscore);
+        writeln;
+        TextBackground(black);
+        TextColor(White);
+
+end;
+
+
+begin
+  config := TIniFile.Create('.\'+changefileext(ParamStr(0),'.ini'));
   ClrScr;
   TextBackground(blue);
   ClrEol;
@@ -542,8 +576,12 @@ begin
   TextBackground(black);
   TextColor(White);
   writeln;
+  InitBuiltInFunctions;
+  InitColorTable;
  if fileexists(changefileext(ParamStr(0),'.agf')) then
     datafile := extractfilename(changefileext(ParamStr(0),'.agf'));
+ if paramstr(1)<>'' then
+    datafile := paramstr(1);
 //  rcstream := TResourceStream.Create(HInstance, 'Resource_1', rt_rcdata);
 //  rcstream.SaveToFile('temp.dat');
 //  datafile := 'temp.dat';
@@ -569,9 +607,20 @@ begin
 
     writeln('Loaded "' + AdventureBinData.metatitle + '" by ' +
       AdventureBinData.metaauthor);
-    writeln;
-  //  if fileexists('temp.dat') then deletefile('temp.dat');
 
+   // look for boot scripts and execute them in the order they were organized
+   // in the editor
+   for i := 0 to adventurebindata.ScriptCount-1 do
+   begin
+    if adventurebindata.Scripts[i].is_boot_script=true then
+    begin
+     RunScript(adventurebindata.Scripts[i], 'Main');
+
+    end;
+   end;
+
+clrscr;
+   writeheader;
   start:
 
     begin
@@ -602,11 +651,7 @@ begin
 
         writeln(AdventureBinData.metatitle + ' by ' +
           AdventureBinData.metaauthor);
-        if debugmode = true then
-        begin
-          GotoXY(35, 1);
-          write('Node: ' + currentnode);
-        end;
+
         if moneydisplay = true then
         begin
           GotoXY(38, 1);
@@ -645,12 +690,13 @@ begin
             wingame := GetWinGameFlagFromChoice(currentnode, choiceinteger);
 
             addedscore := GetScoreFromChoice(currentnode, choiceinteger);
+            lastnode:=currentnode;
             currentnode := GetTargetNodeFromChoice(currentnode, choiceinteger);
             //
             // scripts can override the target node by using the random chance system
             // so currentnode assignment is before choice command processing
             //
-            ProcessChoiceCommands(currentnode, choiceinteger);
+            ProcessChoiceCommands(lastnode, choiceinteger);
             Inc(score, addedscore);
             if wingame = true then
             begin

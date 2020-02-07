@@ -3,7 +3,8 @@ unit MetaData;
 interface
 
 uses
-  Windows,AdventureBinary, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Windows, AdventureBinary, SysUtils, Variants, Classes, Graphics, Controls,
+  Forms,
   Dialogs, StdCtrls;
 
 type
@@ -15,8 +16,7 @@ type
     lbl3: TLabel;
     mmodescription: TMemo;
     btn1: TButton;
-    procedure edttitleKeyUp(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure edttitleKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure edtauthorKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure mmodescriptionKeyUp(Sender: TObject; var Key: Word;
@@ -37,24 +37,27 @@ implementation
 procedure TForm2.edttitleKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-AdventureData.MetaInfo.Title := edttitle.text;
+  AdventureData.MetaInfo.Title := edttitle.text;
 end;
 
 procedure TForm2.edtauthorKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-AdventureData.MetaInfo.Author := edtauthor.text;
+  AdventureData.MetaInfo.Author := edtauthor.text;
 
 end;
 
 procedure TForm2.mmodescriptionKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-AdventureData.MetaInfo.Description := mmodescription.text;
+  AdventureData.MetaInfo.Description := mmodescription.text;
 
-AdventureData.MetaInfo.Description := Stringreplace(AdventureData.MetaInfo.Description, #13#10,'\n',[rfReplaceAll]);
-AdventureData.MetaInfo.Description := Stringreplace(AdventureData.MetaInfo.Description, '\n',#10,[rfReplaceAll]);
-
+  AdventureData.MetaInfo.Description :=
+    Stringreplace(AdventureData.MetaInfo.Description, #13#10, '\n',
+    [rfReplaceAll]);
+  AdventureData.MetaInfo.Description :=
+    Stringreplace(AdventureData.MetaInfo.Description, '\n', #10,
+    [rfReplaceAll]);
 
 end;
 

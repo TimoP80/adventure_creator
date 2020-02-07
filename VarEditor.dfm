@@ -1,9 +1,9 @@
 object Form3: TForm3
   Left = 774
   Top = 281
-  Width = 556
-  Height = 347
   Caption = 'Variable Editor'
+  ClientHeight = 308
+  ClientWidth = 540
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
