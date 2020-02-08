@@ -16,9 +16,9 @@ object Form5: TForm5
   object Label1: TLabel
     Left = 8
     Top = 8
-    Width = 47
+    Width = 51
     Height = 13
-    Caption = 'Script list:'
+    Caption = 'Script list>'
   end
   object Label2: TLabel
     Left = 383
@@ -89,8 +89,8 @@ object Form5: TForm5
     OnClick = Button2Click
   end
   object SynEdit1: TSynEdit
-    Left = 384
-    Top = 121
+    Left = 383
+    Top = 120
     Width = 697
     Height = 297
     Font.Charset = DEFAULT_CHARSET
@@ -219,16 +219,6 @@ object Form5: TForm5
     TabOrder = 14
     OnClick = Button8Click
   end
-  object Button9: TButton
-    Left = 896
-    Top = 73
-    Width = 104
-    Height = 25
-    Caption = 'Script Tools'
-    DropDownMenu = PopupMenu1
-    Style = bsSplitButton
-    TabOrder = 15
-  end
   object SynCSSyn1: TSynCSSyn
     Options.AutoDetectEnabled = False
     Options.AutoDetectLineLimit = 0
@@ -257,13 +247,5 @@ object Form5: TForm5
     Editor = SynEdit1
     Left = 864
     Top = 56
-  end
-  object PopupMenu1: TPopupMenu
-    Left = 856
-    Top = 216
-    object CreateRandomstringgroup1: TMenuItem
-      Caption = 'Create Random string group'
-      OnClick = CreateRandomstringgroup1Click
-    end
   end
 end

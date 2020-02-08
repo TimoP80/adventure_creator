@@ -2,7 +2,7 @@ unit AdventureBinary;
 
 interface
 
-uses FileIOFunctions, AdventureFile;
+uses sysutils, classes, jclstrings,JclFileUtils, FileIOFunctions, AdventureScript, AdventureScriptCompilerUtils,AdventureFile;
 
 const
   is_equal = 1;
@@ -61,6 +61,8 @@ type
     GameNodeCount: integer;
     Variables: array of GameVariable;
     VariableCount: integer;
+    Scripts: array of Script;
+    ScriptCount: integer;
     MetaTitle: ansistring;
     MetaAuthor: ansistring;
     MetaDescription: ansistring;
@@ -70,8 +72,9 @@ type
 var
 
   AdventureBinData: AdventureGame;
+  ScriptParser: TAdventureScript;
   AdventureData: IXMLAdventureGameType;
-
+  Script: TStrings;
 procedure SaveAdventureBin(filename: string);
 procedure CompileAdventure;
 procedure LoadAdventureBin(filename: string);
@@ -135,11 +138,43 @@ begin
           .ChoiceCommands[y].varparam);
         ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
           .ChoiceCommands[y].value);
+      end;
+
+
+      setlength(AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceConditions,
+        AdventureBinData.GameNodes[i].NodeChoices[j].ChoiceConditionCount + 1);
+
+      BlockRead(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceConditionCount, 4);
+      for y := 0 to AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceConditionCount - 1 do
+      begin
+        ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].cmd);
+        ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].varparam);
+        blockread(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].eval, 4);
+        ReadString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].value);
 
       end;
 
+
     end;
   end;
+
+  BlockRead(x, adventurebindata.ScriptCount, 4);
+
+  setlength(adventurebindata.Scripts, adventurebindata.ScriptCount+1);
+
+  for y := 0 to adventurebindata.ScriptCount-1 do
+  begin
+
+  writeln('Load script '+adventurebindata.Scripts[y].script_name);
+  LoadScriptFromAGF(x, adventurebindata.Scripts[y]);
+  end;
+
   CloseFile(x);
 
 end;
@@ -194,9 +229,54 @@ begin
           .ChoiceCommands[y].value);
 
       end;
+
+      BlockWrite(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceConditionCount, 4);
+      for y := 0 to AdventureBinData.GameNodes[i].NodeChoices[j]
+        .ChoiceConditionCount - 1 do
+      begin
+        WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].cmd);
+        WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].varparam);
+        blockwrite(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].eval, 4);
+        WriteString(x, AdventureBinData.GameNodes[i].NodeChoices[j]
+          .ChoiceConditions[y].value);
+
+      end;
+
     end;
+
+  end;
+
+  BlockWrite(x, adventurebindata.ScriptCount, 4);
+
+  for y := 0 to adventurebindata.ScriptCount-1 do
+  begin
+  writeln('Save script '+adventurebindata.Scripts[y].script_name);
+  SaveScriptToAGF(x, adventurebindata.Scripts[y]);
   end;
   CloseFile(x);
+end;
+
+function eval2enum(eval: string): integer;
+begin
+result:=0;
+if eval='is equal to' then
+  result := is_equal else
+if eval='less than or equal to' then
+  result := less_than_or_equal else
+if eval='larger than or equal to' then
+  result := larger_than_or_equal else
+if eval='larger than' then
+  result := larger_than else
+if eval='less than' then
+  result := less_than else
+if eval='not equal to' then
+  result := not_equal_to else
+
+
 end;
 
 procedure CompileAdventure;
@@ -298,11 +378,80 @@ begin
           .NodeChoiceCount].ChoiceCommands[i].value := AdventureData.GameNodes
           [u].ChoiceCommands[z].cmd[i].text;
       end;
+
+        setlength(AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoices[AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoiceCount].ChoiceConditions,
+        AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+        [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoiceCount].ChoiceConditionCount + 1);
+
+        AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+        [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+        .NodeChoiceCount].ChoiceConditionCount := AdventureData.GameNodes.Node[u].ChoiceConditions[z]
+      .Count;
+      for i := 0 to AdventureData.GameNodes.Node[u].ChoiceConditions[z]
+        .Count - 1 do
+      begin
+        AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+          [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+          .NodeChoiceCount].ChoiceConditions[i].cmd := AdventureData.GameNodes[u]
+          .ChoiceConditions[z].Condition[i].Name;
+        AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+          [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+          .NodeChoiceCount].ChoiceConditions[i].varparam :=
+          AdventureData.GameNodes[u].ChoiceConditions[z].Condition[i].Varname;
+        AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+          [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+          .NodeChoiceCount].ChoiceConditions[i].value := AdventureData.GameNodes[u].ChoiceConditions[z].Condition[i].Text;
+             AdventureBinData.GameNodes[AdventureBinData.GameNodeCount].NodeChoices
+          [AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
+          .NodeChoiceCount].ChoiceConditions[i].eval := eval2enum(AdventureData.GameNodes[u].ChoiceConditions[z].Condition[i].Eval);
+
+
+      end;
+
+
+
       inc(AdventureBinData.GameNodes[AdventureBinData.GameNodeCount]
         .NodeChoiceCount);
     end;
     inc(AdventureBinData.GameNodeCount);
   end;
+
+  // compile scripts
+  ScriptParser :=TAdventureScript.Create(nil);
+  writeln('Compiling scripts ... ');
+InitBuiltInFunctions;
+  for i := 0 to Adventuredata.Scripts.Count-1 do
+  begin
+  CurrentScript.instruction_count := 0;
+   stringtofile('temp.as',AdventureData.Scripts.Script[i].Text);
+   Scriptparser.SourceFileName := 'temp.as';
+   ScriptParser.execute;
+   setlength(adventurebindata.Scripts, adventurebindata.ScriptCount+1);
+
+   if scriptparser.Successful=true then
+   begin
+     CurrentScript.script_name := adventuredata.Scripts[i].Name;
+     CurrentScript.script_filename := adventuredata.Scripts[i].Filename;
+     CurrentScript.script_author := adventuredata.Scripts[i].Author;
+     currentscript.is_boot_script := adventuredata.Scripts[i].IsBootScript;
+     if currentscript.is_boot_script=true then
+     writeln('"'+currentscript.script_name+'" will be executed at startup');
+     writeln('Compiled successfully: '+Currentscript.script_name);
+     AdventureBinData.Scripts[adventurebindata.ScriptCount] := CurrentScript;
+   DeleteFile('temp.as');
+
+     inc(adventurebindata.scriptcount);
+   end else
+   begin
+     writeln('Error compiling script: '+AdventureData.Scripts.Script[i].Filename);
+     Scriptparser.ListStream.SaveToFile(changefileext(AdventureData.Scripts.Script[i].Filename, '.lst'));
+   end;
+  end;
+
+
 end;
 
 end.

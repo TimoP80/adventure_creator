@@ -120,7 +120,6 @@ object Form4: TForm4
       TabOrder = 6
       Text = 'ScriptSelector'
       Visible = False
-      OnClick = ScriptSelectorClick
     end
   end
   object Button1: TButton

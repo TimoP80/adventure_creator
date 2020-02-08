@@ -21,7 +21,7 @@ unit AdventureScriptCompilerUtils;
 
 interface
 
-uses Console, Classes, Sysutils, Variants, FileIOFunctions;
+uses Velthuis.Console, Classes, Sysutils, Variants, FileIOFunctions;
 
 type
   ColourTable = record
@@ -124,6 +124,16 @@ type
     inst_paramcount: integer;
   end;
 
+  type RandomStringListData = record
+       text: string;
+  end;
+
+  type RandomStringList = record
+         name_id: string;
+         StringData: array of RandomStringListData;
+         StringCnt: integer;
+  end;
+
 type
   RandomChanceData = record
     probability: integer;
@@ -158,6 +168,8 @@ var
   TestScript: Script;
   RandomChanceTable: array of RandomChanceData;
   RandomChanceCnt: integer;
+  RandomStringLists: array of RandomStringList;
+  RandomStringListCnt: integer;
   ColourData: array of ColourTable;
   ColourDataCnt: integer;
   instruction_created: boolean;
@@ -236,13 +248,13 @@ begin
     if vartype(instr.inst_params[i].data) = varInteger then
     begin
       intdata := instr.inst_params[i].data;
-      result := result + ' ' + inttostr(intdata);
+      result := result + inttostr(intdata);
     end
     else if (vartype(instr.inst_params[i].data) = varString) or
       (vartype(instr.inst_params[i].data) = varUString) then
     begin
       strdata := instr.inst_params[i].data;
-      result := result + ' ' + strdata;
+      result := result +  strdata;
     end;
 
     if i < instr.inst_paramcount - 1 then
@@ -439,7 +451,18 @@ begin
   RandomChanceTable[RandomChanceCnt].targetnode := target_node;
   inc(RandomChanceCnt);
 end;
-
+function FindStringList (strid: string): integer;
+var i: integer;
+begin
+for i := 0 to RandomStringListCnt-1 do
+begin
+  if strid=randomstringlists[i].name_id then
+  begin
+    result:=i;
+    exit;
+  end;
+end;
+end;
 procedure CallBuiltInFunction(TheScript: Script; instr: instruction;
   funcname: string; var resultstorage: variant);
 var
@@ -512,7 +535,7 @@ begin
   else if funcname = 'Delay' then
   begin
   delayamount := instr.inst_params[1].data;
- sleep(delayamount);
+  sleep(delayamount);
 
   end
 
@@ -523,7 +546,7 @@ begin
 
   else if funcname = 'ClrEol' then
   begin
-    ClrScr;
+    ClrEol;
   end
   else if funcname = 'ClrScr' then
   begin
@@ -543,7 +566,6 @@ begin
 
     if instr.inst_params[2].data_type = DATA_TYPE_PARAMETER_INT then
    ypos := instr.inst_params[2].data;
-
     GotoXY(xpos, ypos);
   end
   else if funcname = 'ReadInput' then
@@ -560,6 +582,39 @@ begin
   begin
     TextBackground(ColorStringToConst(instr.inst_params[1].data));
     // GotoXY(instr.inst_params[1].data, instr.inst_params[2].data);
+  end
+  else if funcname = 'InitRandomList' then
+  begin
+  setlength(RandomStringLists,RandomStringListCnt+1);
+  randomstringlists[randomstringlistcnt].name_id := instr.inst_params[1].data;
+  RandomStringLists[index].StringCnt := 0;
+  inc(RandomStringListCnt);
+  end
+  else if funcname = 'AddToRandomList' then
+  begin
+  index := FindStringList(instr.inst_params[1].data);
+  setlength(RandomStringLists[index].StringData, RandomStringLists[index].StringCnt+1);
+  RandomStringLists[index].stringdata[RandomStringLists[index].StringCnt].text := instr.inst_params[2].data;
+  inc(RandomStringLists[index].StringCnt);
+  end
+  else if funcname = 'GetFromRandomList' then
+  begin
+  index := FindStringList(instr.inst_params[1].data);
+  randomvalue := Random(RandomStringLists[index].StringCnt);
+   resultstorage:=RandomStringLists[index].StringData[randomvalue].text;
+
+  end
+  else if funcname = 'ReplaceVars' then
+  begin
+    temp := GetVariableValue(TheScript,instr.inst_params[1].data);
+    temp := ReplaceScriptVars(TheScript,temp);
+    SetVariableValue(thescript,instr.inst_params[1].data,temp);
+
+  end
+  else if funcname = 'FlushRandomListTable' then
+  begin
+    RandomStringListCnt:=0;
+    SetLength(RandomStringLists,0);
   end
   else if funcname = 'InitRandomChance' then
   begin
@@ -676,8 +731,7 @@ begin
     begin
       SetAGFVariableValue(TheScript.variables[u].name,
         TheScript.variables[u].value);
-      writeln('[DEBUG] updating variable ''' + TheScript.variables[u].name +
-        ''' value to ', TheScript.variables[u].value);
+
     end;
   end;
 end;
@@ -694,8 +748,7 @@ begin
     begin
       TheScript.variables[u].value :=
         GetAGFVariableValue(TheScript.variables[u].name);
-      writeln('[DEBUG] updating variable ''' + TheScript.variables[u].name +
-        ''' value to ', TheScript.variables[u].value);
+
     end;
   end;
 end;
@@ -1083,7 +1136,11 @@ begin
   built_in_functions.Add('DisplayMessage');
   built_in_functions.Add('DisplayMessageNoLN');
   built_in_functions.Add('WaitForKeyPress');
-  built_in_functions.Add('Random');
+  built_in_functions.Add('FlushRandomListTable');
+  built_in_functions.Add('InitRandomList');
+  built_in_functions.Add('AddToRandomList');
+  built_in_functions.Add('GetFromRandomList');
+
   built_in_functions.Add('InitRandomChance');
   built_in_functions.Add('ExecuteRandomChance');
   built_in_functions.Add('ReadInput');
@@ -1091,6 +1148,7 @@ begin
   built_in_functions.Add('Delay');
   built_in_functions.Add('Return');
   built_in_functions.Add('SetCurrentNode');
+  built_in_functions.Add('ReplaceVars');
 end;
 
 function ParamTypeToStr(paramtype: integer): string;
@@ -1236,8 +1294,8 @@ begin
     if (data_type = varString) or (data_type = varUString) then
       stringtbl.strings[stringtbl.stringcnt] := strdata
     else
+    if (data_type = varInteger) then
       stringtbl.strings[stringtbl.stringcnt] := intdata;
-
     result := stringtbl.stringcnt;
     inc(stringtbl.stringcnt);
   end
@@ -1251,6 +1309,7 @@ procedure LoadScriptFromAGF(var f: file; var TheScript: Script);
 var
   j, i: integer;
   lengths: array of integer;
+  int_temp: integer;
   lengthcnt: integer;
   vartypes: array of integer;
   vartypecnt: integer;
@@ -1328,7 +1387,9 @@ begin
 
       if (vartype_temp = varInteger) then
     begin
-      blockread(f, TheScript.stringdata.strings[j], 4);
+
+      blockread(f, int_temp, 4);
+      TheScript.stringdata.strings[j] := int_temp;
     end;
     ReadHeader(f, ' ');
   end;
@@ -1452,7 +1513,7 @@ end;
 procedure SaveScriptToAGF(var f: file; TheScript: Script);
 var
   j, i: integer;
-  length_temp: integer;
+  int_temp, length_temp: integer;
   vartype_temp: integer;
 begin
   WriteStringNoLength(f, 'AdventureScript v1.0');
@@ -1512,9 +1573,11 @@ begin
     if (vartype_temp = varString) or (vartype_temp = varUString) then
       WriteStringNoLength(f, TheScript.stringdata.strings[j])
     else
-
-      if (vartype_temp = varInteger) then
-      blockwrite(f, TheScript.stringdata.strings[j], 4);
+       if (vartype_temp = varInteger) then
+     begin
+            int_temp := TheScript.stringdata.strings[j];
+      blockwrite(f, int_temp, 4);
+      end;
     WriteStringNoLength(f, ' ');
   end;
 end;

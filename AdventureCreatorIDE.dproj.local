@@ -2,31 +2,34 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>1899.12.30 00.00.00.000.910,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.262,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.272,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.976,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.418,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
     <Transaction>1899.12.30 00.00.00.000.448,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.061,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.613,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.989,=C:\CodeProjects\AdventureCreator\src\adventurecreator\ModelSupport_AdventureCreatorIDE\AboutForm\default.txvpck</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.731,=C:\CodeProjects\AdventureCreator\src\adventurecreator\ModelSupport_AdventureCreatorIDE\AdventureBinaryRuntime\default.txvpck</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.367,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.623,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.065,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.580,=C:\CodeProjects\AdventureCreator\src\adventurecreator\ModelSupport_AdventureCreatorIDE\AdventureFIle\default.txvpck</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.144,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\AboutForm.dfm</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.144,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AboutForm.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.669,=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.178,=C:\CodeProjects\AdventureCreator\src\adventurecreator\ModelSupport_AdventureCreatorIDE\default.txaPackage</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.569,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit6.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\ChoiceConditionsForm.dfm</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.453,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\ScriptEditorForm.dfm</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.628,=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.418,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
     <Transaction>1899.12.30 00.00.00.000.569,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit6.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\ChoiceConditionsForm.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.898,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureBinary.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureBinaryRuntime.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.754,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit7.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\AddRandomGroup.dfm</Transaction>
     <Transaction>1899.12.30 00.00.00.000.045,=C:\CodeProjects\AdventureCreator\src\adventurecreator\ModelSupport_AdventureCreatorIDE\AdventureCreatorIDE\default.txvpck</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.453,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\ScriptEditorForm.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.266,=C:\CodeProjects\AdventureCreator\src\adventurecreator\ModelSupport_AdventureCreatorIDE\default.txvpck</Transaction>
     <Transaction>1899.12.30 00.00.00.000.698,=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit6.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.976,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.272,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.065,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.061,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.262,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.623,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.613,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.367,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFile.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureFIle.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.669,=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.628,=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.453,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\ScriptEditorForm.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.144,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AboutForm.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.178,=C:\CodeProjects\AdventureCreator\src\adventurecreator\ModelSupport_AdventureCreatorIDE\default.txaPackage</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.453,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\ScriptEditorForm.dfm</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.144,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit5.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\AboutForm.dfm</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.266,=C:\CodeProjects\AdventureCreator\src\adventurecreator\ModelSupport_AdventureCreatorIDE\default.txvpck</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.242,=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit7.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.754,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit7.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AddRandomGroup.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.569,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit6.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\ChoiceConditionsForm.dfm</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.731,=C:\CodeProjects\AdventureCreator\src\adventurecreator\ModelSupport_AdventureCreatorIDE\AdventureBinaryRuntime\default.txvpck</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.898,C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureBinary.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\AdventureBinaryRuntime.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.580,=C:\CodeProjects\AdventureCreator\src\adventurecreator\ModelSupport_AdventureCreatorIDE\AdventureFIle\default.txvpck</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.989,=C:\CodeProjects\AdventureCreator\src\adventurecreator\ModelSupport_AdventureCreatorIDE\AboutForm\default.txvpck</Transaction>
   </Transactions>
 </BorlandProject>

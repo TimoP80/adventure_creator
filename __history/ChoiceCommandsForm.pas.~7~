@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, AdventureFile, Winapi.Messages, System.SysUtils,
-  System.Variants, System.Classes, AdventureBinary, Vcl.Graphics,
+  System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
 
 type
@@ -29,7 +29,6 @@ type
     procedure mmoparamvalKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure lstcommandsClick(Sender: TObject);
-    procedure ScriptSelectorClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -101,15 +100,11 @@ begin
   begin
     ScriptSelector.Visible := true;
     mmoparamval.Visible := false;
-    cbbvarsel.Visible:=false;
-    lbl10.Visible:=false;
   end
   else
   begin
     ScriptSelector.Visible := false;
     mmoparamval.Visible := true;
-    cbbvarsel.Visible:=true;
-    lbl10.Visible:=true;
   end;
   UpdateChoiceCommandSel;
 end;
@@ -137,12 +132,6 @@ begin
 
   UpdateChoiceCommands;
 
-end;
-
-procedure TForm4.ScriptSelectorClick(Sender: TObject);
-begin
-  command.Text := adventuredata.scripts.script[scriptselector.itemindex].name;
-  UpdateChoiceCommandSel;
 end;
 
 end.

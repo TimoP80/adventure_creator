@@ -9,6 +9,7 @@ uses
   Controls, Forms,
   AdventureScriptCompilerUtils,
   JclFileUtils, Dialogs, xmldom, XMLIntf, msxmldom, XMLDoc, StdCtrls, Menus,
+  Velthuis.Console,
   Vcl.ComCtrls,
   Vcl.WinXCtrls;
 
@@ -79,6 +80,7 @@ type
     Button4: TButton;
     Scripts1: TMenuItem;
     ScriptSelector: TComboBox;
+    Button5: TButton;
     procedure LoadAdventureFile1Click(Sender: TObject);
     procedure Quit1Click(Sender: TObject);
     procedure btn3Click(Sender: TObject);
@@ -125,6 +127,7 @@ type
     procedure Button4Click(Sender: TObject);
     procedure Scripts1Click(Sender: TObject);
     procedure ScriptSelectorClick(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -180,8 +183,8 @@ begin
   Form1.ScriptSelector.Clear;
   for u := 0 to AdventureData.Scripts.Count - 1 do
   begin
-    form4.ScriptSelector.Items.Add(AdventureData.Scripts.Script[u].Name);
-    Form1.ScriptSelector.Items.Add(AdventureData.Scripts.Script[u].Name);
+    form4.ScriptSelector.Items.Add(AdventureData.Scripts.Script[u].Name+ ' - '+AdventureData.Scripts.Script[u].Filename);
+    Form1.ScriptSelector.Items.Add(AdventureData.Scripts.Script[u].Name+ ' - '+AdventureData.Scripts.Script[u].Filename);
   end;
 end;
 
@@ -468,7 +471,7 @@ end;
 
 procedure TForm1.ScriptSelectorClick(Sender: TObject);
 begin
-  thecmd.Text := ScriptSelector.Text;
+  thecmd.Text := AdventureData.Scripts.Script[scriptselector.itemindex].Name;
   UpdateNodeCommandSel;
 end;
 
@@ -812,6 +815,21 @@ begin
   UpdateNodeLists;
 end;
 
+procedure TForm1.Button5Click(Sender: TObject);
+var u: integer;
+begin
+ TextColor(lightgray);
+ ClrScr;
+ writeln(TheNode.DescriptionText);
+ writeln;
+ for u := 0 to thenode.Choices.Count-1 do
+   begin
+      GotoXY(7, wherey);
+     writeln(alphabets[u],'. ',thenode.Choices.Choice[u].Text);
+
+   end;
+end;
+
 procedure TForm1.cbbcmdClick(Sender: TObject);
 begin
   thecmd.Name := cbbcmd.Text;
@@ -819,12 +837,16 @@ begin
   if thecmd.Name = 'RunScript' then
   begin
     ScriptSelector.Visible := true;
+    cbbvarsel.Visible:=false;
     mmoparamval.Visible := false;
+    lbl10.Visible:=false;
   end
   else
   begin
     ScriptSelector.Visible := false;
+    cbbvarsel.Visible:=true;
     mmoparamval.Visible := true;
+    lbl10.Visible:=true;
   end;
 
   UpdateNodeCommandSel;

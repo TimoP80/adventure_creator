@@ -604,18 +604,6 @@ begin
    resultstorage:=RandomStringLists[index].StringData[randomvalue].text;
 
   end
-  else if funcname = 'ReplaceVars' then
-  begin
-    temp := GetVariableValue(TheScript,instr.inst_params[1].data);
-    temp := ReplaceScriptVars(TheScript,temp);
-    SetVariableValue(thescript,instr.inst_params[1].data,temp);
-
-  end
-  else if funcname = 'FlushRandomListTable' then
-  begin
-    RandomStringListCnt:=0;
-    SetLength(RandomStringLists,0);
-  end
   else if funcname = 'InitRandomChance' then
   begin
     ClearRandomChanceTable;
@@ -731,8 +719,8 @@ begin
     begin
       SetAGFVariableValue(TheScript.variables[u].name,
         TheScript.variables[u].value);
-     // writeln('[DEBUG] updating variable ''' + TheScript.variables[u].name +
-     //   ''' value to ', TheScript.variables[u].value);
+      writeln('[DEBUG] updating variable ''' + TheScript.variables[u].name +
+        ''' value to ', TheScript.variables[u].value);
     end;
   end;
 end;
@@ -749,8 +737,8 @@ begin
     begin
       TheScript.variables[u].value :=
         GetAGFVariableValue(TheScript.variables[u].name);
-      //writeln('[DEBUG] updating variable ''' + TheScript.variables[u].name +
-      //  ''' value to ', TheScript.variables[u].value);
+      writeln('[DEBUG] updating variable ''' + TheScript.variables[u].name +
+        ''' value to ', TheScript.variables[u].value);
     end;
   end;
 end;
@@ -1138,7 +1126,6 @@ begin
   built_in_functions.Add('DisplayMessage');
   built_in_functions.Add('DisplayMessageNoLN');
   built_in_functions.Add('WaitForKeyPress');
-  built_in_functions.Add('FlushRandomListTable');
   built_in_functions.Add('InitRandomList');
   built_in_functions.Add('AddToRandomList');
   built_in_functions.Add('GetFromRandomList');
@@ -1150,7 +1137,6 @@ begin
   built_in_functions.Add('Delay');
   built_in_functions.Add('Return');
   built_in_functions.Add('SetCurrentNode');
-  built_in_functions.Add('ReplaceVars');
 end;
 
 function ParamTypeToStr(paramtype: integer): string;

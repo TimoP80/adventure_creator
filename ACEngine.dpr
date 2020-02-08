@@ -11,11 +11,13 @@ uses
   Velthuis.Console,
   classes,
   Inifiles,
-  SysUtils;
+  SysUtils,vfsengine;
 
 
 var i: integer;
     strs: tstrings;
+   vfsfile: vfs_header_rec;
+   f: file;
 
 label start;
 
@@ -121,45 +123,7 @@ begin
   end;
 end;
 
-procedure SetVarValue(varname, value: string);
-var
-  u: integer;
-begin
-  for u := 0 to AdventureBinData.VariableCount - 1 do
-  begin
-    if varname = AdventureBinData.Variables[u].name then
-    begin
-      AdventureBinData.Variables[u].value := value;
-      exit;
-    end;
-  end;
-end;
 
-function GetVarValue(varname: string): string;
-var
-  u: integer;
-begin
-  for u := 0 to AdventureBinData.VariableCount - 1 do
-  begin
-    if varname = AdventureBinData.Variables[u].name then
-    begin
-      Result := AdventureBinData.Variables[u].value;
-      exit;
-    end;
-  end;
-end;
-
-function ReplaceVars(str: string): string;
-var
-  u: integer;
-begin
-  Result := str;
-  for u := 0 to AdventureBinData.VariableCount - 1 do
-  begin
-   Result := StringReplace(Result, '$' + AdventureBinData.Variables[u].name,
-      AdventureBinData.Variables[u].value, [rfReplaceAll]);
-  end;
-end;
 
 procedure ProcessChoiceCommands(name: string; choiceindex: integer);
 var
@@ -228,7 +192,10 @@ begin
           ImportVariableData(adventurebindata.Scripts[script_index]);
           RunScript(adventurebindata.Scripts[script_index], 'Main');
           ExportVariableData(adventurebindata.Scripts[script_index]);
-
+          end else
+          begin
+            writeln('Script was not found ',value);
+            halt;
           end;
       end
       else if cmd = 'RandomNumber' then
@@ -424,7 +391,7 @@ var
 
   begin
  // by default return true if no conditions are present
- result := false;
+ result := true;
 
   if AdventureBinData.GameNodes[nodeindex].NodeChoices[choiceindex]
     .ChoiceConditionCount > 0 then
@@ -472,15 +439,16 @@ var
           end;
       end;
       end;
-      
+
       if current_condition = true then inc(conditions_true);
       if current_condition = false then inc(conditions_false);
+
+      result := (conditions_true = AdventureBinData.GameNodes[nodeindex].NodeChoices[choiceindex]
+      .ChoiceConditionCount);
 
     end;
   end;
 
-  result := (conditions_true = AdventureBinData.GameNodes[nodeindex].NodeChoices[choiceindex]
-      .ChoiceConditionCount);
 end;
 
 procedure DisplayNode(name: string);
@@ -499,7 +467,7 @@ begin
     begin
       writeln('Runtime Engine Error: This node contains no text.');
     end;
-    writeln(WrapText(txt, 80));
+    writeln(txt);
     writeln;
     if AdventureBinData.GameNodes[nodeind].NodeChoiceCount > 0 then
     begin
@@ -578,8 +546,8 @@ begin
   writeln;
   InitBuiltInFunctions;
   InitColorTable;
- if fileexists(changefileext(ParamStr(0),'.agf')) then
-    datafile := extractfilename(changefileext(ParamStr(0),'.agf'));
+ if fileexists(changefileext(ParamStr(0),'.dat')) then
+    datafile := extractfilename(changefileext(ParamStr(0),'.dat'));
  if paramstr(1)<>'' then
     datafile := paramstr(1);
 //  rcstream := TResourceStream.Create(HInstance, 'Resource_1', rt_rcdata);
@@ -595,7 +563,11 @@ begin
       halt;
     end;
     // writeln('Loading '+paramstr(1));
-    LoadAdventureBin(datafile);
+
+    writeln('Loading data...');
+    openvfspackfile(f, vfsfile, datafile);
+    open_from_vfs(f, vfsfile, changefileext(datafile,'.agf'),false, windowstemp);
+    LoadAdventureBin(windowstemp+'\'+changefileext(datafile,'.agf'));
     msg_pressanykey := config.ReadString(GetVarValue('GameLanguage'),
       'PressAnyKey', '');
     msg_gamefinished := config.ReadString(GetVarValue('GameLanguage'),
@@ -604,10 +576,11 @@ begin
       'WrongChoice', '');
     msg_gameover := config.ReadString(GetVarValue('GameLanguage'),
       'GameOver', '') + ' ';
-
+    vfs_cleanup(vfsfile);
+    closevfshandle(f);
     writeln('Loaded "' + AdventureBinData.metatitle + '" by ' +
       AdventureBinData.metaauthor);
-
+    delay(1000);
    // look for boot scripts and execute them in the order they were organized
    // in the editor
    for i := 0 to adventurebindata.ScriptCount-1 do
@@ -618,7 +591,7 @@ begin
 
     end;
    end;
-
+Randomize;
 clrscr;
    writeheader;
   start:

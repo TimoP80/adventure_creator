@@ -2,7 +2,7 @@ unit AdventureBinaryRuntime;
 
 interface
 
-uses Sysutils, inifiles, classes, AdventureScriptCompilerUtils, FileIOFunctions;
+uses inifiles, classes, AdventureScriptCompilerUtils, FileIOFunctions;
 
 const
   is_equal = 1;
@@ -103,69 +103,8 @@ var
 procedure SaveAdventureBin(filename: string);
 procedure LoadAdventureBin(filename: string);
 function FindScriptByName(name: string): integer;
-function ReplaceVars(str: string): string;
-procedure SetVarValue(varname, value: string);
-function GetVarValue(varname: string): string;
-function ReplaceScriptVars(thescript: script; str: string): string;
 
 implementation
-
-
-procedure SetVarValue(varname, value: string);
-var
-  u: integer;
-begin
-  for u := 0 to AdventureBinData.VariableCount - 1 do
-  begin
-    if varname = AdventureBinData.Variables[u].name then
-    begin
-      AdventureBinData.Variables[u].value := value;
-      exit;
-    end;
-  end;
-end;
-
-function GetVarValue(varname: string): string;
-var
-  u: integer;
-begin
-  for u := 0 to AdventureBinData.VariableCount - 1 do
-  begin
-    if varname = AdventureBinData.Variables[u].name then
-    begin
-      Result := AdventureBinData.Variables[u].value;
-      exit;
-    end;
-  end;
-end;
-
-
-
-function ReplaceScriptVars(thescript: script; str: string): string;
-var
-  u: integer;
-begin
-  Result := str;
-  for u := 0 to thescript.variablecnt - 1 do
-  begin
-  writeln('Vars: ',thescript.variables[u].name);
-   Result := StringReplace(Result, '$' + thescript.variables[u].name,
-      thescript.variables[u].value, [rfReplaceAll]);
-  end;
-end;
-
-function ReplaceVars(str: string): string;
-var
-  u: integer;
-begin
-  Result := str;
-  for u := 0 to AdventureBinData.VariableCount - 1 do
-  begin
-   Result := StringReplace(Result, '$' + AdventureBinData.Variables[u].name,
-      AdventureBinData.Variables[u].value, [rfReplaceAll]);
-  end;
-end;
-
 
 procedure LoadAdventureBin(filename: string);
 var

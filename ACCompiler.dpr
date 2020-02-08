@@ -3,12 +3,13 @@ program ACCompiler;
 {$APPTYPE CONSOLE}
 
 uses
-  Windows, JclFileUtils, ActiveX, comobj, AdventureBinary, AdventureFile,
-  SysUtils;
+  Winapi.ShellAPI, Winapi.Windows, JclFileUtils, ActiveX, comobj, AdventureBinary, AdventureFile,
+  SysUtils,vfsengine;
 
 var
   outputname: string;
-
+  vfsfile: vfs_header_rec;
+f: file;
 begin
   CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
   writeln('Adventure Creator Compiler v1.0 by T. Pitkanen');
@@ -22,14 +23,24 @@ begin
     outputname := changefileext(ParamStr(1), '.agf')
   else
     outputname := ParamStr(2);
+  writeln('Loading XML...');
   AdventureData := LoadAdventureGame(ParamStr(1));
   writeln('Compiling data..');
   CompileAdventure;
   writeln('Saving binary to "', outputname, '"');
   SaveAdventureBin(outputname);
+  writeln('Compressing data...');
+  cleanupdatablock;
+  createnewpackfile(f, vfsfile, AdventureBinData.MetaAuthor, changefileext(outputname,'.dat'));
+  add_file_to_vfs(vfsfile, outputname);
+
+  writeheader(f, vfsfile);
+  closevfshandle(f);
   writeln('Creating executable ... ');
   FileCopy('.\ACEngine.exe', changefileext(ParamStr(1), '.exe'), true);
   FileCopy('.\ACEngine.ini', changefileext(ParamStr(1), '.ini'), true);
+  writeln('Compressing executable with UPX');
+  ShellExecute(0 , 'open', 'upx.exe', pwidechar(changefileext(ParamStr(1), '.exe')), pwidechar(GetCurrentDir), SW_SHOWNORMAL);
   writeln('Bimary file "' + changefileext(ParamStr(1), '.exe') + '" created.');
   writeln('Configuration file "' + changefileext(ParamStr(1), '.ini') + '" created.');
   writeln;

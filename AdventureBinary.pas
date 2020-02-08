@@ -25,6 +25,10 @@ type
     varparam: ansistring;
     value: ansistring;
   end;
+const
+  alphabets: array [0 .. 10] of char = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+    'i', 'j', 'k');
+  numbers: array [0 .. 10] of integer = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
 type
   NodeChoice = record
@@ -439,7 +443,7 @@ InitBuiltInFunctions;
      currentscript.is_boot_script := adventuredata.Scripts[i].IsBootScript;
      if currentscript.is_boot_script=true then
      writeln('"'+currentscript.script_name+'" will be executed at startup');
-     writeln('Compiled successfully: '+Currentscript.script_name);
+     writeln('Compiled successfully: '+Currentscript.script_filename);
      AdventureBinData.Scripts[adventurebindata.ScriptCount] := CurrentScript;
    DeleteFile('temp.as');
 

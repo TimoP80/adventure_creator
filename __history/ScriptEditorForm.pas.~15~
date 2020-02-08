@@ -7,7 +7,7 @@ uses
   System.Classes, Vcl.Graphics,
   AdventureFile, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SynEdit, Vcl.StdCtrls,
   AdventureScriptCompilerUtils, AdventureScript, SynEditHighlighter,
-  AdventureBinary, SynHighlighterCS, SynCompletionProposal, Vcl.Menus;
+  AdventureBinary, SynHighlighterCS, SynCompletionProposal;
 
 type
   TForm5 = class(TForm)
@@ -34,9 +34,6 @@ type
     Button6: TButton;
     Button7: TButton;
     Button8: TButton;
-    Button9: TButton;
-    PopupMenu1: TPopupMenu;
-    CreateRandomstringgroup1: TMenuItem;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure SynEdit1KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -53,7 +50,6 @@ type
     procedure Button8Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
-    procedure CreateRandomstringgroup1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -70,7 +66,7 @@ procedure UpdateScripts;
 
 implementation
 
-uses AdventureCreatorIDEMain, AddRandomGroup;
+uses AdventureCreatorIDEMain;
 
 {$R *.dfm}
 
@@ -107,7 +103,7 @@ begin
   Script.Name := '<< NEW SCRIPT >>';
   Script.Filename := '';
   Script.Author := AdventureData.MetaInfo.Author;
-  Script.IsBootScript := false;
+  Script.IsBootScript:=false;
   templateloader.LoadFromFile('Script Templates\Script_Template.as');
   Script.Text := templateloader.Text;
   UpdateScripts;
@@ -136,7 +132,7 @@ begin
     LogMsg('Successfully compiled the edited script with ' +
       inttostr(currentscript.instruction_count) + ' instructions.');
     RunScript(currentscript, 'Main');
-    DeleteFile('temp.as');
+   DeleteFile('temp.as');
   end
   else
   begin
@@ -151,14 +147,13 @@ begin
         ScriptParser.ErrorStr(TCocoError(ScriptParser.ErrorList.Items[i])
         .ErrorCode, TCocoError(ScriptParser.ErrorList.Items[i]).Data));
     end;
-    DeleteFile('temp.as');
+   DeleteFile('temp.as');
   end;
 end;
 
 procedure TForm5.Button5Click(Sender: TObject);
-var
-  i: integer;
-  scriptdisassembly: tstrings;
+var i: integer;
+scriptdisassembly: TStrings;
 begin
   ScriptParser := TAdventureScript.Create(nil);
   SynEdit1.Lines.SaveToFile('temp.as');
@@ -169,10 +164,10 @@ begin
   begin
     LogMsg('Successfully compiled the edited script with ' +
       inttostr(currentscript.instruction_count) + ' instructions.');
-    scriptdisassembly := DisassembleScript(currentscript);
-    compileddataview.Text := scriptdisassembly.Text;
+   scriptdisassembly := DisassembleScript(CurrentScript);
+   compileddataview.Text := scriptdisassembly.Text;
 
-    DeleteFile('temp.as');
+   DeleteFile('temp.as');
   end
   else
   begin
@@ -187,93 +182,69 @@ begin
         ScriptParser.ErrorStr(TCocoError(ScriptParser.ErrorList.Items[i])
         .ErrorCode, TCocoError(ScriptParser.ErrorList.Items[i]).Data));
     end;
-    DeleteFile('temp.as');
+   DeleteFile('temp.as');
   end;
 end;
 
 procedure TForm5.Button6Click(Sender: TObject);
-var
-  script_temp_current: IXMLScriptType;
-  script_temp_name, script_temp_filename, script_temp_author: string;
-  script_temp_bootscript: boolean;
-  script_temp_text: string;
+var script_temp_current: IXMLScriptType;
+script_temp_name,
+script_temp_filename,
+script_temp_author: string;
+script_temp_bootscript:boolean;
+script_temp_text: string;
 begin
-  if ScriptList.ItemIndex = 0 then
-    exit;
-  // ScriptListTemp:=
-  script_temp_name := AdventureData.Scripts.Script
-    [ScriptList.ItemIndex - 1].Name;
-  script_temp_filename := AdventureData.Scripts.Script
-    [ScriptList.ItemIndex - 1].Filename;
-  script_temp_author := AdventureData.Scripts.Script
-    [ScriptList.ItemIndex - 1].Author;
-  script_temp_bootscript := AdventureData.Scripts.Script
-    [ScriptList.ItemIndex - 1].IsBootScript;
-  script_temp_text := AdventureData.Scripts.Script
-    [ScriptList.ItemIndex - 1].Text;
+if scriptlist.ItemIndex=0 then
+exit;
+//ScriptListTemp:=
+script_temp_name := AdventureData.Scripts.script[scriptlist.itemindex-1].Name;
+script_temp_filename := AdventureData.Scripts.script[scriptlist.itemindex-1].Filename;
+script_temp_author := AdventureData.Scripts.script[scriptlist.itemindex-1].Author;
+script_temp_bootscript := AdventureData.Scripts.script[scriptlist.itemindex-1].IsBootScript;
+script_temp_text := AdventureData.Scripts.script[scriptlist.itemindex-1].Text;
 
-  AdventureData.Scripts.Script[ScriptList.ItemIndex - 1].Name :=
-    AdventureData.Scripts.Script[ScriptList.ItemIndex].Name;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex - 1].Filename :=
-    AdventureData.Scripts.Script[ScriptList.ItemIndex].Filename;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex - 1].Author :=
-    AdventureData.Scripts.Script[ScriptList.ItemIndex].Author;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex - 1].IsBootScript :=
-    AdventureData.Scripts.Script[ScriptList.ItemIndex].IsBootScript;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex - 1].Text :=
-    AdventureData.Scripts.Script[ScriptList.ItemIndex].Text;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex].Name := script_temp_name;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex].Filename :=
-    script_temp_filename;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex].Author :=
-    script_temp_author;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex].IsBootScript :=
-    script_temp_bootscript;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex].Text := script_temp_text;
-  UpdateScripts;
+AdventureData.Scripts.script[scriptlist.itemindex-1].Name := AdventureData.Scripts.script[scriptlist.itemindex].Name;
+AdventureData.Scripts.script[scriptlist.itemindex-1].Filename := AdventureData.Scripts.script[scriptlist.itemindex].Filename;
+AdventureData.Scripts.script[scriptlist.itemindex-1].Author := AdventureData.Scripts.script[scriptlist.itemindex].Author;
+AdventureData.Scripts.script[scriptlist.itemindex-1].IsBootScript := AdventureData.Scripts.script[scriptlist.itemindex].IsBootScript;
+AdventureData.Scripts.script[scriptlist.itemindex-1].Text := AdventureData.Scripts.script[scriptlist.itemindex].Text;
+AdventureData.Scripts.script[scriptlist.itemindex].Name := script_temp_name;
+AdventureData.Scripts.script[scriptlist.itemindex].Filename := script_temp_filename;
+AdventureData.Scripts.script[scriptlist.itemindex].Author := script_temp_author;
+AdventureData.Scripts.script[scriptlist.itemindex].IsBootScript := script_temp_bootscript;
+AdventureData.Scripts.script[scriptlist.itemindex].Text := script_temp_text;
+UpdateScripts;
 
 end;
 
 procedure TForm5.Button7Click(Sender: TObject);
-var
-  script_temp_current: IXMLScriptType;
-  script_temp_name, script_temp_filename, script_temp_author: string;
-  script_temp_bootscript: boolean;
-  script_temp_text: string;
+var script_temp_current: IXMLScriptType;
+script_temp_name,
+script_temp_filename,
+script_temp_author: string;
+script_temp_bootscript:boolean;
+script_temp_text: string;
 begin
-  if ScriptList.ItemIndex = ScriptList.Items.Count - 1 then
-    exit;
-  // ScriptListTemp:=
-  script_temp_name := AdventureData.Scripts.Script
-    [ScriptList.ItemIndex + 1].Name;
-  script_temp_filename := AdventureData.Scripts.Script
-    [ScriptList.ItemIndex + 1].Filename;
-  script_temp_author := AdventureData.Scripts.Script
-    [ScriptList.ItemIndex + 1].Author;
-  script_temp_bootscript := AdventureData.Scripts.Script
-    [ScriptList.ItemIndex + 1].IsBootScript;
-  script_temp_text := AdventureData.Scripts.Script
-    [ScriptList.ItemIndex + 1].Text;
+if scriptlist.ItemIndex=scriptlist.Items.Count-1 then
+exit;
+//ScriptListTemp:=
+script_temp_name := AdventureData.Scripts.script[scriptlist.itemindex+1].Name;
+script_temp_filename := AdventureData.Scripts.script[scriptlist.itemindex+1].Filename;
+script_temp_author := AdventureData.Scripts.script[scriptlist.itemindex+1].Author;
+script_temp_bootscript := AdventureData.Scripts.script[scriptlist.itemindex+1].IsBootScript;
+script_temp_text := AdventureData.Scripts.script[scriptlist.itemindex+1].Text;
 
-  AdventureData.Scripts.Script[ScriptList.ItemIndex + 1].Name :=
-    AdventureData.Scripts.Script[ScriptList.ItemIndex].Name;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex + 1].Filename :=
-    AdventureData.Scripts.Script[ScriptList.ItemIndex].Filename;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex + 1].Author :=
-    AdventureData.Scripts.Script[ScriptList.ItemIndex].Author;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex + 1].IsBootScript :=
-    AdventureData.Scripts.Script[ScriptList.ItemIndex].IsBootScript;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex + 1].Text :=
-    AdventureData.Scripts.Script[ScriptList.ItemIndex].Text;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex].Name := script_temp_name;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex].Filename :=
-    script_temp_filename;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex].Author :=
-    script_temp_author;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex].IsBootScript :=
-    script_temp_bootscript;
-  AdventureData.Scripts.Script[ScriptList.ItemIndex].Text := script_temp_text;
-  UpdateScripts;
+AdventureData.Scripts.script[scriptlist.itemindex+1].Name := AdventureData.Scripts.script[scriptlist.itemindex].Name;
+AdventureData.Scripts.script[scriptlist.itemindex+1].Filename := AdventureData.Scripts.script[scriptlist.itemindex].Filename;
+AdventureData.Scripts.script[scriptlist.itemindex+1].Author := AdventureData.Scripts.script[scriptlist.itemindex].Author;
+AdventureData.Scripts.script[scriptlist.itemindex+1].IsBootScript := AdventureData.Scripts.script[scriptlist.itemindex].IsBootScript;
+AdventureData.Scripts.script[scriptlist.itemindex+1].Text := AdventureData.Scripts.script[scriptlist.itemindex].Text;
+AdventureData.Scripts.script[scriptlist.itemindex].Name := script_temp_name;
+AdventureData.Scripts.script[scriptlist.itemindex].Filename := script_temp_filename;
+AdventureData.Scripts.script[scriptlist.itemindex].Author := script_temp_author;
+AdventureData.Scripts.script[scriptlist.itemindex].IsBootScript := script_temp_bootscript;
+AdventureData.Scripts.script[scriptlist.itemindex].Text := script_temp_text;
+ updatescripts;
 
 end;
 
@@ -282,11 +253,11 @@ var
   templateloader: tstrings;
 begin
   templateloader := TStringlist.Create;
-  Script := AdventureData.Scripts.Insert(ScriptList.ItemIndex);
+  Script := AdventureData.Scripts.Insert(ScriptList.itemindex);
   Script.Name := '<< NEW SCRIPT >>';
   Script.Filename := '';
   Script.Author := AdventureData.MetaInfo.Author;
-  Script.IsBootScript := false;
+  Script.IsBootScript:=false;
   templateloader.LoadFromFile('Script Templates\Script_Template.as');
   Script.Text := templateloader.Text;
   UpdateScripts;
@@ -294,29 +265,9 @@ begin
 
 end;
 
-procedure TForm5.CreateRandomstringgroup1Click(Sender: TObject);
-var
-  text: string;
-  i: integer;
-begin
-  form7.showmodal;
-
-  if form7.modalresult = mrOK then
-  begin
-    text := 'InitRandomList("' + form7.GroupID.Text + '");'+#13#10;
-    synedit1.InsertLine(synedit1.CaretXY, synedit1.CaretXY, pwidechar(text), false);
-    for i := 0 to form7.StringsList.Lines.Count - 1 do
-    begin
-    text := 'AddToRandomList("' + form7.GroupID.Text + '","' +
-        form7.StringsList.Lines[i] + '");'+#13#10;
-    synedit1.InsertLine(synedit1.CaretXY, synedit1.CaretXY, pwidechar(text), false);
-    end;
-  end;
-end;
-
 procedure TForm5.IsBootScriptClick(Sender: TObject);
 begin
-  Script.IsBootScript := IsBootScript.Checked;
+Script.IsBootScript:=isbootscript.Checked;
 end;
 
 procedure TForm5.ScriptAuthorKeyUp(Sender: TObject; var Key: Word;
@@ -338,7 +289,7 @@ begin
   ScriptName.Text := Script.Name;
   ScriptFilename.Text := Script.Filename;
   ScriptAuthor.Text := Script.Author;
-  IsBootScript.Checked := Script.IsBootScript;
+  isbootscript.Checked := Script.IsBootScript;
 
   SynEdit1.Lines.Text := Script.Text;
 

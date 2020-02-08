@@ -382,6 +382,15 @@ object Form1: TForm1
     TabOrder = 22
     OnClick = Button4Click
   end
+  object Button5: TButton
+    Left = 328
+    Top = 507
+    Width = 75
+    Height = 25
+    Caption = 'Preview node'
+    TabOrder = 23
+    OnClick = Button5Click
+  end
   object DataReader: TXMLDocument
     Left = 240
     Top = 120
