@@ -234,7 +234,11 @@ IfStatement =
   instruction_temp := AddInstruction(CurrentScript, OP_IFEND);
   NextInstruction(currentscript, instruction_temp);
 
-.) [{"else" ["if" (. 
+.) [{"else" (. 
+  instruction_temp := AddInstruction(CurrentScript, OP_IF_ELSE);
+  NextInstruction(currentscript, instruction_temp);
+
+.)["if" (. 
   instruction_temp := AddInstruction(CurrentScript, OP_IF_CHAINED);
   NextInstruction(currentscript, instruction_temp);
 
