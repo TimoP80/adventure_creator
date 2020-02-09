@@ -175,7 +175,7 @@ begin
   for y := 0 to adventurebindata.ScriptCount-1 do
   begin
 
-  writeln('Load script '+adventurebindata.Scripts[y].script_name);
+ // writeln('Load script '+adventurebindata.Scripts[y].script_name);
   LoadScriptFromAGF(x, adventurebindata.Scripts[y]);
   end;
 
@@ -258,7 +258,7 @@ begin
 
   for y := 0 to adventurebindata.ScriptCount-1 do
   begin
-  writeln('Save script '+adventurebindata.Scripts[y].script_name);
+ // writeln('Save script '+adventurebindata.Scripts[y].script_name);
   SaveScriptToAGF(x, adventurebindata.Scripts[y]);
   end;
   CloseFile(x);
@@ -429,7 +429,8 @@ begin
 InitBuiltInFunctions;
   for i := 0 to Adventuredata.Scripts.Count-1 do
   begin
-  CurrentScript.instruction_count := 0;
+   CurrentScript.instruction_count := 0;
+   InitScriptData(currentscript,'','','');
    stringtofile('temp.as',AdventureData.Scripts.Script[i].Text);
    Scriptparser.SourceFileName := 'temp.as';
    ScriptParser.execute;

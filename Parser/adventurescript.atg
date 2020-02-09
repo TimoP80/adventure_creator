@@ -68,7 +68,13 @@ begin;
     begin;
       temp := temp + '"';
       Inc(t, 1);
-    end else
+    end else                   
+    if (zstr[t] = '\') and (zstr[t + 1] = '\') then
+    begin;
+      temp := temp + '\';
+      Inc(t, 1);
+    end
+    else
     if (zstr[t] = '\') and (zstr[t + 1] = 't') then
     begin;
       temp := temp + #9;
@@ -102,10 +108,10 @@ CHARACTERS
   files    = letter + digit + ":\." .
   chars    = CHR(32) .. CHR(255) - "'" .
   strings  = CHR(32) .. CHR(255) - '"'.
-  macros   = ANY - eol .
+  macros   = ANY - eol.
 
 COMMENTS FROM "/*" TO "*/"
-COMMENTS FROM "//" TO eol
+COMMENTS FROM "//" TO lf
 
 IGNORE
   tab + eol + lf
@@ -228,7 +234,11 @@ IfStatement =
   instruction_temp := AddInstruction(CurrentScript, OP_IFEND);
   NextInstruction(currentscript, instruction_temp);
 
-.) [{"else" ["if" (. 
+.) [{"else" (. 
+  instruction_temp := AddInstruction(CurrentScript, OP_IF_ELSE);
+  NextInstruction(currentscript, instruction_temp);
+
+.)["if" (. 
   instruction_temp := AddInstruction(CurrentScript, OP_IF_CHAINED);
   NextInstruction(currentscript, instruction_temp);
 
@@ -380,13 +390,34 @@ SetVar = "SetVar" "$" identifier
 .)
  "=" (RegularCommand 
  (. 
-   instruction_temp := AddInstruction(currentscript, OP_ENDINSTRUCTION);
+  instruction_temp := AddInstruction(currentscript, OP_ENDINSTRUCTION);
   NextInstruction(CurrentScript, instruction_temp);
 
  .) | 
  RegularExp).
 
+ CaseLabel = (_string (. instruction_temp := AddInstruction(currentscript, OP_SWITCH_LABEL);
+  AddParam(instruction_temp,parse_string(LexString),DATA_TYPE_SWITCH_LABEL_DATA);
+  NextInstruction(CurrentScript, instruction_temp);
+ .) |number (. instruction_temp := AddInstruction(currentscript, OP_SWITCH_LABEL);
+  AddParam(instruction_temp,strtotine(LexString),DATA_TYPE_SWITCH_LABEL_DATA);
+  NextInstruction(CurrentScript, instruction_temp);
+ .)|identifier (.
+  instruction_temp := AddInstruction(currentscript, OP_SWITCH_LABEL);
+  AddParam(instruction_temp,LexString,DATA_TYPE_SWITCH_LABEL_DATA);
+  NextInstruction(CurrentScript, instruction_temp);
+ 
+  .) ) ":" "{" (. instruction_temp := AddInstruction(currentscript, OP_SWITCH_LABEL_CODE_BEGIN); NextInstruction(CurrentScript, instruction_temp); .) {Command} "}" 
+ (. instruction_temp := AddInstruction(currentscript, OP_SWITCH_LABEL_CODE_END); NextInstruction(CurrentScript, instruction_temp); .).
 
+SwitchStatement = "switch" (.   instruction_temp := AddInstruction(currentscript, OP_SWITCH_VAR); .) identifier (. AddParam(instruction_temp, lexstring, DATA_TYPE_SWITCH_VAR); NextInstruction(CurrentScript, instruction_temp); .)
+            "{"  (. instruction_temp := AddInstruction(currentscript, OP_SWITCH_BEGIN);
+  NextInstruction(CurrentScript, instruction_temp);
+ .)
+            CaseLabel {CaseLabel} 
+            "}" (. instruction_temp := AddInstruction(currentscript, OP_SWITCH_END);
+  NextInstruction(CurrentScript, instruction_temp);
+ .) . 
                          
 
 Command = (RegularCommand | SetVar | RandomChance)  ";" .
@@ -421,7 +452,7 @@ FuncDefinition = ("int"
   NextInstruction(CurrentScript, instruction_temp);
  .)
 
-  {(Command|IfStatement)} "}" 
+  {(Command|IfStatement|SwitchStatement)} "}" 
   (.
   instruction_temp := AddInstruction(CurrentScript, OP_FUNCTIONEND);
   NextInstruction(CurrentScript, instruction_temp);

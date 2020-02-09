@@ -10,7 +10,7 @@
             <Dependencies/>
         </Projects>
         <Projects Include="ACEngine.dproj">
-            <Dependencies/>
+            <Dependencies>ACCompiler.dproj</Dependencies>
         </Projects>
     </ItemGroup>
     <ProjectExtensions>
@@ -38,13 +38,13 @@
     <Target Name="ACCompiler:Make">
         <MSBuild Projects="ACCompiler.dproj" Targets="Make"/>
     </Target>
-    <Target Name="ACEngine">
+    <Target Name="ACEngine" DependsOnTargets="ACCompiler">
         <MSBuild Projects="ACEngine.dproj"/>
     </Target>
-    <Target Name="ACEngine:Clean">
+    <Target Name="ACEngine:Clean" DependsOnTargets="ACCompiler:Clean">
         <MSBuild Projects="ACEngine.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="ACEngine:Make">
+    <Target Name="ACEngine:Make" DependsOnTargets="ACCompiler:Make">
         <MSBuild Projects="ACEngine.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">

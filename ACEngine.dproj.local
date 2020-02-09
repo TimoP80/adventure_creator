@@ -2,10 +2,10 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>1899.12.30 00.00.00.000.682,=C:\CodeProjects\AdventureCreator\näyttisquest.agf</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.669,C:\CodeProjects\AdventureCreator\src\adventurecreator\ChoiceCommandsForm.pas=</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.881,C:\CodeProjects\AdventureCreator\src\adventurecreator\ChoiceCommandsForm.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit4.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.175,=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit4.pas</Transaction>
-    <Transaction>1899.12.30 00.00.00.000.881,C:\CodeProjects\AdventureCreator\src\adventurecreator\ChoiceCommandsForm.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit4.dfm</Transaction>
     <Transaction>1899.12.30 00.00.00.000.364,C:\CodeProjects\AdventureCreator\näyttisquest.agf=</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.669,C:\CodeProjects\AdventureCreator\src\adventurecreator\ChoiceCommandsForm.pas=</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.881,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit4.pas=C:\CodeProjects\AdventureCreator\src\adventurecreator\ChoiceCommandsForm.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.175,=C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit4.pas</Transaction>
+    <Transaction>1899.12.30 00.00.00.000.881,C:\CodeProjects\AdventureCreator\src\adventurecreator\Unit4.dfm=C:\CodeProjects\AdventureCreator\src\adventurecreator\ChoiceCommandsForm.dfm</Transaction>
   </Transactions>
 </BorlandProject>

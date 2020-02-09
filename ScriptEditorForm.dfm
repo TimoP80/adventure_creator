@@ -1,9 +1,9 @@
 object Form5: TForm5
-  Left = 0
-  Top = 0
+  Left = 411
+  Top = 231
   Caption = 'Script Editor'
-  ClientHeight = 670
-  ClientWidth = 1089
+  ClientHeight = 754
+  ClientWidth = 1179
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,6 +11,7 @@ object Form5: TForm5
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poMainFormCenter
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
@@ -50,7 +51,7 @@ object Form5: TForm5
   end
   object Label6: TLabel
     Left = 383
-    Top = 424
+    Top = 508
     Width = 100
     Height = 14
     Caption = 'Compiled Data View:'
@@ -63,16 +64,16 @@ object Form5: TForm5
   end
   object ScriptList: TListBox
     Left = 8
-    Top = 24
+    Top = 27
     Width = 369
-    Height = 607
+    Height = 688
     ItemHeight = 13
     TabOrder = 0
     OnClick = ScriptListClick
   end
   object Button1: TButton
     Left = 8
-    Top = 637
+    Top = 721
     Width = 75
     Height = 25
     Caption = 'New Script'
@@ -81,7 +82,7 @@ object Form5: TForm5
   end
   object Button2: TButton
     Left = 89
-    Top = 637
+    Top = 721
     Width = 75
     Height = 25
     Caption = 'Delete Script'
@@ -89,10 +90,10 @@ object Form5: TForm5
     OnClick = Button2Click
   end
   object SynEdit1: TSynEdit
-    Left = 384
-    Top = 121
-    Width = 697
-    Height = 297
+    Left = 383
+    Top = 120
+    Width = 788
+    Height = 382
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -13
@@ -113,6 +114,8 @@ object Form5: TForm5
     Gutter.Font.Height = -11
     Gutter.Font.Name = 'Courier New'
     Gutter.Font.Style = []
+    Gutter.LeadingZeros = True
+    Gutter.ShowLineNumbers = True
     Gutter.Gradient = True
     Gutter.GradientEndColor = clSilver
     Gutter.GradientSteps = 35
@@ -144,8 +147,8 @@ object Form5: TForm5
     OnKeyUp = ScriptAuthorKeyUp
   end
   object Button3: TButton
-    Left = 1006
-    Top = 640
+    Left = 1096
+    Top = 721
     Width = 75
     Height = 25
     Caption = 'Close'
@@ -153,7 +156,7 @@ object Form5: TForm5
     TabOrder = 7
   end
   object Button4: TButton
-    Left = 1006
+    Left = 1096
     Top = 73
     Width = 75
     Height = 25
@@ -163,8 +166,8 @@ object Form5: TForm5
   end
   object compileddataview: TMemo
     Left = 383
-    Top = 444
-    Width = 698
+    Top = 528
+    Width = 788
     Height = 187
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -175,7 +178,7 @@ object Form5: TForm5
     TabOrder = 9
   end
   object Button5: TButton
-    Left = 1006
+    Left = 1096
     Top = 42
     Width = 75
     Height = 25
@@ -194,7 +197,7 @@ object Form5: TForm5
   end
   object Button6: TButton
     Left = 302
-    Top = 637
+    Top = 721
     Width = 75
     Height = 25
     Caption = 'Move Up'
@@ -203,7 +206,7 @@ object Form5: TForm5
   end
   object Button7: TButton
     Left = 383
-    Top = 637
+    Top = 721
     Width = 75
     Height = 25
     Caption = 'Move Down'
@@ -212,7 +215,7 @@ object Form5: TForm5
   end
   object Button8: TButton
     Left = 170
-    Top = 637
+    Top = 721
     Width = 75
     Height = 25
     Caption = 'Insert Script'
@@ -220,7 +223,7 @@ object Form5: TForm5
     OnClick = Button8Click
   end
   object Button9: TButton
-    Left = 896
+    Left = 986
     Top = 73
     Width = 104
     Height = 25
@@ -264,6 +267,10 @@ object Form5: TForm5
     object CreateRandomstringgroup1: TMenuItem
       Caption = 'Create Random string group'
       OnClick = CreateRandomstringgroup1Click
+    end
+    object Createmultilinemessage1: TMenuItem
+      Caption = 'Create multiline message'
+      OnClick = Createmultilinemessage1Click
     end
   end
 end

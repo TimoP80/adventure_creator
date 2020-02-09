@@ -220,11 +220,16 @@ begin
 end;
 
 procedure cleanupdatablock;
+var s: boolean;
+temp: string;
 begin
   if fileexists(windowstemp + '\vfs_temp.tmp') then
   begin
     consoleoutput('deleting temporary data block.');
-    deletefile(pwidechar(windowstemp + '\vfs_temp.tmp'));
+   temp:=windowstemp + '\vfs_temp.tmp';
+   s:= deletefile(pwidechar(temp));
+  if s=false then consoleoutput('Delete failed!');
+
   end;
 end;
 
@@ -297,7 +302,6 @@ begin
   begin
     if packfile.files[t].file_opened = True then
     begin
-      ConsoleOutput(packfile.files[t].filename);
       if pathoverride <> '' then
       begin
       //  debug('Cleaning up ' + packfile.files[t].filename);
@@ -435,6 +439,8 @@ begin
   index := vfs_get_file_index(packfile, filename);
   if index <> -1 then
   begin
+    writeln('Attempting to open '+getenvironmentvariable('TEMP') + '\' +
+        extractfilename(filename));
     if (packfile.files[index].file_compressed = True) then
       assignfile(temphandle, getenvironmentvariable('TEMP') + '\' +
         extractfilename(filename) + '.zlib')

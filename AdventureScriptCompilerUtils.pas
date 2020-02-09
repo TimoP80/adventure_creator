@@ -33,6 +33,7 @@ const
   EXEC_MODE_NORMAL = $4000;
   EXEC_MODE_SETVAR = $4001;
   EXEC_MODE_CONDITION = $4002;
+  EXEC_MODE_SWITCH = $4003;
 
   COMPARE_MODE_STRING = $4500;
   COMPARE_MODE_INTEGER = $4501;
@@ -69,6 +70,13 @@ const
   OP_CONDITION_BLOCK_START = $8017;
   OP_CONDITION_BLOCK_END = $8018;
   OP_FUNCTION_PARAMS = $8019;
+  OP_SWITCH_VAR = $801A;
+  OP_SWITCH_LABEL = $801B;
+  OP_SWITCH_LABEL_CODE_BEGIN = $B01C;
+  OP_SWITCH_LABEL_CODE_END = $B01D;
+  OP_SWITCH_BEGIN = $B01E;
+  OP_SWITCH_END = $B01F;
+
 
   RETURN_TYPE_VOID = $4000;
   RETURN_TYPE_INTEGER = $4001;
@@ -93,6 +101,8 @@ const
   DATA_TYPE_PARAMETER_STRING = $A014;
   DATA_TYPE_PARAMETER_VARIABLEREF = $A015;
   DATA_TYPE_PARAMETER_INT = $A016;
+  DATA_TYPE_SWITCH_VAR = $A017;
+  DATA_TYPE_SWITCH_LABEL_DATA =$A018;
 
   IF_CONNECT_AND = $C000;
   IF_CONNECT_OR = $C001;
@@ -124,14 +134,16 @@ type
     inst_paramcount: integer;
   end;
 
-  type RandomStringListData = record
-       text: string;
+type
+  RandomStringListData = record
+    text: string;
   end;
 
-  type RandomStringList = record
-         name_id: string;
-         StringData: array of RandomStringListData;
-         StringCnt: integer;
+type
+  RandomStringList = record
+    name_id: string;
+    StringData: array of RandomStringListData;
+    stringcnt: integer;
   end;
 
 type
@@ -152,7 +164,7 @@ type
     script_filename: ansistring;
     script_author: ansistring;
     is_boot_script: boolean;
-    stringdata: stringtable;
+    StringData: stringtable;
     variables: array of scriptvar;
     variablecnt: integer;
     instructions: array of instruction;
@@ -176,6 +188,7 @@ var
   instruction_ended: boolean;
   built_in_functions: TStrings;
 
+function DecodeInstruction (i: integer; instr: instruction): string;
 function AddInstruction(var TheScript: Script; inst_type: integer): instruction;
 procedure NextInstruction(var TheScript: Script; prev_instruction: instruction);
 procedure AddParam(var instruction: instruction; param: variant;
@@ -254,12 +267,21 @@ begin
       (vartype(instr.inst_params[i].data) = varUString) then
     begin
       strdata := instr.inst_params[i].data;
-      result := result +  strdata;
+      result := result + strdata;
     end;
 
     if i < instr.inst_paramcount - 1 then
       result := result + ', ';
   end;
+
+end;
+
+function DecodeInstruction (i: integer; instr: instruction): string;
+begin
+
+result := format('%0.4x: %s %s',
+      [i, OpcodeToStr(instr.inst_type),
+      GetParams(instr)])
 
 end;
 
@@ -451,30 +473,34 @@ begin
   RandomChanceTable[RandomChanceCnt].targetnode := target_node;
   inc(RandomChanceCnt);
 end;
-function FindStringList (strid: string): integer;
-var i: integer;
+
+function FindStringList(strid: string): integer;
+var
+  i: integer;
 begin
-for i := 0 to RandomStringListCnt-1 do
-begin
-  if strid=randomstringlists[i].name_id then
+  result := -1;
+  for i := 0 to RandomStringListCnt - 1 do
   begin
-    result:=i;
-    exit;
+    if strid = RandomStringLists[i].name_id then
+    begin
+      result := i;
+      exit;
+    end;
   end;
 end;
-end;
+
 procedure CallBuiltInFunction(TheScript: Script; instr: instruction;
   funcname: string; var resultstorage: variant);
 var
   ch: char;
   z: integer;
   list: TArrayofVariant;
-  xpos,ypos,listcnt: integer;
+  xpos, ypos, listcnt: integer;
   resultdata: variant;
-  paramdatax,paramdatay: string;
+  paramdatax, paramdatay: string;
   randomvalue, randomrange, finalindex, index: integer;
   i: integer;
-  delayamount,throw: integer;
+  delayamount, throw: integer;
   varvalue: variant;
   temp, randomchancefinalresult: string;
   output: string;
@@ -523,6 +549,8 @@ begin
   begin
     // code here for current node changes
     // can't do it elsewhere but ACEngine.exe
+    if IsVariable(thescript, instr.inst_params[1].data) then
+    currentnode := GetVariableValue(thescript, instr.inst_params[1].data) else
     currentnode := instr.inst_params[1].data;
 
   end
@@ -530,12 +558,12 @@ begin
   begin
     randomrange := instr.inst_params[1].data;
     randomvalue := random(randomrange);
-    resultstorage:=randomvalue;
+    resultstorage := randomvalue;
   end
   else if funcname = 'Delay' then
   begin
-  delayamount := instr.inst_params[1].data;
-  sleep(delayamount);
+    delayamount := instr.inst_params[1].data;
+    sleep(delayamount);
 
   end
 
@@ -556,16 +584,16 @@ begin
   begin
 
     if instr.inst_params[1].data_type = DATA_TYPE_PARAMETER_VARIABLEREF then
-     xpos := wherex;
+      xpos := wherex;
 
     if instr.inst_params[2].data_type = DATA_TYPE_PARAMETER_VARIABLEREF then
-     xpos := wherey;
+      xpos := wherey;
 
     if instr.inst_params[1].data_type = DATA_TYPE_PARAMETER_INT then
-     xpos := instr.inst_params[1].data;
+      xpos := instr.inst_params[1].data;
 
     if instr.inst_params[2].data_type = DATA_TYPE_PARAMETER_INT then
-   ypos := instr.inst_params[2].data;
+      ypos := instr.inst_params[2].data;
     GotoXY(xpos, ypos);
   end
   else if funcname = 'ReadInput' then
@@ -576,45 +604,78 @@ begin
   else if funcname = 'TextColor' then
   begin
     TextColor(ColorStringToConst(instr.inst_params[1].data));
-    // GotoXY(instr.inst_params[1].data, instr.inst_params[2].data);
   end
   else if funcname = 'TextBackground' then
   begin
     TextBackground(ColorStringToConst(instr.inst_params[1].data));
-    // GotoXY(instr.inst_params[1].data, instr.inst_params[2].data);
   end
   else if funcname = 'InitRandomList' then
   begin
-  setlength(RandomStringLists,RandomStringListCnt+1);
-  randomstringlists[randomstringlistcnt].name_id := instr.inst_params[1].data;
-  RandomStringLists[index].StringCnt := 0;
-  inc(RandomStringListCnt);
+
+    // Check if the specified string list exists
+    // if not, then initialize
+    // if it does, then nothing happens here
+
+    index:=FindStringList(instr.inst_params[2].data);
+    if index=-1 then
+    begin
+    SetLength(RandomStringLists, RandomStringListCnt + 1);
+    RandomStringLists[RandomStringListCnt].name_id := instr.inst_params[1].data;
+    RandomStringLists[RandomStringListCnt].stringcnt := 0;
+    inc(RandomStringListCnt);
+    end;
+
+  end
+  else if funcname = 'CombineStrings' then
+  begin
+
+   output := '';
+    for z := 1 to instr.inst_paramcount - 1 do
+    begin
+      if instr.inst_params[z].data_type = DATA_TYPE_PARAMETER_VARIABLEREF then
+      begin
+        varvalue := GetVariableValue(TheScript, instr.inst_params[z].data);
+        if vartype(varvalue) = varInteger then
+          output := output + inttostr(varvalue)
+        else if (vartype(varvalue) = varString) or
+          (vartype(varvalue) = varUString) then
+          output := output + varvalue;
+
+      end
+      else
+        output := output + instr.inst_params[z].data;
+    end;
+
+   resultstorage := output;
   end
   else if funcname = 'AddToRandomList' then
   begin
-  index := FindStringList(instr.inst_params[1].data);
-  setlength(RandomStringLists[index].StringData, RandomStringLists[index].StringCnt+1);
-  RandomStringLists[index].stringdata[RandomStringLists[index].StringCnt].text := instr.inst_params[2].data;
-  inc(RandomStringLists[index].StringCnt);
+    index := FindStringList(instr.inst_params[1].data);
+    SetLength(RandomStringLists[index].StringData,
+      RandomStringLists[index].stringcnt + 1);
+    RandomStringLists[index].StringData[RandomStringLists[index].stringcnt].text
+      := instr.inst_params[2].data;
+    inc(RandomStringLists[index].stringcnt)
   end
   else if funcname = 'GetFromRandomList' then
   begin
-  index := FindStringList(instr.inst_params[1].data);
-  randomvalue := Random(RandomStringLists[index].StringCnt);
-   resultstorage:=RandomStringLists[index].StringData[randomvalue].text;
+    index := FindStringList(instr.inst_params[1].data);
+    randomvalue := random(RandomStringLists[index].stringcnt);
+
+    resultstorage := RandomStringLists[index].StringData[randomvalue].text;
 
   end
   else if funcname = 'ReplaceVars' then
   begin
-    temp := GetVariableValue(TheScript,instr.inst_params[1].data);
-    temp := ReplaceScriptVars(TheScript,temp);
-    SetVariableValue(thescript,instr.inst_params[1].data,temp);
+    temp := GetVariableValue(TheScript, instr.inst_params[1].data);
+    temp := ReplaceScriptVars(TheScript, temp);
+    SetVariableValue(TheScript, instr.inst_params[1].data, temp);
 
   end
   else if funcname = 'FlushRandomListTable' then
   begin
-    RandomStringListCnt:=0;
-    SetLength(RandomStringLists,0);
+    RandomStringListCnt := 0;
+    SetLength(RandomStringLists, 0);
   end
   else if funcname = 'InitRandomChance' then
   begin
@@ -628,8 +689,11 @@ begin
       throw := random(100 - RandomChanceTable[i].probability);
       if throw < RandomChanceTable[i].probability then
       begin
+       writeln('Throw ',throw,' = HIT!');
         AddToList(i, list, listcnt);
-      end;
+      end else
+        writeln('Throw ',throw,' = MISS!');
+
     end;
     index := random(listcnt);
     finalindex := list[index];
@@ -731,8 +795,7 @@ begin
     begin
       SetAGFVariableValue(TheScript.variables[u].name,
         TheScript.variables[u].value);
-     // writeln('[DEBUG] updating variable ''' + TheScript.variables[u].name +
-     //   ''' value to ', TheScript.variables[u].value);
+
     end;
   end;
 end;
@@ -749,8 +812,7 @@ begin
     begin
       TheScript.variables[u].value :=
         GetAGFVariableValue(TheScript.variables[u].name);
-      //writeln('[DEBUG] updating variable ''' + TheScript.variables[u].name +
-      //  ''' value to ', TheScript.variables[u].value);
+
     end;
   end;
 end;
@@ -775,6 +837,8 @@ var
   funcresult: variant;
   finaldata: variant;
   condition_variable: string;
+  case_var_value_str: string;
+
   condition_value: variant;
   condition_eval: integer;
   condition_eval_value: variant;
@@ -804,8 +868,43 @@ begin
   numifopcodes := 0;
   while (current_instruction <> OP_FUNCTIONEND) do
   begin
+
     current_instruction := TheScript.instructions[x].inst_type;
     case current_instruction of
+      OP_SWITCH_VAR:
+      begin
+        case_var_value_str := GetVariableValue(thescript, thescript.instructions[x].inst_params[0].data);
+        execution_mode:=EXEC_MODE_SWITCH;
+
+      end;
+      OP_SWITCH_LABEL_CODE_BEGIN:
+      begin
+
+      end;
+      OP_SWITCH_LABEL_CODE_END:
+      begin
+       x:=FindOpcode(thescript,x+1, OP_SWITCH_END);
+
+      end;
+      OP_SWITCH_BEGIN:
+      begin
+
+      end;
+      OP_SWITCH_END:
+      begin
+       execution_mode:=EXEC_MODE_NORMAL;
+      end;
+      OP_SWITCH_LABEL:
+      begin
+        if case_var_value_str = thescript.instructions[x].inst_params[0].data then
+        begin
+         x:=FindOpcode(thescript,x+1, OP_SWITCH_LABEL_CODE_BEGIN);
+         end
+        else
+        begin
+         x:=FindOpcode(thescript,x+1, OP_SWITCH_LABEL);
+        end;
+      end;
       OP_CONDITION_BLOCK_START:
         begin
 
@@ -831,8 +930,9 @@ begin
           execution_mode := EXEC_MODE_CONDITION;
           if_position := FindOpcode(TheScript, x + 1, OP_IFBEGIN);
           if_else_position := FindOpcode(TheScript, x + 1, OP_IF_ELSE);
-          if if_else_position=-1 then
-          if_else_position := FindOpcode(TheScript, x + 1, OP_CONDITION_BLOCK_END);
+          if if_else_position = -1 then
+            if_else_position := FindOpcode(TheScript, x + 1,
+              OP_CONDITION_BLOCK_END);
 
           jump_position := FindOpcode(TheScript, if_else_position + 1,
             OP_IFELSEEND);
@@ -1049,7 +1149,6 @@ begin
         end;
       OP_RANDOMCHANCE:
         begin
-          // writeln('RANDOM Chance: ',thescript.instructions[x].inst_params[0].data,' => ',thescript.instructions[x].inst_params[1].data);
           AddRandomChance(TheScript.instructions[x].inst_params[0].data,
             TheScript.instructions[x].inst_params[1].data);
         end;
@@ -1142,6 +1241,7 @@ begin
   built_in_functions.Add('InitRandomList');
   built_in_functions.Add('AddToRandomList');
   built_in_functions.Add('GetFromRandomList');
+  built_in_functions.Add('CombineStrings');
 
   built_in_functions.Add('InitRandomChance');
   built_in_functions.Add('ExecuteRandomChance');
@@ -1247,7 +1347,20 @@ begin
       result := 'OP_CONDITION_BLOCK_END';
     OP_IF_ELSE:
       result := 'OP_IF_ELSE';
+    OP_SWITCH_VAR:
+      result:='OP_SWITCH_VAR';
+    OP_SWITCH_LABEL:
+     result:='OP_SWITCH_LABEL';
+     OP_SWITCH_LABEL_CODE_BEGIN:
+     result:='OP_SWITCH_LABEL_CODE_BEGIN';
+     OP_SWITCH_LABEL_CODE_END:
+     result:='OP_SWITCH_LABEL_CODE_END';
+     OP_SWITCH_BEGIN:
+     result:='OP_SWITCH_BEGIN';
+     OP_SWITCH_END:
+     result:='OP_SWITCH_END';
   else
+
     result := 'OP_UNKNOWN (' + format('%0.4x', [opcode]) + ')';
   end;
 end;
@@ -1295,8 +1408,7 @@ begin
     SetLength(stringtbl.strings, stringtbl.stringcnt + 1);
     if (data_type = varString) or (data_type = varUString) then
       stringtbl.strings[stringtbl.stringcnt] := strdata
-    else
-    if (data_type = varInteger) then
+    else if (data_type = varInteger) then
       stringtbl.strings[stringtbl.stringcnt] := intdata;
     result := stringtbl.stringcnt;
     inc(stringtbl.stringcnt);
@@ -1363,12 +1475,12 @@ begin
         .stringtableindex, 4);
     end;
   end;
-  blockread(f, TheScript.stringdata.stringcnt, 4);
-  lengthcnt := TheScript.stringdata.stringcnt;
-  vartypecnt := TheScript.stringdata.stringcnt;
+  blockread(f, TheScript.StringData.stringcnt, 4);
+  lengthcnt := TheScript.StringData.stringcnt;
+  vartypecnt := TheScript.StringData.stringcnt;
   SetLength(lengths, lengthcnt + 1);
   SetLength(vartypes, vartypecnt + 1);
-  for j := 0 to TheScript.stringdata.stringcnt - 1 do
+  for j := 0 to TheScript.StringData.stringcnt - 1 do
   begin
     blockread(f, length_temp, 4);
     lengths[j] := length_temp;
@@ -1376,14 +1488,14 @@ begin
     vartypes[j] := vartype_temp;
 
   end;
-  SetLength(TheScript.stringdata.strings, TheScript.stringdata.stringcnt + 1);
-  for j := 0 to TheScript.stringdata.stringcnt - 1 do
+  SetLength(TheScript.StringData.strings, TheScript.StringData.stringcnt + 1);
+  for j := 0 to TheScript.StringData.stringcnt - 1 do
   begin
     vartype_temp := vartypes[j];
     if (vartype_temp = varString) or (vartype_temp = varUString) then
     begin
       ReadStringWithLength(f, lengths[j], stringtemp);
-      TheScript.stringdata.strings[j] := VarAsType(stringtemp, varString);
+      TheScript.StringData.strings[j] := VarAsType(stringtemp, varString);
     end
     else
 
@@ -1391,7 +1503,7 @@ begin
     begin
 
       blockread(f, int_temp, 4);
-      TheScript.stringdata.strings[j] := int_temp;
+      TheScript.StringData.strings[j] := int_temp;
     end;
     ReadHeader(f, ' ');
   end;
@@ -1401,7 +1513,7 @@ begin
     for j := 0 to TheScript.instructions[i].inst_paramcount - 1 do
     begin
       TheScript.instructions[i].inst_params[j].data :=
-        TheScript.stringdata.strings[TheScript.instructions[i].inst_params[j]
+        TheScript.StringData.strings[TheScript.instructions[i].inst_params[j]
         .stringtableindex];
     end;
 
@@ -1467,12 +1579,12 @@ begin
         .stringtableindex, 4);
     end;
   end;
-  blockread(f, TheScript.stringdata.stringcnt, 4);
-  lengthcnt := TheScript.stringdata.stringcnt;
-  vartypecnt := TheScript.stringdata.stringcnt;
+  blockread(f, TheScript.StringData.stringcnt, 4);
+  lengthcnt := TheScript.StringData.stringcnt;
+  vartypecnt := TheScript.StringData.stringcnt;
   SetLength(lengths, lengthcnt + 1);
   SetLength(vartypes, vartypecnt + 1);
-  for j := 0 to TheScript.stringdata.stringcnt - 1 do
+  for j := 0 to TheScript.StringData.stringcnt - 1 do
   begin
     blockread(f, length_temp, 4);
     lengths[j] := length_temp;
@@ -1480,20 +1592,20 @@ begin
     vartypes[j] := vartype_temp;
 
   end;
-  SetLength(TheScript.stringdata.strings, TheScript.stringdata.stringcnt + 1);
-  for j := 0 to TheScript.stringdata.stringcnt - 1 do
+  SetLength(TheScript.StringData.strings, TheScript.StringData.stringcnt + 1);
+  for j := 0 to TheScript.StringData.stringcnt - 1 do
   begin
     vartype_temp := vartypes[j];
     if (vartype_temp = varString) or (vartype_temp = varUString) then
     begin
       ReadStringWithLength(f, lengths[j], stringtemp);
-      TheScript.stringdata.strings[j] := VarAsType(stringtemp, varString);
+      TheScript.StringData.strings[j] := VarAsType(stringtemp, varString);
     end
     else
 
       if (vartype_temp = varInteger) then
     begin
-      blockread(f, TheScript.stringdata.strings[j], 4);
+      blockread(f, TheScript.StringData.strings[j], 4);
     end;
     ReadHeader(f, ' ');
   end;
@@ -1503,7 +1615,7 @@ begin
     for j := 0 to TheScript.instructions[i].inst_paramcount - 1 do
     begin
       TheScript.instructions[i].inst_params[j].data :=
-        TheScript.stringdata.strings[TheScript.instructions[i].inst_params[j]
+        TheScript.StringData.strings[TheScript.instructions[i].inst_params[j]
         .stringtableindex];
     end;
 
@@ -1553,33 +1665,32 @@ begin
     begin
       blockwrite(f, TheScript.instructions[i].inst_params[j].data_type, 4);
       TheScript.instructions[i].inst_params[j].stringtableindex :=
-        AddToStringTable(TheScript.stringdata,
+        AddToStringTable(TheScript.StringData,
         TheScript.instructions[i].inst_params[j].data);
       blockwrite(f, TheScript.instructions[i].inst_params[j]
         .stringtableindex, 4);
     end;
   end;
-  blockwrite(f, TheScript.stringdata.stringcnt, 4);
-  for j := 0 to TheScript.stringdata.stringcnt - 1 do
+  blockwrite(f, TheScript.StringData.stringcnt, 4);
+  for j := 0 to TheScript.StringData.stringcnt - 1 do
   begin
-    length_temp := length(TheScript.stringdata.strings[j]);
+    length_temp := length(TheScript.StringData.strings[j]);
     blockwrite(f, length_temp, 4);
-    vartype_temp := vartype(TheScript.stringdata.strings[j]);
+    vartype_temp := vartype(TheScript.StringData.strings[j]);
     blockwrite(f, vartype_temp, 4);
 
   end;
 
-  for j := 0 to TheScript.stringdata.stringcnt - 1 do
+  for j := 0 to TheScript.StringData.stringcnt - 1 do
   begin
-    vartype_temp := vartype(TheScript.stringdata.strings[j]);
+    vartype_temp := vartype(TheScript.StringData.strings[j]);
     if (vartype_temp = varString) or (vartype_temp = varUString) then
-      WriteStringNoLength(f, TheScript.stringdata.strings[j])
-    else
-       if (vartype_temp = varInteger) then
-     begin
-            int_temp := TheScript.stringdata.strings[j];
+      WriteStringNoLength(f, TheScript.StringData.strings[j])
+    else if (vartype_temp = varInteger) then
+    begin
+      int_temp := TheScript.StringData.strings[j];
       blockwrite(f, int_temp, 4);
-      end;
+    end;
     WriteStringNoLength(f, ' ');
   end;
 end;
@@ -1626,31 +1737,31 @@ begin
     begin
       blockwrite(f, TheScript.instructions[i].inst_params[j].data_type, 4);
       TheScript.instructions[i].inst_params[j].stringtableindex :=
-        AddToStringTable(TheScript.stringdata,
+        AddToStringTable(TheScript.StringData,
         TheScript.instructions[i].inst_params[j].data);
       blockwrite(f, TheScript.instructions[i].inst_params[j]
         .stringtableindex, 4);
     end;
   end;
-  blockwrite(f, TheScript.stringdata.stringcnt, 4);
-  for j := 0 to TheScript.stringdata.stringcnt - 1 do
+  blockwrite(f, TheScript.StringData.stringcnt, 4);
+  for j := 0 to TheScript.StringData.stringcnt - 1 do
   begin
-    length_temp := length(TheScript.stringdata.strings[j]);
+    length_temp := length(TheScript.StringData.strings[j]);
     blockwrite(f, length_temp, 4);
-    vartype_temp := vartype(TheScript.stringdata.strings[j]);
+    vartype_temp := vartype(TheScript.StringData.strings[j]);
     blockwrite(f, vartype_temp, 4);
 
   end;
 
-  for j := 0 to TheScript.stringdata.stringcnt - 1 do
+  for j := 0 to TheScript.StringData.stringcnt - 1 do
   begin
-    vartype_temp := vartype(TheScript.stringdata.strings[j]);
+    vartype_temp := vartype(TheScript.StringData.strings[j]);
     if (vartype_temp = varString) or (vartype_temp = varUString) then
-      WriteStringNoLength(f, TheScript.stringdata.strings[j])
+      WriteStringNoLength(f, TheScript.StringData.strings[j])
     else
 
       if (vartype_temp = varInteger) then
-      blockwrite(f, TheScript.stringdata.strings[j], 4);
+      blockwrite(f, TheScript.StringData.strings[j], 4);
     WriteStringNoLength(f, ' ');
   end;
   closefile(f);
@@ -1689,10 +1800,14 @@ end;
 
 procedure InitScriptData(var TheScript: Script; name: ansistring;
   filename: ansistring; author: ansistring);
-var u: integer;
+var
+  u: integer;
 begin
-SetLength(thescript.instructions,0);
+  SetLength(TheScript.instructions, 0);
   TheScript.instruction_count := 0;
+  setlength(thescript.variables, 0);
+  thescript.variablecnt:=0;
+
   TheScript.script_name := name;
   TheScript.script_filename := filename;
   TheScript.script_author := author;

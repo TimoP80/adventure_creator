@@ -37,6 +37,7 @@ type
     Button9: TButton;
     PopupMenu1: TPopupMenu;
     CreateRandomstringgroup1: TMenuItem;
+    Createmultilinemessage1: TMenuItem;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure SynEdit1KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -54,6 +55,7 @@ type
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
     procedure CreateRandomstringgroup1Click(Sender: TObject);
+    procedure Createmultilinemessage1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -70,7 +72,7 @@ procedure UpdateScripts;
 
 implementation
 
-uses AdventureCreatorIDEMain, AddRandomGroup;
+uses AdventureCreatorIDEMain, AddRandomGroup, AddMultilineMessage;
 
 {$R *.dfm}
 
@@ -294,22 +296,54 @@ begin
 
 end;
 
+procedure TForm5.Createmultilinemessage1Click(Sender: TObject);
+var
+  Text: string;
+  i: integer;
+  linetemp: string;
+begin
+  form8.showmodal;
+
+  if form8.modalresult = mrOK then
+  begin
+    for i := 0 to form8.StringsList.Lines.Count - 1 do
+    begin
+      linetemp := form8.StringsList.Lines[i];
+      linetemp := StringReplace(linetemp, '\','\\',[rfReplaceAll]);
+      linetemp := StringReplace(linetemp, '"','\"',[rfReplaceAll]);
+
+      Text := 'DisplayMessage("' + linetemp + '");' + #13#10;
+      SynEdit1.InsertLine(SynEdit1.CaretXY, SynEdit1.CaretXY,
+        pwidechar(Text), false);
+      if form8.LineDelay.Checked then
+      begin
+        Text := 'Delay(' + form8.DelayAmount.Text + ');' + #13#10;
+        SynEdit1.InsertLine(SynEdit1.CaretXY, SynEdit1.CaretXY,
+          pwidechar(Text), false);
+      end;
+    end;
+  end;
+
+end;
+
 procedure TForm5.CreateRandomstringgroup1Click(Sender: TObject);
 var
-  text: string;
+  Text: string;
   i: integer;
 begin
   form7.showmodal;
 
   if form7.modalresult = mrOK then
   begin
-    text := 'InitRandomList("' + form7.GroupID.Text + '");'+#13#10;
-    synedit1.InsertLine(synedit1.CaretXY, synedit1.CaretXY, pwidechar(text), false);
+    Text := 'InitRandomList("' + form7.GroupID.Text + '");' + #13#10;
+    SynEdit1.InsertLine(SynEdit1.CaretXY, SynEdit1.CaretXY,
+      pwidechar(Text), false);
     for i := 0 to form7.StringsList.Lines.Count - 1 do
     begin
-    text := 'AddToRandomList("' + form7.GroupID.Text + '","' +
-        form7.StringsList.Lines[i] + '");'+#13#10;
-    synedit1.InsertLine(synedit1.CaretXY, synedit1.CaretXY, pwidechar(text), false);
+      Text := 'AddToRandomList("' + form7.GroupID.Text + '","' +
+        form7.StringsList.Lines[i] + '");' + #13#10;
+      SynEdit1.InsertLine(SynEdit1.CaretXY, SynEdit1.CaretXY,
+        pwidechar(Text), false);
     end;
   end;
 end;

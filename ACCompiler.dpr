@@ -30,12 +30,13 @@ begin
   writeln('Saving binary to "', outputname, '"');
   SaveAdventureBin(outputname);
   writeln('Compressing data...');
-  cleanupdatablock;
+
   createnewpackfile(f, vfsfile, AdventureBinData.MetaAuthor, changefileext(outputname,'.dat'));
   add_file_to_vfs(vfsfile, outputname);
 
   writeheader(f, vfsfile);
   closevfshandle(f);
+  cleanupdatablock;
   writeln('Creating executable ... ');
   FileCopy('.\ACEngine.exe', changefileext(ParamStr(1), '.exe'), true);
   FileCopy('.\ACEngine.ini', changefileext(ParamStr(1), '.ini'), true);

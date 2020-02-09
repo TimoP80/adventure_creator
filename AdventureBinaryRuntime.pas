@@ -148,7 +148,6 @@ begin
   Result := str;
   for u := 0 to thescript.variablecnt - 1 do
   begin
-  writeln('Vars: ',thescript.variables[u].name);
    Result := StringReplace(Result, '$' + thescript.variables[u].name,
       thescript.variables[u].value, [rfReplaceAll]);
   end;
