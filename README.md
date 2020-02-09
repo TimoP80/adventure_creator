@@ -22,7 +22,9 @@ accompiler.exe for compiling xml files to agf
 AdventureCreatorIDE.exe for editing game files and saving them to xml format
 
 The source code is compilable with Delphi 10 Seattle and above. Compiled binaries are provided and they are
-updated regularly.
+updated regularly. There is also an installer for the binary bundle in the IS-Installer folder.
+
+This repository is the full online mirror of my local development folder. The first release will be added when I feel the engine and editor are stable enough.
 
 For compiling the IDE, the Delphi Jedi Code Library is required. Get it from https://github.com/project-jedi/jcl, also 
 the JVCL is recommended to be installed just in case. https://github.com/project-jedi/jvcl (In the future there might be some JVCL components used in the IDE)
