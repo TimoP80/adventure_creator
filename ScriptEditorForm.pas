@@ -56,6 +56,8 @@ type
     procedure Button7Click(Sender: TObject);
     procedure CreateRandomstringgroup1Click(Sender: TObject);
     procedure Createmultilinemessage1Click(Sender: TObject);
+    procedure ScriptListMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
   private
     { Private declarations }
   public
@@ -367,6 +369,9 @@ end;
 
 procedure TForm5.ScriptListClick(Sender: TObject);
 begin
+if scriptlist.ItemIndex=-1 then
+  exit;
+
   Script := AdventureData.Scripts.Script[ScriptList.ItemIndex];
 
   ScriptName.Text := Script.Name;
@@ -376,6 +381,23 @@ begin
 
   SynEdit1.Lines.Text := Script.Text;
 
+end;
+
+procedure TForm5.ScriptListMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+  var CursorPos: tpoint;
+  begin
+  cursorpos.X:=x;
+  cursorpos.Y:=y;
+ if ScriptList.ItemAtPos(cursorpos,true)=-1 then
+      begin
+        ScriptName.Text:='';
+        ScriptFilename.Text:='';
+        ScriptAuthor.Text := '';
+        SynEdit1.Text := '';
+        IsBootScript.Checked:=false;
+        scriptlist.ItemIndex:=-1;
+      end;
 end;
 
 procedure TForm5.ScriptNameKeyUp(Sender: TObject; var Key: Word;

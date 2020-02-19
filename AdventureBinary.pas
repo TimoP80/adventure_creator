@@ -53,6 +53,12 @@ type
     NodeChoiceCount: integer;
   end;
 
+type AdditionalFile = record
+     filename: ansistring;
+     description: ansistring;
+     filetype: ansistring;
+end;
+
 type
   GameVariable = record
     name: ansistring;
@@ -67,18 +73,20 @@ type
     VariableCount: integer;
     Scripts: array of Script;
     ScriptCount: integer;
+    AdditionalFiles: array of AdditionalFile;
+    AdditionalFileCount: integer;
     MetaTitle: ansistring;
     MetaAuthor: ansistring;
     MetaDescription: ansistring;
     MaxScore: integer;
   end;
-
 var
 
   AdventureBinData: AdventureGame;
   ScriptParser: TAdventureScript;
   AdventureData: IXMLAdventureGameType;
   Script: TStrings;
+
 procedure SaveAdventureBin(filename: string);
 procedure CompileAdventure;
 procedure LoadAdventureBin(filename: string);
@@ -180,7 +188,6 @@ begin
   end;
 
   CloseFile(x);
-
 end;
 
 procedure SaveAdventureBin(filename: string);
@@ -195,6 +202,14 @@ begin
   WriteString(x, AdventureBinData.MetaDescription);
   BlockWrite(x, AdventureBinData.MaxScore, 4);
   BlockWrite(x, AdventureBinData.GameNodeCount, 4);
+  BlockWrite(x, AdventureBinData.AdditionalFileCount, 4);
+  for i := 0 to AdventureBinData.AdditionalFileCount - 1 do
+  begin
+    WriteString(x, AdventureBinData.AdditionalFiles[i].filename);
+    WriteString(x, AdventureBinData.AdditionalFiles[i].description);
+    WriteString(x, AdventureBinData.AdditionalFiles[i].filetype);
+  end;
+
   BlockWrite(x, AdventureBinData.VariableCount, 4);
   for i := 0 to AdventureBinData.VariableCount - 1 do
   begin
@@ -293,6 +308,15 @@ begin
   setlength(AdventureBinData.GameNodes, AdventureData.GameNodes.Count + 1);
   AdventureBinData.GameNodeCount := 0;
   AdventureBinData.MaxScore := 0;
+  setlength(AdventureBinData.AdditionalFiles, AdventureData.AdditionalFiles.Count + 1);
+  AdventureBinData.AdditionalFileCount := 0;
+  for u := 0 to adventuredata.AdditionalFiles.Count-1 do
+  begin
+    AdventureBinData.AdditionalFiles[AdventureBinData.AdditionalFileCount].filename := adventuredata.AdditionalFiles.File_[u].Name;
+    AdventureBinData.AdditionalFiles[AdventureBinData.AdditionalFileCount].description := adventuredata.AdditionalFiles.File_[u].Text;
+    AdventureBinData.AdditionalFiles[AdventureBinData.AdditionalFileCount].filetype := adventuredata.AdditionalFiles.File_[u].File_type;
+  inc(adventurebindata.AdditionalFileCount);
+  end;
   setlength(AdventureBinData.Variables, AdventureData.Variables.Count + 1);
   AdventureBinData.VariableCount := 0;
   for u := 0 to AdventureData.Variables.Count - 1 do
@@ -442,9 +466,10 @@ InitBuiltInFunctions;
      CurrentScript.script_filename := adventuredata.Scripts[i].Filename;
      CurrentScript.script_author := adventuredata.Scripts[i].Author;
      currentscript.is_boot_script := adventuredata.Scripts[i].IsBootScript;
+     write('Compiled successfully: '+Currentscript.script_filename);
      if currentscript.is_boot_script=true then
-     writeln('"'+currentscript.script_name+'" will be executed at startup');
-     writeln('Compiled successfully: '+Currentscript.script_filename);
+     write(' (boot script)');
+     writeln;
      AdventureBinData.Scripts[adventurebindata.ScriptCount] := CurrentScript;
    DeleteFile('temp.as');
 

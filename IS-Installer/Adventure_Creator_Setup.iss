@@ -20,6 +20,11 @@ OutputDir=C:\CodeProjects\AdventureCreator\src\adventurecreator\IS-Installer
 OutputBaseFilename=adventure_creator_1.0-stable_setup
 Compression=lzma
 SolidCompression=yes
+VersionInfoVersion=1.0
+VersionInfoCopyright=(c) 2015-2020 T. Pitkänen
+VersionInfoProductName=Adventure Creator
+VersionInfoProductVersion=1.0
+VersionInfoProductTextVersion=1.0-stable
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -34,7 +39,9 @@ Source: "C:\CodeProjects\AdventureCreator\src\adventurecreator\Bin\accompiler.ex
 Source: "C:\CodeProjects\AdventureCreator\src\adventurecreator\Bin\ACEngine.ini"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Script Templates\*"; DestDir: "{app}\Script Templates"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
-Source: "C:\Windows\Fonts\DejaVuSansMono.ttf"; DestDir: "{fonts}"; FontInstall: "DejaVu Sans Mono"; Flags: onlyifdoesntexist uninsneveruninstall
+Source: "C:\Windows\Fonts\DejaVuSansMono.ttf"; DestDir: "{fonts}"; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: "DejaVu Sans Mono"
+Source: "..\..\..\upx.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\..\näyttisquest.xml"; DestDir: "{app}\Examples"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\Adventure Creator"; Filename: "{app}\AdventureCreatorIDE.exe"

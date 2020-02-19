@@ -225,10 +225,9 @@ temp: string;
 begin
   if fileexists(windowstemp + '\vfs_temp.tmp') then
   begin
-    consoleoutput('deleting temporary data block.');
-   temp:=windowstemp + '\vfs_temp.tmp';
+     temp:=windowstemp + '\vfs_temp.tmp';
    s:= deletefile(pwidechar(temp));
-  if s=false then consoleoutput('Delete failed!');
+  if s=false then consoleoutput('vfs_temp.tmp delete failed!');
 
   end;
 end;
@@ -440,7 +439,7 @@ begin
   if index <> -1 then
   begin
     writeln('Attempting to open '+getenvironmentvariable('TEMP') + '\' +
-        extractfilename(filename));
+       extractfilename(filename));
     if (packfile.files[index].file_compressed = True) then
       assignfile(temphandle, getenvironmentvariable('TEMP') + '\' +
         extractfilename(filename) + '.zlib')
@@ -676,8 +675,6 @@ begin
     blockread(vfsfile, packfile.files[t].size_uncompressed, 4);
   end;
 
-  consoleoutput('Opened VFSP file ' + filename + ' :: ' + IntToStr(packfile.numfiles) +
-    ' file(s)');
 
 end;
 
@@ -741,9 +738,9 @@ var
   cur_offset: integer;
   md5offsetmarker: integer;
   i, offsetmarker: integer;
+  temp: string;
   temp_input: file;
 begin
-  consoleoutputnoln('Writing header...');
   md5textfile := TStringList.Create;
   md5textfile.add('; VFSManager log file');
   md5textfile.add('; -------------------');
@@ -806,8 +803,9 @@ begin
     blockwrite(outputfile, buf, numread, numwritten);
   end;
   closefile(temp_input);
-  consoleoutput('done!');
-  deletefile(pwidechar(windowstemp + '\vfs_temp.tmp'));
+     temp:=windowstemp + '\vfs_temp.tmp';
+
+  deletefile(pwidechar(temp));
 end;
 
 procedure closevfshandle(var outputfile: file);

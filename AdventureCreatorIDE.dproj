@@ -129,13 +129,21 @@
         <DCCReference Include="ScriptEditorForm.pas">
             <Form>Form5</Form>
         </DCCReference>
-        <DCCReference Include="AdventureFile.pas"/>
         <DCCReference Include="AddRandomGroup.pas">
             <Form>Form7</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="AddMultilineMessage.pas">
             <Form>Form8</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="ProjectSettingsForm.pas">
+            <Form>Form9</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="AdventureFile.pas"/>
+        <DCCReference Include="AdditionalFilesForm.pas">
+            <Form>Form10</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <None Include="ModelSupport_AdventureCreatorIDE\default.txaPackage"/>
@@ -202,7 +210,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="ModelSupport_AdventureCreatorIDE\default.txaPackage" Configuration="Release" Class="ProjectFile"/>
+                <DeployFile LocalName="..\..\AdventureCreatorIDE.exe" Configuration="Release" Class="ProjectOutput"/>
                 <DeployFile LocalName="..\..\AdventureCreatorIDE.exe" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployFile LocalName="ModelSupport_AdventureCreatorIDE\default.txvpck" Configuration="Release" Class="ProjectFile"/>
                 <DeployFile LocalName="..\..\AdventureCreatorIDE.exe" Configuration="Release" Class="ProjectOutput">
@@ -274,7 +282,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\..\AdventureCreatorIDE.exe" Configuration="Release" Class="ProjectOutput"/>
+                <DeployFile LocalName="ModelSupport_AdventureCreatorIDE\default.txaPackage" Configuration="Release" Class="ProjectFile"/>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="iOSSimulator">
                         <Operation>1</Operation>

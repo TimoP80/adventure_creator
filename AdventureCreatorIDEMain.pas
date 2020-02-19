@@ -81,6 +81,8 @@ type
     Scripts1: TMenuItem;
     ScriptSelector: TComboBox;
     Button5: TButton;
+    Compilersettings1: TMenuItem;
+    Additionalfiles1: TMenuItem;
     procedure LoadAdventureFile1Click(Sender: TObject);
     procedure Quit1Click(Sender: TObject);
     procedure btn3Click(Sender: TObject);
@@ -128,6 +130,8 @@ type
     procedure Scripts1Click(Sender: TObject);
     procedure ScriptSelectorClick(Sender: TObject);
     procedure Button5Click(Sender: TObject);
+    procedure Compilersettings1Click(Sender: TObject);
+    procedure Additionalfiles1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -156,7 +160,8 @@ procedure UpdateScriptSelectors;
 implementation
 
 uses MetaData, VarEditor, ChoiceCommandsForm, AboutForm, ChoiceConditionsForm,
-  ScriptEditorForm;
+  ScriptEditorForm, AddMultilineMessage, ProjectSettingsForm,
+  AdditionalFilesForm;
 
 procedure UpdateScriptEditorCompletion;
 var
@@ -520,6 +525,12 @@ begin
   end;
 end;
 
+procedure TForm1.Additionalfiles1Click(Sender: TObject);
+begin
+UpdateAdditionalFiles;
+form10.showmodal;
+end;
+
 procedure TForm1.btn1Click(Sender: TObject);
 begin
 
@@ -583,7 +594,11 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   AdventureData := NewAdventureGame;
+  AdventureData.ProjectSettings.DebugMode := false;
+  AdventureData.ProjectSettings.AudioEnabled := false;
+  AdventureData.ProjectSettings.AudioVolume := 50;
 
+  CurrentFilename := 'Untitled.xml';
   initbuiltinfunctions;
   InitColorTable;
 end;
@@ -598,11 +613,10 @@ var
   z, Y: Integer;
   cond: IXMLConditionListType;
 begin
-  for Y := 0 to AdventureData.Scripts.Count - 1 do
-  begin
-   LogMsg('Resetting script "'+AdventureData.Scripts.Script[y].Name+'" Boot script state.');
-    adventuredata.Scripts.Script[y].IsBootScript := false;
-  end;
+adventuredata.ProjectSettings.DebugMode := false;
+adventuredata.ProjectSettings.AudioEnabled := false;
+adventuredata.ProjectSettings.AudioVolume := 50;
+
 end;
 
 procedure TForm1.chkendgameClick(Sender: TObject);
@@ -614,6 +628,21 @@ procedure TForm1.mmonodetextKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   TheNode.DescriptionText := mmonodetext.Text;
+end;
+
+procedure TForm1.Compilersettings1Click(Sender: TObject);
+begin
+form9.audioenabled.Checked := AdventureData.ProjectSettings.AudioEnabled;
+form9.soundvolume.Value := adventuredata.projectsettings.AudioVolume;
+Form9.soundvolumeChange(nil);
+form9.debugmode.Checked := AdventureData.ProjectSettings.DebugMode;
+
+form9.showmodal;
+
+ AdventureData.ProjectSettings.AudioEnabled := form9.audioenabled.Checked;
+adventuredata.projectsettings.AudioVolume := form9.soundvolume.Value;
+AdventureData.ProjectSettings.DebugMode := form9.debugmode.Checked;
+
 end;
 
 procedure TForm1.CompiletoBinary1Click(Sender: TObject);
@@ -868,6 +897,10 @@ end;
 procedure TForm1.NewAdventureFile1Click(Sender: TObject);
 begin
   AdventureData := NewAdventureGame;
+  AdventureData.ProjectSettings.DebugMode := false;
+  AdventureData.ProjectSettings.AudioEnabled := false;
+  AdventureData.ProjectSettings.AudioVolume := 50;
+
   UpdateNodeLists;
   UpdateVariables;
   CurrentFilename := 'Untitled.xml';

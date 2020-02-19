@@ -2,7 +2,7 @@ unit AdventureBinaryRuntime;
 
 interface
 
-uses Sysutils, inifiles, classes, AdventureScriptCompilerUtils, FileIOFunctions;
+uses Sysutils, inifiles, classes, AdventureScriptCompilerUtils, FileIOFunctions,Velthuis.Console;
 
 const
   is_equal = 1;
@@ -49,6 +49,12 @@ type
     NodeChoiceCount: integer;
   end;
 
+type AdditionalFile = record
+     filename: ansistring;
+     description: ansistring;
+     filetype: ansistring;
+end;
+
 type
   GameVariable = record
     name: ansistring;
@@ -63,6 +69,8 @@ type
     VariableCount: integer;
     Scripts: array of Script;
     ScriptCount: integer;
+    AdditionalFiles: array of AdditionalFile;
+    AdditionalFileCount: integer;
     MetaTitle: ansistring;
     MetaAuthor: ansistring;
     MetaDescription: ansistring;
@@ -90,10 +98,13 @@ var
   currentmoney, numchoices: integer;
  lastnode, moneystring, currentnode: ansistring;
   wingame, endgame: boolean;
+  audiosupport: boolean;
+  debugmode: boolean;
+  audiovolume: integer;
   random_min, random_max: integer;
   rcstream: Tresourcestream;
   datafile: string;
-  moneydisplay, debugmode: boolean;
+  moneydisplay: boolean;
   msg_gameover, msg_wrongchoice, msg_pressanykey: ansistring;
   msgtemp, msg_gamefinished: ansistring;
   savedx, savedy, choiceinteger: integer;
@@ -107,6 +118,8 @@ function ReplaceVars(str: string): string;
 procedure SetVarValue(varname, value: string);
 function GetVarValue(varname: string): string;
 function ReplaceScriptVars(thescript: script; str: string): string;
+procedure UpdateMoney;
+ procedure PrintHeader;
 
 implementation
 
@@ -138,8 +151,39 @@ begin
     end;
   end;
 end;
+procedure UpdateMoney;
+var
+  moneyvar: string;
+begin
+  moneyvar := GetVarValue('MoneyVar');
+  currentmoney := strtoint(GetVarValue(moneyvar));
+end;
 
+procedure PrintHeader;
+begin
+        TextBackground(blue);
+        TextColor(Yellow);
+        ClrEol;
 
+        writeln(AdventureBinData.metatitle + ' by ' +
+          AdventureBinData.metaauthor);
+
+        if moneydisplay = true then
+        begin
+          GotoXY(38, 1);
+          UpdateMoney;
+          moneystring := GetVarValue('MoneyCaption');
+          moneystring := STringReplace(moneystring, '$Money',
+            inttostr(currentmoney), [rfReplaceAll]);
+          write(moneystring);
+        end;
+        GotoXY(65, 1);
+        writeln('Score: ', score, ' / ', AdventureBinData.maxscore);
+        writeln;
+        TextBackground(black);
+        TextColor(White);
+
+end;
 
 function ReplaceScriptVars(thescript: script; str: string): string;
 var
@@ -178,6 +222,15 @@ begin
   ReadString(x, AdventureBinData.MetaDescription);
   BlockRead(x, AdventureBinData.MaxScore, 4);
   BlockRead(x, AdventureBinData.GameNodeCount, 4);
+  BlockRead(x, AdventureBinData.AdditionalFileCount, 4);
+  setlength(adventurebindata.AdditionalFiles, adventurebindata.AdditionalFileCount+1);
+  for i := 0 to AdventureBinData.AdditionalFileCount - 1 do
+  begin
+    ReadString(x, AdventureBinData.AdditionalFiles[i].filename);
+    ReadString(x, AdventureBinData.AdditionalFiles[i].description);
+    ReadString(x, AdventureBinData.AdditionalFiles[i].filetype);
+  end;
+
   BlockRead(x, AdventureBinData.VariableCount, 4);
   setlength(AdventureBinData.Variables, AdventureBinData.VariableCount + 1);
   for i := 0 to AdventureBinData.VariableCount - 1 do

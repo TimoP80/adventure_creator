@@ -3,6 +3,8 @@
   This is the main unit for the AdventureScript compiler/interpreter. This unit is used
   by the generated CoCo/R parser AdventureScript.pas to generate the bytecode.
 
+  It is also used by ACEngine for running the script code.
+
   What works now is:
 
   - Variable definitions
@@ -10,10 +12,15 @@
   - Function calls
   - Variable assignments (SetVar $<variable> = <>)
   - If-else blocks (you can chain if statements endlessly)
+  - Switch statements, works with strings, integers and identifiers (variable references)
 
   What I'd like to add:
 
   - Function calls with parameters passed to them (future feature)
+  - For-loops
+  - Repeat-loops
+  - While-loops
+  - Expressions as parameters (rather tough to do without redesigning parts of the parser)
 
 
 *)
@@ -21,7 +28,7 @@ unit AdventureScriptCompilerUtils;
 
 interface
 
-uses Velthuis.Console, Classes, Sysutils, Variants, FileIOFunctions;
+uses Velthuis.Console, ACSoundLib, Classes, Sysutils, Variants, FileIOFunctions;
 
 type
   ColourTable = record
@@ -72,11 +79,13 @@ const
   OP_FUNCTION_PARAMS = $8019;
   OP_SWITCH_VAR = $801A;
   OP_SWITCH_LABEL = $801B;
-  OP_SWITCH_LABEL_CODE_BEGIN = $B01C;
-  OP_SWITCH_LABEL_CODE_END = $B01D;
-  OP_SWITCH_BEGIN = $B01E;
-  OP_SWITCH_END = $B01F;
-
+  OP_SWITCH_LABEL_CODE_BEGIN = $801C;
+  OP_SWITCH_LABEL_CODE_END = $801D;
+  OP_SWITCH_BEGIN = $801E;
+  OP_SWITCH_END = $801F;
+  OP_FOR_LOOP = $8020;
+  OP_FOR_BEGIN = $8021;
+  OP_FOR_END = $8022;
 
   RETURN_TYPE_VOID = $4000;
   RETURN_TYPE_INTEGER = $4001;
@@ -497,7 +506,7 @@ var
   list: TArrayofVariant;
   xpos, ypos, listcnt: integer;
   resultdata: variant;
-  paramdatax, paramdatay: string;
+  paramdatax, windowstemp, paramdatay: string;
   randomvalue, randomrange, finalindex, index: integer;
   i: integer;
   delayamount, throw: integer;
@@ -565,6 +574,11 @@ begin
     delayamount := instr.inst_params[1].data;
     sleep(delayamount);
 
+  end
+  else if funcname = 'PlaySound' then
+  begin
+     windowstemp := getenvironmentvariable('TEMP');
+    PlayMusic(windowstemp+'\'+instr.inst_params[1].data, -1);
   end
 
   else if funcname = 'WaitForKeyPress' then
@@ -830,6 +844,7 @@ var
   execution_mode: integer;
   last_mode: integer;
   condition_result: boolean;
+  if_connector: integer;
   numifopcodes: integer;
   numconditions: integer;
   numconditionstrue: integer;
@@ -1140,6 +1155,11 @@ begin
               end;
           end;
         end;
+      OP_IF_CONNECTOR:
+      begin
+        // add code here
+        if_connector := TheScript.instructions[x].inst_params[0].data;
+      end;
       OP_SETVAR:
         begin
           execution_mode := EXEC_MODE_SETVAR;
@@ -1251,6 +1271,7 @@ begin
   built_in_functions.Add('Return');
   built_in_functions.Add('SetCurrentNode');
   built_in_functions.Add('ReplaceVars');
+  built_in_functions.Add('PlaySound');
 end;
 
 function ParamTypeToStr(paramtype: integer): string;

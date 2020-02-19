@@ -3,13 +3,13 @@
 {                                                                            }
 {                              XML Data Binding                              }
 {                                                                            }
-{         Generated on: 6.2.2020 23.40.15                                    }
+{         Generated on: 18.2.2020 19.01.30                                   }
 {       Generated from: C:\CodeProjects\AdventureCreator\AdventureFIle.xml   }
 {   Settings stored in: C:\CodeProjects\AdventureCreator\AdventureFIle.xdb   }
 {                                                                            }
 {****************************************************************************}
 
-unit AdventureFile;
+unit AdventureFIle;
 
 interface
 
@@ -24,6 +24,9 @@ type
   IXMLScriptsType = interface;
   IXMLScriptType = interface;
   IXMLScriptTypeList = interface;
+  IXMLAdditionalFilesType = interface;
+  IXMLFileType = interface;
+  IXMLProjectSettingsType = interface;
   IXMLVariablesType = interface;
   IXMLVariableType = interface;
   IXMLGameNodesType = interface;
@@ -46,15 +49,19 @@ type
 { IXMLAdventureGameType }
 
   IXMLAdventureGameType = interface(IXMLNode)
-    ['{5FABDAE1-5806-41F6-9CE8-200B546E4866}']
+    ['{AB64F704-106A-454C-AFCE-2BE5339492E3}']
     { Property Accessors }
     function Get_MetaInfo: IXMLMetaInfoType;
     function Get_Scripts: IXMLScriptsType;
+    function Get_AdditionalFiles: IXMLAdditionalFilesType;
+    function Get_ProjectSettings: IXMLProjectSettingsType;
     function Get_Variables: IXMLVariablesType;
     function Get_GameNodes: IXMLGameNodesType;
     { Methods & Properties }
     property MetaInfo: IXMLMetaInfoType read Get_MetaInfo;
     property Scripts: IXMLScriptsType read Get_Scripts;
+    property AdditionalFiles: IXMLAdditionalFilesType read Get_AdditionalFiles;
+    property ProjectSettings: IXMLProjectSettingsType read Get_ProjectSettings;
     property Variables: IXMLVariablesType read Get_Variables;
     property GameNodes: IXMLGameNodesType read Get_GameNodes;
   end;
@@ -62,7 +69,7 @@ type
 { IXMLMetaInfoType }
 
   IXMLMetaInfoType = interface(IXMLNode)
-    ['{3F6587B3-2C3C-45EB-A122-41E8D4054D4F}']
+    ['{920AB9E8-DA16-45F8-80CC-95431A25D501}']
     { Property Accessors }
     function Get_Title: UnicodeString;
     function Get_Author: UnicodeString;
@@ -79,7 +86,7 @@ type
 { IXMLScriptsType }
 
   IXMLScriptsType = interface(IXMLNodeCollection)
-    ['{F2485B82-7C7B-433B-9A28-0F26F4A07B22}']
+    ['{86E608F6-F97C-43B6-98FC-C831982CF7D7}']
     { Property Accessors }
     function Get_Script(Index: Integer): IXMLScriptType;
     { Methods & Properties }
@@ -91,7 +98,7 @@ type
 { IXMLScriptType }
 
   IXMLScriptType = interface(IXMLNode)
-    ['{485334A5-1DB9-4A03-A07D-D1284E4A7356}']
+    ['{7D94C473-0125-4ABA-8E88-8D5DC709CEFB}']
     { Property Accessors }
     function Get_Name: UnicodeString;
     function Get_Filename: UnicodeString;
@@ -111,7 +118,7 @@ type
 { IXMLScriptTypeList }
 
   IXMLScriptTypeList = interface(IXMLNodeCollection)
-    ['{C9C4915A-43F6-480D-A030-96F5A8C7C659}']
+    ['{FF4CD0AD-E773-48C0-9DC4-79C90D56AC6F}']
     { Methods & Properties }
     function Add: IXMLScriptType;
     function Insert(const Index: Integer): IXMLScriptType;
@@ -120,10 +127,56 @@ type
     property Items[Index: Integer]: IXMLScriptType read Get_Item; default;
   end;
 
+{ IXMLAdditionalFilesType }
+
+  IXMLAdditionalFilesType = interface(IXMLNodeCollection)
+    ['{D595B51C-1B1C-4E93-A718-0A50FAEDDC25}']
+    { Property Accessors }
+    function Get_File_(Index: Integer): IXMLFileType;
+    { Methods & Properties }
+    function Add: IXMLFileType;
+    function Insert(const Index: Integer): IXMLFileType;
+    property File_[Index: Integer]: IXMLFileType read Get_File_; default;
+  end;
+
+{ IXMLFileType }
+
+  IXMLFileType = interface(IXMLNode)
+    ['{D3CD4EE5-6417-47E6-9E72-E2C803175D3B}']
+    { Property Accessors }
+    function Get_Path: UnicodeString;
+    function Get_Name: UnicodeString;
+    function Get_File_type: UnicodeString;
+    procedure Set_Path(Value: UnicodeString);
+    procedure Set_Name(Value: UnicodeString);
+    procedure Set_File_type(Value: UnicodeString);
+    { Methods & Properties }
+    property Path: UnicodeString read Get_Path write Set_Path;
+    property Name: UnicodeString read Get_Name write Set_Name;
+    property File_type: UnicodeString read Get_File_type write Set_File_type;
+  end;
+
+{ IXMLProjectSettingsType }
+
+  IXMLProjectSettingsType = interface(IXMLNode)
+    ['{7951894B-5CB4-4534-B606-51A283078549}']
+    { Property Accessors }
+    function Get_DebugMode: Boolean;
+    function Get_AudioEnabled: Boolean;
+    function Get_AudioVolume: Integer;
+    procedure Set_DebugMode(Value: Boolean);
+    procedure Set_AudioEnabled(Value: Boolean);
+    procedure Set_AudioVolume(Value: Integer);
+    { Methods & Properties }
+    property DebugMode: Boolean read Get_DebugMode write Set_DebugMode;
+    property AudioEnabled: Boolean read Get_AudioEnabled write Set_AudioEnabled;
+    property AudioVolume: Integer read Get_AudioVolume write Set_AudioVolume;
+  end;
+
 { IXMLVariablesType }
 
   IXMLVariablesType = interface(IXMLNodeCollection)
-    ['{A13D14AB-8A58-4895-95B3-72DD31A744CC}']
+    ['{9FB6B008-DC4F-4CFD-80EC-C555616E4CB5}']
     { Property Accessors }
     function Get_Variable(Index: Integer): IXMLVariableType;
     { Methods & Properties }
@@ -135,7 +188,7 @@ type
 { IXMLVariableType }
 
   IXMLVariableType = interface(IXMLNode)
-    ['{E105F4B0-6E9E-4852-9978-F6D83033A978}']
+    ['{7D018950-F788-41F3-8C15-F98412EE0F1A}']
     { Property Accessors }
     function Get_Name: UnicodeString;
     procedure Set_Name(Value: UnicodeString);
@@ -146,7 +199,7 @@ type
 { IXMLGameNodesType }
 
   IXMLGameNodesType = interface(IXMLNodeCollection)
-    ['{EBEAD53E-B3AA-434B-AA00-4E7A9CE65F19}']
+    ['{86BB9655-DD75-4A46-8B40-1483A8C3F871}']
     { Property Accessors }
     function Get_Node(Index: Integer): IXMLNodeType;
     { Methods & Properties }
@@ -158,7 +211,7 @@ type
 { IXMLNodeType }
 
   IXMLNodeType = interface(IXMLNode)
-    ['{BF00AFC5-5F2F-4AC6-B3A5-E75ABEB0526C}']
+    ['{33EB6796-A98E-4812-BC74-3E15FA9E1326}']
     { Property Accessors }
     function Get_Name: UnicodeString;
     function Get_DescriptionText: UnicodeString;
@@ -183,7 +236,7 @@ type
 { IXMLChoicesType }
 
   IXMLChoicesType = interface(IXMLNodeCollection)
-    ['{FB8D1A86-7BF9-4B62-B1C7-6CD9F3DDAC6E}']
+    ['{D10DD7AA-ECE2-4502-9AD0-BB5836AE794D}']
     { Property Accessors }
     function Get_Choice(Index: Integer): IXMLChoiceType;
     { Methods & Properties }
@@ -195,7 +248,7 @@ type
 { IXMLChoiceType }
 
   IXMLChoiceType = interface(IXMLNode)
-    ['{5EE20EE8-9B2F-45ED-967E-E5E4A74DA8A6}']
+    ['{FA5895D1-7E0C-47CE-95EB-F4AB2E22991C}']
     { Property Accessors }
     function Get_Endgame: Boolean;
     function Get_Targetnode: UnicodeString;
@@ -215,7 +268,7 @@ type
 { IXMLChoiceCommandsType }
 
   IXMLChoiceCommandsType = interface(IXMLNodeCollection)
-    ['{E1BC341B-06F3-4EA5-A274-5340E8722DA4}']
+    ['{747720BC-1C36-4A13-9A46-39F80F2AAD51}']
     { Property Accessors }
     function Get_CommandList(Index: Integer): IXMLCommandListType;
     { Methods & Properties }
@@ -227,7 +280,7 @@ type
 { IXMLCommandListType }
 
   IXMLCommandListType = interface(IXMLNodeCollection)
-    ['{81A4D259-5E19-430B-8A6D-511E2D0349D8}']
+    ['{4E4E1B92-BE56-464F-84FE-E7134DBA4920}']
     { Property Accessors }
     function Get_CMD(Index: Integer): IXMLCMDType;
     { Methods & Properties }
@@ -239,7 +292,7 @@ type
 { IXMLCMDType }
 
   IXMLCMDType = interface(IXMLNode)
-    ['{63FEECA0-36C6-49C8-96E2-49CD4A702487}']
+    ['{03CB9103-1A03-4171-A762-685F67A9F433}']
     { Property Accessors }
     function Get_Name: UnicodeString;
     function Get_Variable: UnicodeString;
@@ -253,7 +306,7 @@ type
 { IXMLChoiceConditionsType }
 
   IXMLChoiceConditionsType = interface(IXMLNodeCollection)
-    ['{B6A0B5A7-9E84-45ED-9A49-7BBBDF29493F}']
+    ['{888C16FD-6E3F-4A47-B031-093DB323F7A4}']
     { Property Accessors }
     function Get_ConditionList(Index: Integer): IXMLConditionListType;
     { Methods & Properties }
@@ -265,7 +318,7 @@ type
 { IXMLConditionListType }
 
   IXMLConditionListType = interface(IXMLNodeCollection)
-    ['{A15C3FAF-81CC-4B3E-AB7A-A1271139A377}']
+    ['{CA0819AA-8609-4CC3-AD1A-A8517E85EBA3}']
     { Property Accessors }
     function Get_Condition(Index: Integer): IXMLConditionType;
     { Methods & Properties }
@@ -277,7 +330,7 @@ type
 { IXMLConditionListTypeList }
 
   IXMLConditionListTypeList = interface(IXMLNodeCollection)
-    ['{76CDDB21-31BA-49E6-9EFF-9C59DB37901C}']
+    ['{202F65E7-001D-4694-8604-D0F2499F0CDD}']
     { Methods & Properties }
     function Add: IXMLConditionListType;
     function Insert(const Index: Integer): IXMLConditionListType;
@@ -289,7 +342,7 @@ type
 { IXMLConditionType }
 
   IXMLConditionType = interface(IXMLNode)
-    ['{B8E1F2D7-F172-44C6-AF40-2D7A244013CD}']
+    ['{CE23B472-13BD-4F7C-A2ED-27E895293484}']
     { Property Accessors }
     function Get_Name: UnicodeString;
     function Get_Varname: UnicodeString;
@@ -306,7 +359,7 @@ type
 { IXMLConditionTypeList }
 
   IXMLConditionTypeList = interface(IXMLNodeCollection)
-    ['{AB7D27EF-52DF-4D36-959C-4E260913379D}']
+    ['{FF494DDA-701B-492B-87E2-75A9B1D8C625}']
     { Methods & Properties }
     function Add: IXMLConditionType;
     function Insert(const Index: Integer): IXMLConditionType;
@@ -318,7 +371,7 @@ type
 { IXMLNodeCommandsType }
 
   IXMLNodeCommandsType = interface(IXMLNodeCollection)
-    ['{B8E1A1F6-D8DF-49AD-A0B2-CCE2FC2688D4}']
+    ['{1AE813C7-8154-4F5F-9FEC-1793E3D234E7}']
     { Property Accessors }
     function Get_CMD(Index: Integer): IXMLCMDType;
     { Methods & Properties }
@@ -330,19 +383,19 @@ type
 { IXMLCommandListType2 }
 
   IXMLCommandListType2 = interface(IXMLNode)
-    ['{B0101CF0-2436-4B8B-B240-3CEF67185D76}']
+    ['{56CFCFD2-039B-44D5-B5EB-EEA3F2049CC9}']
   end;
 
 { IXMLNodeCommandsType2 }
 
   IXMLNodeCommandsType2 = interface(IXMLNode)
-    ['{34F4E8E0-D4E3-47D9-9837-70F07603B278}']
+    ['{86250ADF-F34D-422E-B84A-1F4F256AACF6}']
   end;
 
 { IXMLChoicesType2 }
 
   IXMLChoicesType2 = interface(IXMLNode)
-    ['{5A7946F8-7286-4932-800B-C6BE593CAF14}']
+    ['{303CB074-698A-4D8C-AD89-856F0A7C0681}']
   end;
 
 { Forward Decls }
@@ -352,6 +405,9 @@ type
   TXMLScriptsType = class;
   TXMLScriptType = class;
   TXMLScriptTypeList = class;
+  TXMLAdditionalFilesType = class;
+  TXMLFileType = class;
+  TXMLProjectSettingsType = class;
   TXMLVariablesType = class;
   TXMLVariableType = class;
   TXMLGameNodesType = class;
@@ -378,6 +434,8 @@ type
     { IXMLAdventureGameType }
     function Get_MetaInfo: IXMLMetaInfoType;
     function Get_Scripts: IXMLScriptsType;
+    function Get_AdditionalFiles: IXMLAdditionalFilesType;
+    function Get_ProjectSettings: IXMLProjectSettingsType;
     function Get_Variables: IXMLVariablesType;
     function Get_GameNodes: IXMLGameNodesType;
   public
@@ -433,6 +491,44 @@ type
     function Insert(const Index: Integer): IXMLScriptType;
 
     function Get_Item(Index: Integer): IXMLScriptType;
+  end;
+
+{ TXMLAdditionalFilesType }
+
+  TXMLAdditionalFilesType = class(TXMLNodeCollection, IXMLAdditionalFilesType)
+  protected
+    { IXMLAdditionalFilesType }
+    function Get_File_(Index: Integer): IXMLFileType;
+    function Add: IXMLFileType;
+    function Insert(const Index: Integer): IXMLFileType;
+  public
+    procedure AfterConstruction; override;
+  end;
+
+{ TXMLFileType }
+
+  TXMLFileType = class(TXMLNode, IXMLFileType)
+  protected
+    { IXMLFileType }
+    function Get_Path: UnicodeString;
+    function Get_Name: UnicodeString;
+    function Get_File_type: UnicodeString;
+    procedure Set_Path(Value: UnicodeString);
+    procedure Set_Name(Value: UnicodeString);
+    procedure Set_File_type(Value: UnicodeString);
+  end;
+
+{ TXMLProjectSettingsType }
+
+  TXMLProjectSettingsType = class(TXMLNode, IXMLProjectSettingsType)
+  protected
+    { IXMLProjectSettingsType }
+    function Get_DebugMode: Boolean;
+    function Get_AudioEnabled: Boolean;
+    function Get_AudioVolume: Integer;
+    procedure Set_DebugMode(Value: Boolean);
+    procedure Set_AudioEnabled(Value: Boolean);
+    procedure Set_AudioVolume(Value: Integer);
   end;
 
 { TXMLVariablesType }
@@ -677,6 +773,8 @@ procedure TXMLAdventureGameType.AfterConstruction;
 begin
   RegisterChildNode('MetaInfo', TXMLMetaInfoType);
   RegisterChildNode('Scripts', TXMLScriptsType);
+  RegisterChildNode('AdditionalFiles', TXMLAdditionalFilesType);
+  RegisterChildNode('ProjectSettings', TXMLProjectSettingsType);
   RegisterChildNode('Variables', TXMLVariablesType);
   RegisterChildNode('GameNodes', TXMLGameNodesType);
   inherited;
@@ -690,6 +788,16 @@ end;
 function TXMLAdventureGameType.Get_Scripts: IXMLScriptsType;
 begin
   Result := ChildNodes['Scripts'] as IXMLScriptsType;
+end;
+
+function TXMLAdventureGameType.Get_AdditionalFiles: IXMLAdditionalFilesType;
+begin
+  Result := ChildNodes['AdditionalFiles'] as IXMLAdditionalFilesType;
+end;
+
+function TXMLAdventureGameType.Get_ProjectSettings: IXMLProjectSettingsType;
+begin
+  Result := ChildNodes['ProjectSettings'] as IXMLProjectSettingsType;
 end;
 
 function TXMLAdventureGameType.Get_Variables: IXMLVariablesType;
@@ -816,6 +924,95 @@ end;
 function TXMLScriptTypeList.Get_Item(Index: Integer): IXMLScriptType;
 begin
   Result := List[Index] as IXMLScriptType;
+end;
+
+{ TXMLAdditionalFilesType }
+
+procedure TXMLAdditionalFilesType.AfterConstruction;
+begin
+  RegisterChildNode('File', TXMLFileType);
+  ItemTag := 'File';
+  ItemInterface := IXMLFileType;
+  inherited;
+end;
+
+function TXMLAdditionalFilesType.Get_File_(Index: Integer): IXMLFileType;
+begin
+  Result := List[Index] as IXMLFileType;
+end;
+
+function TXMLAdditionalFilesType.Add: IXMLFileType;
+begin
+  Result := AddItem(-1) as IXMLFileType;
+end;
+
+function TXMLAdditionalFilesType.Insert(const Index: Integer): IXMLFileType;
+begin
+  Result := AddItem(Index) as IXMLFileType;
+end;
+
+{ TXMLFileType }
+
+function TXMLFileType.Get_Path: UnicodeString;
+begin
+  Result := AttributeNodes['path'].Text;
+end;
+
+procedure TXMLFileType.Set_Path(Value: UnicodeString);
+begin
+  SetAttribute('path', Value);
+end;
+
+function TXMLFileType.Get_Name: UnicodeString;
+begin
+  Result := AttributeNodes['name'].Text;
+end;
+
+procedure TXMLFileType.Set_Name(Value: UnicodeString);
+begin
+  SetAttribute('name', Value);
+end;
+
+function TXMLFileType.Get_File_type: UnicodeString;
+begin
+  Result := AttributeNodes['file_type'].Text;
+end;
+
+procedure TXMLFileType.Set_File_type(Value: UnicodeString);
+begin
+  SetAttribute('file_type', Value);
+end;
+
+{ TXMLProjectSettingsType }
+
+function TXMLProjectSettingsType.Get_DebugMode: Boolean;
+begin
+  Result := ChildNodes['DebugMode'].NodeValue;
+end;
+
+procedure TXMLProjectSettingsType.Set_DebugMode(Value: Boolean);
+begin
+  ChildNodes['DebugMode'].NodeValue := Value;
+end;
+
+function TXMLProjectSettingsType.Get_AudioEnabled: Boolean;
+begin
+  Result := ChildNodes['AudioEnabled'].NodeValue;
+end;
+
+procedure TXMLProjectSettingsType.Set_AudioEnabled(Value: Boolean);
+begin
+  ChildNodes['AudioEnabled'].NodeValue := Value;
+end;
+
+function TXMLProjectSettingsType.Get_AudioVolume: Integer;
+begin
+  Result := ChildNodes['AudioVolume'].NodeValue;
+end;
+
+procedure TXMLProjectSettingsType.Set_AudioVolume(Value: Integer);
+begin
+  ChildNodes['AudioVolume'].NodeValue := Value;
 end;
 
 { TXMLVariablesType }

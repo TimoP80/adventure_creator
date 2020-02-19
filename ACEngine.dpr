@@ -6,7 +6,7 @@ program ACEngine;
 
 uses
 
-  AdventureBinaryRuntime,
+ Windows, ACSoundlib, AdventureBinaryRuntime,
   AdventureScriptCompilerUtils,
   Velthuis.Console,
   classes,
@@ -499,43 +499,12 @@ begin
   end;
 end;
 
-procedure UpdateMoney;
-var
-  moneyvar: string;
-begin
-  moneyvar := GetVarValue('MoneyVar');
-  currentmoney := strtoint(GetVarValue(moneyvar));
-end;
 
-procedure WriteHeader;
-begin
-        TextBackground(blue);
-        TextColor(Yellow);
-        ClrEol;
 
-        writeln(AdventureBinData.metatitle + ' by ' +
-          AdventureBinData.metaauthor);
-
-        if moneydisplay = true then
-        begin
-          GotoXY(38, 1);
-          UpdateMoney;
-          moneystring := GetVarValue('MoneyCaption');
-          moneystring := STringReplace(moneystring, '$Money',
-            inttostr(currentmoney), [rfReplaceAll]);
-          write(moneystring);
-        end;
-        GotoXY(65, 1);
-        writeln('Score: ', score, ' / ', AdventureBinData.maxscore);
-        writeln;
-        TextBackground(black);
-        TextColor(White);
-
-end;
 
 
 begin
-  config := TIniFile.Create('.\'+changefileext(ParamStr(0),'.ini'));
+  config := TIniFile.Create(changefileext(ParamStr(0),'.ini'));
   ClrScr;
   TextBackground(blue);
   ClrEol;
@@ -543,9 +512,19 @@ begin
   writeln('Adventure Creator Runtime Engine v1.0 by T. Pitkänen');
   TextBackground(black);
   TextColor(White);
+  if extractfilename(paramstr(0))='ACEngine.exe' then
+  begin
+    writeln;
+    writeln('This program is meant to be called from the adventure game executable');
+    writeln('named after the game. (ex. MyAdventure.exe)');
+    halt;
+
+  end;
   writeln;
+  writeln('Init script engine...');
   InitBuiltInFunctions;
   InitColorTable;
+
  if fileexists(changefileext(ParamStr(0),'.dat')) then
     datafile := extractfilename(changefileext(ParamStr(0),'.dat'));
  if paramstr(1)<>'' then
@@ -567,7 +546,13 @@ begin
     writeln('Loading data...');
     openvfspackfile(f, vfsfile, datafile);
     open_from_vfs(f, vfsfile, changefileext(datafile,'.agf'),false, windowstemp);
-    LoadAdventureBin(windowstemp+'\'+changefileext(datafile,'.agf'));
+     LoadAdventureBin(windowstemp+'\'+changefileext(datafile,'.agf'));
+   for i := 0 to AdventureBinData.AdditionalFileCount-1 do
+    begin
+    writeln('Open additional file ',adventurebindata.AdditionalFiles[i].filename);
+    open_from_vfs(f, vfsfile, adventurebindata.AdditionalFiles[i].filename,false, windowstemp);
+    delay(500);
+    end;
     msg_pressanykey := config.ReadString(GetVarValue('GameLanguage'),
       'PressAnyKey', '');
     msg_gamefinished := config.ReadString(GetVarValue('GameLanguage'),
@@ -576,8 +561,13 @@ begin
       'WrongChoice', '');
     msg_gameover := config.ReadString(GetVarValue('GameLanguage'),
       'GameOver', '') + ' ';
-    vfs_cleanup(vfsfile);
-    closevfshandle(f);
+      debugmode := config.ReadBool('Main Config','DebugMode',false);
+    audiosupport := config.ReadBool('Main Config','AudioEnabled',false);
+    if audiosupport=true then
+    begin
+      InitSound(0);
+    end;
+
     writeln('Loaded "' + AdventureBinData.metatitle + '" by ' +
       AdventureBinData.metaauthor);
     delay(1000);
@@ -593,7 +583,7 @@ begin
    end;
 Randomize;
 clrscr;
-   writeheader;
+   PrintHeader;
   start:
 
     begin
@@ -653,8 +643,11 @@ clrscr;
         Write('> ');
         readln(choice);
         if choice = 'q' then
-          halt;
-
+         begin
+            vfs_cleanup(vfsfile);
+            closevfshandle(f);
+            halt;
+         end;
           choiceinteger := ChoiceToNumber(choice);
           numchoices := GetChoiceCountInNode(currentnode);
           if choiceinteger <= numchoices - 1 then

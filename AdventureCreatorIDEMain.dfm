@@ -62,7 +62,7 @@ object Form1: TForm1
     Left = 328
     Top = 408
     Width = 153
-    Height = 13
+    Height = 17
     AutoSize = False
     Caption = 'Score award for this choice:'
   end
@@ -165,7 +165,7 @@ object Form1: TForm1
   end
   object chkendgame: TCheckBox
     Left = 328
-    Top = 448
+    Top = 462
     Width = 233
     Height = 25
     Caption = 'This choice causes the game to end'
@@ -190,7 +190,7 @@ object Form1: TForm1
   end
   object edtchoicescore: TEdit
     Left = 328
-    Top = 424
+    Top = 427
     Width = 105
     Height = 21
     TabOrder = 12
@@ -245,7 +245,13 @@ object Form1: TForm1
       Top = 40
       Width = 209
       Height = 177
-      ItemHeight = 13
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Arial'
+      Font.Style = []
+      ItemHeight = 18
+      ParentFont = False
       TabOrder = 0
       OnClick = lstcommandsClick
     end
@@ -349,7 +355,7 @@ object Form1: TForm1
   end
   object gamewinner: TCheckBox
     Left = 328
-    Top = 476
+    Top = 493
     Width = 233
     Height = 25
     Caption = 'This choice causes game win condition'
@@ -385,7 +391,7 @@ object Form1: TForm1
   end
   object Button5: TButton
     Left = 328
-    Top = 507
+    Top = 524
     Width = 75
     Height = 25
     Caption = 'Preview node'
@@ -454,6 +460,14 @@ object Form1: TForm1
       object Scripts1: TMenuItem
         Caption = 'Scripts...'
         OnClick = Scripts1Click
+      end
+      object Compilersettings1: TMenuItem
+        Caption = 'Project settings...'
+        OnClick = Compilersettings1Click
+      end
+      object Additionalfiles1: TMenuItem
+        Caption = 'Additional files...'
+        OnClick = Additionalfiles1Click
       end
     end
     object Help1: TMenuItem

@@ -70,6 +70,7 @@ object Form5: TForm5
     ItemHeight = 13
     TabOrder = 0
     OnClick = ScriptListClick
+    OnMouseDown = ScriptListMouseDown
   end
   object Button1: TButton
     Left = 8

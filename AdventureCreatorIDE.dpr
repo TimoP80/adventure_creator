@@ -13,9 +13,11 @@ uses
   AboutForm in 'AboutForm.pas' {IDEAboutForm},
   ChoiceConditionsForm in 'ChoiceConditionsForm.pas' {Form6},
   ScriptEditorForm in 'ScriptEditorForm.pas' {Form5},
-  AdventureFile in 'AdventureFile.pas',
   AddRandomGroup in 'AddRandomGroup.pas' {Form7},
-  AddMultilineMessage in 'AddMultilineMessage.pas' {Form8};
+  AddMultilineMessage in 'AddMultilineMessage.pas' {Form8},
+  ProjectSettingsForm in 'ProjectSettingsForm.pas' {Form9},
+  AdventureFile in 'AdventureFile.pas',
+  AdditionalFilesForm in 'AdditionalFilesForm.pas' {Form10};
 
 {$R *.res}
 
@@ -33,6 +35,8 @@ begin
   Application.CreateForm(TForm5, Form5);
   Application.CreateForm(TForm7, Form7);
   Application.CreateForm(TForm8, Form8);
+  Application.CreateForm(TForm9, Form9);
+  Application.CreateForm(TForm10, Form10);
   Application.Run;
 
 end.
