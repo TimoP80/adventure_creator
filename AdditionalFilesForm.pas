@@ -26,6 +26,7 @@ type
     JvFilenameEdit1: TJvFilenameEdit;
     Label5: TLabel;
     typeselector: TComboBox;
+    Label6: TLabel;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure filedescKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);

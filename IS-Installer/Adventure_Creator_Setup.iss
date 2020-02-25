@@ -42,6 +42,9 @@ Source: "..\Script Templates\*"; DestDir: "{app}\Script Templates"; Flags: ignor
 Source: "C:\Windows\Fonts\DejaVuSansMono.ttf"; DestDir: "{fonts}"; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: "DejaVu Sans Mono"
 Source: "..\..\..\upx.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\..\näyttisquest.xml"; DestDir: "{app}\Examples"; Flags: ignoreversion
+Source: "..\..\..\bass.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\..\bass_fx.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\..\bassflac.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\Adventure Creator"; Filename: "{app}\AdventureCreatorIDE.exe"

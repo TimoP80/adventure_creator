@@ -451,6 +451,12 @@ var
 
 end;
 
+procedure DebugMsg (msg: string);
+begin
+  if debugmode=true then
+   writeln(msg);
+end;
+
 procedure DisplayNode(name: string);
 var
   z, nodeind: integer;
@@ -512,16 +518,16 @@ begin
   writeln('Adventure Creator Runtime Engine v1.0 by T. Pitkänen');
   TextBackground(black);
   TextColor(White);
-  if extractfilename(paramstr(0))='ACEngine.exe' then
+  (* if extractfilename(paramstr(0))='ACEngine.exe' then
   begin
     writeln;
     writeln('This program is meant to be called from the adventure game executable');
     writeln('named after the game. (ex. MyAdventure.exe)');
     halt;
 
-  end;
-  writeln;
-  writeln('Init script engine...');
+  end; *)
+  DebugMsg('');
+  DebugMsg('Init script engine...');
   InitBuiltInFunctions;
   InitColorTable;
 
@@ -543,16 +549,10 @@ begin
     end;
     // writeln('Loading '+paramstr(1));
 
-    writeln('Loading data...');
+  Debugmsg('Loading data...');
     openvfspackfile(f, vfsfile, datafile);
     open_from_vfs(f, vfsfile, changefileext(datafile,'.agf'),false, windowstemp);
      LoadAdventureBin(windowstemp+'\'+changefileext(datafile,'.agf'));
-   for i := 0 to AdventureBinData.AdditionalFileCount-1 do
-    begin
-    writeln('Open additional file ',adventurebindata.AdditionalFiles[i].filename);
-    open_from_vfs(f, vfsfile, adventurebindata.AdditionalFiles[i].filename,false, windowstemp);
-    delay(500);
-    end;
     msg_pressanykey := config.ReadString(GetVarValue('GameLanguage'),
       'PressAnyKey', '');
     msg_gamefinished := config.ReadString(GetVarValue('GameLanguage'),
@@ -567,10 +567,16 @@ begin
     begin
       InitSound(0);
     end;
+  for i := 0 to AdventureBinData.AdditionalFileCount-1 do
+    begin
+   debugmsg('Open additional file '+adventurebindata.AdditionalFiles[i].filename);
+    open_from_vfs(f, vfsfile, adventurebindata.AdditionalFiles[i].filename,false, windowstemp);
+   if debugmode=true then delay(500);
+    end;
 
-    writeln('Loaded "' + AdventureBinData.metatitle + '" by ' +
+    debugmsg('Loaded "' + AdventureBinData.metatitle + '" by ' +
       AdventureBinData.metaauthor);
-    delay(1000);
+    if debugmode then delay(1000);
    // look for boot scripts and execute them in the order they were organized
    // in the editor
    for i := 0 to adventurebindata.ScriptCount-1 do
@@ -646,6 +652,7 @@ clrscr;
          begin
             vfs_cleanup(vfsfile);
             closevfshandle(f);
+            FadeMusicOut;
             halt;
          end;
           choiceinteger := ChoiceToNumber(choice);

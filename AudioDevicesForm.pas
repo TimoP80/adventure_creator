@@ -1,0 +1,70 @@
+unit AudioDevicesForm;
+
+interface
+
+uses
+  Winapi.Windows, Dynamic_bass, Winapi.Messages, ACSOundLib, System.SysUtils,
+  System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+
+type
+  TForm11 = class(TForm)
+    Label1: TLabel;
+    ListBox1: TListBox;
+    Close: TButton;
+    devicename: TLabel;
+    edtdevicename: TEdit;
+    Label2: TLabel;
+    edtdevicedriver: TEdit;
+    Label3: TLabel;
+    CheckBox1: TCheckBox;
+    CheckBox2: TCheckBox;
+    CheckBox3: TCheckBox;
+    procedure ListBox1Click(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form11: TForm11;
+  deviceinfos: array of BASS_DEVICEINFO;
+  infocnt: integer;
+procedure GetDevices;
+implementation
+
+{$R *.dfm}
+
+procedure GetDevices;
+var
+  u: integer;
+begin
+  Form11.ListBox1.Clear;
+  u := 1;
+  infocnt := 0;
+  setlength(deviceinfos, infocnt + 1);
+  while BASS_GetDeviceinfo(u, deviceinfos[infocnt]) = true do
+  begin
+    setlength(deviceinfos, u + 1);
+    inc(infocnt);
+    inc(u);
+  end;
+  writeln('bass error: ',bass_errorgetcode);
+  for u := 0 to infocnt - 1 do
+  begin
+    Form11.ListBox1.Items.Add(deviceinfos[u].name);
+  end;
+end;
+
+procedure TForm11.ListBox1Click(Sender: TObject);
+begin
+edtdevicename.Text := deviceinfos[listbox1.itemindex].name;
+edtdevicedriver.Text := deviceinfos[listbox1.ItemIndex].driver;
+if (deviceinfos[listbox1.ItemIndex].flags = deviceinfos[listbox1.ItemIndex].flags and BASS_DEVICE_INIT) then
+
+  CheckBox1.Checked := true else checkbox1.checked:=false;
+
+end;
+
+end.

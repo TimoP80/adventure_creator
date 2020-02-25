@@ -140,10 +140,10 @@ object Form1: TForm1
     OnClick = btn3Click
   end
   object btn4: TButton
-    Left = 584
-    Top = 320
+    Left = 583
+    Top = 319
     Width = 121
-    Height = 25
+    Height = 27
     Caption = 'Delete choice'
     TabOrder = 6
     OnClick = btn4Click
@@ -291,7 +291,8 @@ object Form1: TForm1
         'SetRandomMin'
         'SetRandomMax'
         'ExecuteRandom'
-        'RunScript')
+        'RunScript'
+        'PlaySound')
     end
     object cbbvarsel: TComboBox
       Left = 240
@@ -363,19 +364,19 @@ object Form1: TForm1
     OnClick = gamewinnerClick
   end
   object Button2: TButton
-    Left = 968
+    Left = 975
     Top = 319
     Width = 137
-    Height = 25
+    Height = 27
     Caption = 'Edit choice commands...'
     TabOrder = 20
     OnClick = Button2Click
   end
   object Button3: TButton
-    Left = 832
-    Top = 321
+    Left = 848
+    Top = 319
     Width = 121
-    Height = 25
+    Height = 27
     Caption = 'Edit choice conditions...'
     TabOrder = 21
     OnClick = Button3Click
@@ -427,9 +428,9 @@ object Form1: TForm1
         Caption = 'Edit Metadata'
         OnClick = Metadata1Click
       end
-      object CompiletoBinary1: TMenuItem
-        Caption = 'Compile to Binary'
-        OnClick = CompiletoBinary1Click
+      object Compileadventure1: TMenuItem
+        Caption = 'Compile adventure'
+        OnClick = Compileadventure1Click
       end
       object N2: TMenuItem
         Caption = '-'
@@ -468,6 +469,10 @@ object Form1: TForm1
       object Additionalfiles1: TMenuItem
         Caption = 'Additional files...'
         OnClick = Additionalfiles1Click
+      end
+      object Audiodevices1: TMenuItem
+        Caption = 'Audio devices...'
+        OnClick = Audiodevices1Click
       end
     end
     object Help1: TMenuItem

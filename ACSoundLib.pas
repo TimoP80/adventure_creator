@@ -3,22 +3,16 @@ unit ACSoundLib;
 interface
 
 uses
-  Velthuis.Console, VCL.Forms,
-  SkinCTRLs, VCL.Controls,
-  Classes, VCL.StdCtrls,
+  Velthuis.Console,
+  Classes,
   SysUtils,
   FileIOFunctions,
-  Windows, MPEGAudio,
-  id3v1,
-  id3v2,
+   MPEGAudio,
+  Windows,
   BASS_FX,
   strutils_,
   JclFileUtils,
-  dynamic_bass,
-  ACS_Classes,
-  FLACFILE,
-
-  ACS_Vorbis;
+  dynamic_bass;
 
 type
   PlayListEntry = record
@@ -36,26 +30,25 @@ var
   sfxstream:      HSTREAM;
   musicstream:    HSTREAM;
   bpmstream:      HSTREAM;
+  modulestream: HMUSIC;
   playlistdata:   array of ^PlayListEntry;
   numplaylistentries: integer;
   sfxfile:        pointer;
-  theprogresscaption: Tspskinstdlabel;
-  theprogressindicator: TspSkinGauge;
-  thestdlabel:    TLabel;
+
   pluginhandle:   HPLUGIN;
   musicenabled:   boolean;
-  VorbisTemp:     TVorbisIn;
+
   soundfile:      pointer;
   cursngfilename: string;
   system_msg:     TStrings;
   playlist:       TStrings;
   artist, album:  string;
   publisher:      string;
-  mpegtemp:       TMPegAudio;
-  flactemp:       TFLACfile;
+
+
   displayedsoundpath: string;
   trackformat:    string;
-  id3tag:         Tid3v2;
+
   duration:       integer;
   title:          string;
 
@@ -65,11 +58,12 @@ procedure PlayMusic(soundfilez: ansistring; playlist_index: integer;
 
 procedure QueueMusic;
 procedure SystemMSG(str: string);
-procedure PlaySound(soundfilez: string; fademusicdown: boolean = False);
+procedure PlaySound(soundfilez: ansistring; fademusicdown: boolean = False);
+
 procedure FadeMusicOut;
 function GetSoundLength(soundfilez: string): integer;
 procedure FadeMusicIn;
-procedure ReadMusicFile(filename: string; var playlistdata: PlayListEntry);
+ procedure PlayModule(soundfilez: ansistring);
 procedure SavePlayList;
 procedure FadeMusicForSFX;
 procedure FadeMusicFromSFX;
@@ -161,7 +155,6 @@ begin
 
   for i := 0 to numplaylistentries - 1 do
   begin
-    application.ProcessMessages;
     blockwrite(x, playlistdata[i].index, 4);
     writestring(x, playlistdata[i].artist);
     writestring(x, playlistdata[i].title);
@@ -205,17 +198,16 @@ begin
 end;
 
 
-procedure PlaySound(soundfilez: string; fademusicdown: boolean = False);
+procedure PlaySound(soundfilez: ansistring; fademusicdown: boolean = False);
 begin
 
   if musicenabled = False then
     exit;
 
 
-  sfxfile := PChar(soundfilez);
+  sfxfile := PAnsiChar(soundfilez);
 
-  sfxstream := BASS_StreamCreateFile(False, sfxfile, 0, 0, 0 or BASS_UNICODE);
-  SystemMsg('Playing sound ' + soundfilez);
+  sfxstream := BASS_StreamCreateFile(False, sfxfile, 0, 0, 0);
 
   if sfxstream <> 0 then
   begin
@@ -232,13 +224,51 @@ begin
     systemmsg('Error playing sound errorcode! ' + IntToStr(BASS_ErrorGetCode));
   end;
 end;
+procedure PlayModule(soundfilez: ansistring);
+  var
+   playresult: boolean;
+begin
+  soundfile := PansiChar(soundfilez);
+
+ modulestream := BASS_MusicLoad(false, soundfile, 0, 0, 0, 0);
+
+  //musicstream := BASS_FX_TempoCreate(musicstream, BASS_SAMPLE_LOOP Or BASS_FX_FREESOURCE);
+
+
+
+
+  if modulestream <> 0 then
+  begin
+     // BASS_FX_BPM_CallbackSet(bpmstream, @GetBPM_Callback, 5, 0, 0, 0);
+
+   playresult := BASS_ChannelPlay(modulestream, False);
+   if playresult=false then
+    begin
+      writeln('ERROR playing sound! code=',BASS_ErrorGetCode);
+
+     readkey;
+    end;
+
+
+
+
+    BASS_ChannelSetAttribute(musicstream, BASS_ATTRIB_VOL, 0.60);
+  end
+
+  else
+  begin
+  writeln('Playback of ',soundfilez,' failed!');
+  writeln('ERROR code=',BASS_ErrorGetCode);
+ halt;
+  end;
+end;
 
 procedure PlayMusic(soundfilez: ansistring; playlist_index: integer;
   theposition: integer = 0);
   var
    playresult: boolean;
 begin
-  writeln('PlayMusic :: ',soundfilez);
+
   soundfile := PAnsiChar(soundfilez);
   cursngfilename := soundfilez;
   musicstream := BASS_StreamCreateFile(False, soundfile, 0, 0, 0);
@@ -251,9 +281,7 @@ begin
 
   if musicstream <> 0 then
   begin
-   writeln('Playing!! duration = ',duration);
-
-    // BASS_FX_BPM_CallbackSet(bpmstream, @GetBPM_Callback, 5, 0, 0, 0);
+     // BASS_FX_BPM_CallbackSet(bpmstream, @GetBPM_Callback, 5, 0, 0, 0);
 
    playresult := BASS_ChannelPlay(musicstream, False);
    if playresult=false then
@@ -277,84 +305,6 @@ begin
   end;
 end;
 
-procedure ReadMusicFile(filename: string; var playlistdata: PlayListEntry);
-begin
-
-  artist := 'Unknown Artist';
-  title  := 'Unknown Title';
-  //  systemmsg('Reading tags from ' + playlist[i]);
-  if extractfileext(filename) = '.flac' then
-  begin
-    Flactemp := TFLACfile.Create;
-    flactemp.ReadFromFile(filename);
-    artist := flactemp.Artist;
-    trackformat := IntToStr(flactemp.SampleRate) + 'hz ' + IntToStr(
-      flactemp.BitsPerSample) + 'bit ' + IntToStr(flactemp.Bitrate) +
-      'kbps ' + flactemp.ChannelMode;
-
-    title := flactemp.Title;
-    duration := trunc(flactemp.duration);
-    album := flactemp.Album;
-    //      systemmsg('FLAC done with ' + artist + ' - ' + title + ' (' + album + ')');
-  end;
-
-  if extractfileext(filename) = '.ogg' then
-  begin
-    VorbisTemp := TVorbisIn.Create(nil);
-    vorbistemp.FileName := filename;
-    artist := vorbistemp.Comments.Values['ARTIST'];
-    title  := vorbistemp.comments.Values['TITLE'];
-    duration := vorbistemp.Time;
-    album  := vorbistemp.Comments.values['ALBUM'];
-    trackformat := IntToStr(vorbistemp.SampleRate) + 'hz ' +
-      IntToStr(vorbistemp.NominalBitrate) + 'kbps';
-
-    vorbistemp.Free;
-
-    //     systemmsg('OGG done!');
-  end;
-
-  if extractfileext(filename) = '.mp3' then
-  begin
-    mpegtemp := TMPEGaudio.Create;
-    mpegtemp.ReadFromFile(filename);
-    id3tag := TID3v2.Create;
-    id3tag.ReadFromFile(filename);
-    artist := id3tag.Artist;
-    title  := id3tag.Title;
-    album  := id3tag.Album;
-
-    duration := trunc(mpegtemp.Duration);
-    if mpegtemp.VBR.Found = True then
-      trackformat := IntToStr(mpegtemp.SampleRate) + 'hz ' +
-        IntToStr(mpegtemp.BitRate) + 'kbps VBR ' + mpegtemp.ChannelMode
-
-    else
-      trackformat := IntToStr(mpegtemp.SampleRate) + 'hz ' +
-        IntToStr(mpegtemp.BitRate) + 'kbps ' + mpegtemp.ChannelMode;
-
-    if (artist = '') and (title = '') then
-    begin
-      artist := mpegtemp.ID3v1.Artist;
-      title  := mpegtemp.ID3v1.Title;
-      album  := mpegtemp.ID3v1.Album;
-      //   artist := mpeg_audio.Artist;
-      //   title  := mpeg_audio.Title;
-      //   album  := mpeg_audio.Album;
-    end;
-
-  end;
-
-  playlistdata.index  := numplaylistentries;
-  playlistdata.artist := artist;
-  playlistdata.album  := album;
-  playlistdata.title  := title;
-  playlistdata.format := trackformat;
-  playlistdata.filename := filename;
-  playlistdata.duration := duration;
-
-end;
-
 
 
 
@@ -363,7 +313,7 @@ begin
   BASS_ChannelSlideAttribute(musicstream, BASS_ATTRIB_VOL, 0.15, 400);
   while bass_channelissliding(musicstream, BASS_ATTRIB_VOL) = True do
   begin
-    application.ProcessMessages;
+
   end;
 
 end;
@@ -375,7 +325,7 @@ begin
 
   while bass_channelissliding(musicstream, BASS_ATTRIB_VOL) = True do
   begin
-    application.ProcessMessages;
+
   end;
 
 end;
@@ -388,7 +338,7 @@ begin
 
   while bass_channelissliding(musicstream, BASS_ATTRIB_VOL) = True do
   begin
-    application.ProcessMessages;
+
   end;
 
 end;
@@ -401,7 +351,7 @@ if musicenabled=false then exit;
   BASS_ChannelSlideAttribute(musicstream, BASS_ATTRIB_VOL, 0.0, 2000);
   while bass_channelissliding(musicstream, BASS_ATTRIB_VOL) = True do
   begin
-    application.ProcessMessages;
+     delay(100);
   end;
 
 end;
@@ -438,6 +388,9 @@ begin
     if BASS_Init(-1, 44100, 0, handle, nil) = True then
     begin
       SystemMsg(' ... Init successful!');
+      SystemMSg('Device name: '+bass_info.name);
+      SystemMSg('Device driver: '+bass_info.driver);
+
     end
     else
     begin

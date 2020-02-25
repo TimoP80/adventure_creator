@@ -438,8 +438,8 @@ begin
   index := vfs_get_file_index(packfile, filename);
   if index <> -1 then
   begin
-    writeln('Attempting to open '+getenvironmentvariable('TEMP') + '\' +
-       extractfilename(filename));
+  //writeln('Attempting to open '+getenvironmentvariable('TEMP') + '\' +
+  //   extractfilename(filename));
     if (packfile.files[index].file_compressed = True) then
       assignfile(temphandle, getenvironmentvariable('TEMP') + '\' +
         extractfilename(filename) + '.zlib')

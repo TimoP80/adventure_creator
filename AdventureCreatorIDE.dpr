@@ -17,7 +17,8 @@ uses
   AddMultilineMessage in 'AddMultilineMessage.pas' {Form8},
   ProjectSettingsForm in 'ProjectSettingsForm.pas' {Form9},
   AdventureFile in 'AdventureFile.pas',
-  AdditionalFilesForm in 'AdditionalFilesForm.pas' {Form10};
+  AdditionalFilesForm in 'AdditionalFilesForm.pas' {Form10},
+  AudioDevicesForm in 'AudioDevicesForm.pas' {Form11};
 
 {$R *.res}
 
@@ -37,6 +38,7 @@ begin
   Application.CreateForm(TForm8, Form8);
   Application.CreateForm(TForm9, Form9);
   Application.CreateForm(TForm10, Form10);
+  Application.CreateForm(TForm11, Form11);
   Application.Run;
 
 end.

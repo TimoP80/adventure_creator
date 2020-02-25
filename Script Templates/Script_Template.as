@@ -2,6 +2,6 @@ Functions:
 
 void Main () {
 
-/* enter your code here */
+// Enter your code here
 
 }

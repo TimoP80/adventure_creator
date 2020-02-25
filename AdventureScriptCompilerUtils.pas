@@ -578,6 +578,16 @@ begin
   else if funcname = 'PlaySound' then
   begin
      windowstemp := getenvironmentvariable('TEMP');
+    PlaySound(windowstemp+'\'+instr.inst_params[1].data);
+  end
+    else if funcname = 'PlayModule' then
+  begin
+     windowstemp := getenvironmentvariable('TEMP');
+    PlayModule(windowstemp+'\'+instr.inst_params[1].data);
+  end
+  else if funcname = 'PlayMusic' then
+  begin
+     windowstemp := getenvironmentvariable('TEMP');
     PlayMusic(windowstemp+'\'+instr.inst_params[1].data, -1);
   end
 
@@ -1272,6 +1282,8 @@ begin
   built_in_functions.Add('SetCurrentNode');
   built_in_functions.Add('ReplaceVars');
   built_in_functions.Add('PlaySound');
+  built_in_functions.Add('PlayModule');
+  built_in_functions.Add('PlayMusic');
 end;
 
 function ParamTypeToStr(paramtype: integer): string;

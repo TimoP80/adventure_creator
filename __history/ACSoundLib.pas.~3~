@@ -1,0 +1,417 @@
+unit ACSoundLib;
+
+interface
+
+uses
+  Velthuis.Console,
+  Classes,
+  SysUtils,
+  FileIOFunctions,
+   MPEGAudio,
+  Windows,
+  BASS_FX,
+  strutils_,
+  JclFileUtils,
+  dynamic_bass;
+
+type
+  PlayListEntry = record
+    index:    integer;
+    format:   ansistring;
+    artist:   ansistring;
+    title:    ansistring;
+    album:    ansistring;
+    filename: ansistring;
+    duration: integer;
+  end;
+
+
+var
+  sfxstream:      HSTREAM;
+  musicstream:    HSTREAM;
+  bpmstream:      HSTREAM;
+  modulestream: HMUSIC;
+  playlistdata:   array of ^PlayListEntry;
+  numplaylistentries: integer;
+  sfxfile:        pointer;
+
+  pluginhandle:   HPLUGIN;
+  musicenabled:   boolean;
+
+  soundfile:      pointer;
+  cursngfilename: string;
+  system_msg:     TStrings;
+  playlist:       TStrings;
+  artist, album:  string;
+  publisher:      string;
+
+
+  displayedsoundpath: string;
+  trackformat:    string;
+
+  duration:       integer;
+  title:          string;
+
+procedure InitSound(handle: HWND);
+procedure PlayMusic(soundfilez: ansistring; playlist_index: integer;
+  theposition: integer = 0);
+
+procedure QueueMusic;
+procedure SystemMSG(str: string);
+procedure PlaySound(soundfilez: ansistring; fademusicdown: boolean = False);
+
+procedure FadeMusicOut;
+function GetSoundLength(soundfilez: string): integer;
+procedure FadeMusicIn;
+ procedure PlayModule(soundfilez: ansistring);
+procedure SavePlayList;
+procedure FadeMusicForSFX;
+procedure FadeMusicFromSFX;
+procedure DeletePlayListEntry(ind: integer);
+function FindPlayListEntry(filename: string): integer;
+
+implementation
+
+uses VCL.Dialogs;
+
+function FindPlayListEntry(filename: string): integer;
+var
+  t: integer;
+begin
+  Result := -1;
+  for t := 0 to numplaylistentries - 1 do
+  begin
+    if filename = playlistdata[t].filename then
+    begin
+      Result := t;
+      exit;
+    end;
+
+  end;
+
+end;
+
+procedure DeletePlayListEntry(ind: integer);
+var
+  t: integer;
+begin
+  if ind = numplaylistentries - 1 then
+  begin
+    numplaylistentries := numplaylistentries - 1;
+    exit;
+  end;
+  for t := ind to numplaylistentries - 1 do
+    playlistdata[t] := playlistdata[t + 1];
+  numplaylistentries := numplaylistentries - 1;
+
+end;
+
+procedure LoadPlayList;
+var
+  i: integer;
+var
+  tehpos: integer;
+  x: file;
+begin
+  assignfile(x, extractfiledir(ParamStr(0)) + '\playlist.dat');
+  reset(x, 1);
+  ReadHeader(x, 'ElektroMania Playlist Data');
+  blockread(x, numplaylistentries, 4);
+  setlength(playlistdata, numplaylistentries);
+  for i := 0 to numplaylistentries - 1 do
+  begin
+    new(playlistdata[i]);
+    blockread(x, playlistdata[i].index, 4);
+    readstring(x, playlistdata[i].artist);
+    readstring(x, playlistdata[i].title);
+    readstring(x, playlistdata[i].album);
+    readstring(x, playlistdata[i].format);
+    readstring(x, playlistdata[i].filename);
+    while pos(#0, playlistdata[i].artist) <> 0 do
+    begin
+      tehpos := pos(#0, playlistdata[i].artist);
+      Delete(playlistdata[i].artist, tehpos, 1);
+    end;
+    playlistdata[i].title := StringReplace(playlistdata[i].title, #0,
+      '', [rfReplaceAll]);
+
+
+    blockread(x, playlistdata[i].duration, 4);
+    playlist.Add(playlistdata[i].filename);
+  end;
+  closefile(x);
+end;
+
+procedure SavePlayList;
+var
+  i: integer;
+var
+  x: file;
+begin
+  assignfile(x, extractfiledir(ParamStr(0)) + '\playlist.dat');
+  rewrite(x, 1);
+  WriteStringNoLength(x, 'ElektroMania Playlist Data');
+  blockwrite(x, numplaylistentries, 4);
+
+  for i := 0 to numplaylistentries - 1 do
+  begin
+    blockwrite(x, playlistdata[i].index, 4);
+    writestring(x, playlistdata[i].artist);
+    writestring(x, playlistdata[i].title);
+    writestring(x, playlistdata[i].album);
+    writestring(x, playlistdata[i].format);
+    writestring(x, playlistdata[i].filename);
+    blockwrite(x, playlistdata[i].duration, 4);
+  end;
+  closefile(x);
+end;
+
+procedure SystemMSG(str: string);
+begin
+  writeln(str);
+end;
+
+function GetSoundLength(soundfilez: string): integer;
+var
+length: integer;
+ secs: double;
+begin
+
+  if musicenabled = False then
+    exit;
+
+  (*
+  QWORD len=BASS_ChannelGetLength(channel, BASS_POS_BYTE); // the length in bytes
+ double time=BASS_ChannelBytes2Seconds(channel, len); // the length in seconds
+
+  *)
+
+
+  sfxfile := PChar(soundfilez);
+
+  sfxstream := BASS_StreamCreateFile(False, sfxfile, 0, 0, 0);
+
+  length:=BASS_ChannelGetLength(sfxstream, BASS_POS_BYTE);
+  secs := BASS_ChannelBytes2Seconds(sfxstream, length);
+  result:=trunc(secs) * 1000;
+
+end;
+
+
+procedure PlaySound(soundfilez: ansistring; fademusicdown: boolean = False);
+begin
+
+  if musicenabled = False then
+    exit;
+
+
+  sfxfile := PAnsiChar(soundfilez);
+
+  sfxstream := BASS_StreamCreateFile(False, sfxfile, 0, 0, 0);
+
+  if sfxstream <> 0 then
+  begin
+
+
+    BASS_ChannelPlay(sfxstream, False);
+    BASS_ChannelSetAttribute(sfxstream, BASS_ATTRIB_VOL, 0.67);
+
+
+
+  end
+  else
+  begin
+    systemmsg('Error playing sound errorcode! ' + IntToStr(BASS_ErrorGetCode));
+  end;
+end;
+procedure PlayModule(soundfilez: ansistring);
+  var
+   playresult: boolean;
+begin
+  soundfile := PansiChar(soundfilez);
+
+ modulestream := BASS_MusicLoad(false, soundfile, 0, 0, 0, 0);
+
+  //musicstream := BASS_FX_TempoCreate(musicstream, BASS_SAMPLE_LOOP Or BASS_FX_FREESOURCE);
+
+
+
+
+  if modulestream <> 0 then
+  begin
+     // BASS_FX_BPM_CallbackSet(bpmstream, @GetBPM_Callback, 5, 0, 0, 0);
+
+   playresult := BASS_ChannelPlay(modulestream, False);
+   if playresult=false then
+    begin
+      writeln('ERROR playing sound! code=',BASS_ErrorGetCode);
+
+     readkey;
+    end;
+
+
+
+
+    BASS_ChannelSetAttribute(musicstream, BASS_ATTRIB_VOL, 0.60);
+  end
+
+  else
+  begin
+  writeln('Playback of ',soundfilez,' failed!');
+  writeln('ERROR code=',BASS_ErrorGetCode);
+ halt;
+  end;
+end;
+
+procedure PlayMusic(soundfilez: ansistring; playlist_index: integer;
+  theposition: integer = 0);
+  var
+   playresult: boolean;
+begin
+
+  soundfile := PAnsiChar(soundfilez);
+  cursngfilename := soundfilez;
+  musicstream := BASS_StreamCreateFile(False, soundfile, 0, 0, 0);
+ //musicstream := BASS_FX_TempoCreate(musicstream, BASS_SAMPLE_LOOP Or BASS_FX_FREESOURCE);
+
+
+  duration := trunc(BASS_ChannelBytes2Seconds(musicstream,
+    BASS_ChannelGetLength(musicstream, BASS_POS_BYTE)));
+
+
+  if musicstream <> 0 then
+  begin
+     // BASS_FX_BPM_CallbackSet(bpmstream, @GetBPM_Callback, 5, 0, 0, 0);
+
+   playresult := BASS_ChannelPlay(musicstream, False);
+   if playresult=false then
+    begin
+      writeln('ERROR playing sound! code=',BASS_ErrorGetCode);
+
+     readkey;
+    end;
+    if theposition > 0 then
+      BASS_ChannelSetPosition(musicstream, BASS_ChannelSeconds2Bytes(
+        musicstream, theposition), BASS_POS_BYTE);
+
+
+    BASS_ChannelSetAttribute(musicstream, BASS_ATTRIB_VOL, 0.60);
+  end
+
+  else
+  begin
+  writeln('Playback of ',soundfilez,' failed!');
+  halt;
+  end;
+end;
+
+
+
+
+procedure FadeMusicForSFX;
+begin
+  BASS_ChannelSlideAttribute(musicstream, BASS_ATTRIB_VOL, 0.15, 400);
+  while bass_channelissliding(musicstream, BASS_ATTRIB_VOL) = True do
+  begin
+
+  end;
+
+end;
+
+procedure FadeMusicFromSFX;
+begin
+  BASS_ChannelSetAttribute(musicstream, BASS_ATTRIB_VOL, 0.15);
+  BASS_ChannelSlideAttribute(musicstream, BASS_ATTRIB_VOL, 1.0, 400);
+
+  while bass_channelissliding(musicstream, BASS_ATTRIB_VOL) = True do
+  begin
+
+  end;
+
+end;
+
+procedure FadeMusicIn;
+
+begin
+  BASS_ChannelSetAttribute(musicstream, BASS_ATTRIB_VOL, 0);
+  BASS_ChannelSlideAttribute(musicstream, BASS_ATTRIB_VOL, 1.0, 2000);
+
+  while bass_channelissliding(musicstream, BASS_ATTRIB_VOL) = True do
+  begin
+
+  end;
+
+end;
+
+procedure FadeMusicOut;
+
+begin
+if musicenabled=false then exit;
+
+  BASS_ChannelSlideAttribute(musicstream, BASS_ATTRIB_VOL, 0.0, 2000);
+  while bass_channelissliding(musicstream, BASS_ATTRIB_VOL) = True do
+  begin
+     delay(100);
+  end;
+
+end;
+
+procedure QueueMusic;
+var
+  x: integer;
+  f: TStrings;
+begin
+  if playlist.Count > 0 then
+  begin
+    x := random(playlist.Count);
+    PlayMusic(playlist[x], x);
+
+  end;
+
+end;
+
+procedure InitSound(handle: HWND);
+var
+  major, minor: integer;
+  plugininfo: PBASS_PLUGININFO;
+
+  t: integer;
+  bass_info: BASS_DEVICEINFO;
+begin
+  if Load_BASSDLL(getcurrentdir + '\bass.dll') = True then
+  begin
+    Major := Hiword(BASS_GetVersion);
+    Minor := Loword(BASS_GetVersion);
+    SystemMsg(format('Bass Version: %s', [BASSVERSIONTEXT]));
+    BASS_GetDeviceInfo(1, bass_info);
+
+    if BASS_Init(-1, 44100, 0, handle, nil) = True then
+    begin
+      SystemMsg(' ... Init successful!');
+    end
+    else
+    begin
+      SystemMsg(' ... Init failed! Error code: ' + IntToStr(BASS_ErrorGetCode));
+
+    end;
+    pluginhandle := BASS_PluginLoad('.\bassflac.dll', 0);
+    new(plugininfo);
+    plugininfo := Bass_plugingetinfo(pluginhandle);
+    if plugininfo <> nil then
+    begin
+      SystemMSG('Flac Plugin loaded, supports:');
+      for t := 0 to plugininfo.formatc - 1 do
+      begin
+        systemmsg('name: ' + plugininfo.formats[t].Name);
+        systemmsg('extensions: ' + plugininfo.formats[t].exts);
+
+      end;
+
+    end;
+
+  end;
+end;
+
+
+end.
+

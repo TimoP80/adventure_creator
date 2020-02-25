@@ -3,7 +3,7 @@ object Form10: TForm10
   Top = 0
   Caption = 'Additional files'
   ClientHeight = 557
-  ClientWidth = 635
+  ClientWidth = 997
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,21 +15,21 @@ object Form10: TForm10
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
-    Left = 272
+    Left = 624
     Top = 24
     Width = 26
     Height = 13
     Caption = 'Path:'
   end
   object Label2: TLabel
-    Left = 272
+    Left = 624
     Top = 70
     Width = 46
     Height = 13
     Caption = 'Filename:'
   end
   object Label3: TLabel
-    Left = 272
+    Left = 624
     Top = 116
     Width = 57
     Height = 13
@@ -43,16 +43,23 @@ object Form10: TForm10
     Caption = 'File list:'
   end
   object Label5: TLabel
-    Left = 272
+    Left = 624
     Top = 162
     Width = 28
     Height = 13
     Caption = 'Type:'
   end
+  object Label6: TLabel
+    Left = 624
+    Top = 210
+    Width = 66
+    Height = 13
+    Caption = 'File to import:'
+  end
   object ListBox1: TListBox
     Left = 8
     Top = 29
-    Width = 249
+    Width = 601
     Height = 489
     ItemHeight = 13
     TabOrder = 0
@@ -77,7 +84,7 @@ object Form10: TForm10
     OnClick = Button2Click
   end
   object filepath: TEdit
-    Left = 272
+    Left = 624
     Top = 43
     Width = 355
     Height = 21
@@ -85,7 +92,7 @@ object Form10: TForm10
     OnKeyUp = filepathKeyUp
   end
   object filename: TEdit
-    Left = 272
+    Left = 624
     Top = 89
     Width = 355
     Height = 21
@@ -93,7 +100,7 @@ object Form10: TForm10
     OnKeyUp = filenameKeyUp
   end
   object filedesc: TEdit
-    Left = 272
+    Left = 624
     Top = 135
     Width = 355
     Height = 21
@@ -101,7 +108,7 @@ object Form10: TForm10
     OnKeyUp = filedescKeyUp
   end
   object Button3: TButton
-    Left = 552
+    Left = 914
     Top = 524
     Width = 75
     Height = 25
@@ -110,8 +117,8 @@ object Form10: TForm10
     TabOrder = 6
   end
   object Button5: TButton
-    Left = 552
-    Top = 248
+    Left = 904
+    Top = 256
     Width = 75
     Height = 25
     Caption = 'Import file'
@@ -119,15 +126,15 @@ object Form10: TForm10
     OnClick = Button5Click
   end
   object JvFilenameEdit1: TJvFilenameEdit
-    Left = 272
-    Top = 221
+    Left = 624
+    Top = 229
     Width = 355
     Height = 21
     TabOrder = 8
     Text = ''
   end
   object typeselector: TComboBox
-    Left = 272
+    Left = 624
     Top = 181
     Width = 355
     Height = 21
