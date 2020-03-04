@@ -52,8 +52,7 @@ var
   duration:       integer;
   title:          string;
 
-procedure InitSound(handle: HWND; device: integer = -1);
-
+procedure InitSound(handle: HWND);
 procedure PlayMusic(soundfilez: ansistring; playlist_index: integer;
   theposition: integer = 0);
 
@@ -258,7 +257,7 @@ begin
 
   else
   begin
-  writeln('PlayModule(): Playback of ',soundfilez,' failed!');
+  writeln('Playback of ',soundfilez,' failed!');
   writeln('ERROR code=',BASS_ErrorGetCode);
  halt;
   end;
@@ -301,7 +300,7 @@ begin
 
   else
   begin
-  writeln('PlayMusic(): Playback of ',soundfilez,' failed!');
+  writeln('Playback of ',soundfilez,' failed!');
   halt;
   end;
 end;
@@ -371,7 +370,7 @@ begin
 
 end;
 
-procedure InitSound(handle: HWND; device: integer = -1);
+procedure InitSound(handle: HWND);
 var
   major, minor: integer;
   plugininfo: PBASS_PLUGININFO;
@@ -384,13 +383,13 @@ begin
     Major := Hiword(BASS_GetVersion);
     Minor := Loword(BASS_GetVersion);
     SystemMsg(format('Bass Version: %s', [BASSVERSIONTEXT]));
-    BASS_GetDeviceInfo(device, bass_info);
+    BASS_GetDeviceInfo(1, bass_info);
 
-    if BASS_Init(device, 44100, 0, handle, nil) = True then
+    if BASS_Init(-1, 44100, 0, handle, nil) = True then
     begin
       SystemMsg(' ... Init successful!');
-      SystemMsg('Device name: '+bass_info.name);
-      SystemMsg('Device driver: '+bass_info.driver);
+      SystemMSg('Device name: '+bass_info.name);
+      SystemMSg('Device driver: '+bass_info.driver);
 
     end
     else

@@ -71,7 +71,7 @@ end;
 
 procedure TForm11.ListBox1Click(Sender: TObject);
 begin;
-
+writeln('DEBUG: FLAGS=',deviceinfos[listbox1.ItemIndex].flags);
 edtdevicename.Text := deviceinfos[listbox1.itemindex].name;
 edtdevicedriver.Text := deviceinfos[listbox1.ItemIndex].driver;
 if ((deviceinfos[listbox1.ItemIndex].flags and BASS_DEVICE_ENABLED) <> 0) then

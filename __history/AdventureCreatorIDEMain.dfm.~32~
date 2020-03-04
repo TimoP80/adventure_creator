@@ -12,6 +12,7 @@ object Form1: TForm1
   Font.Style = []
   Menu = mm1
   OldCreateOrder = False
+  Position = poScreenCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
@@ -61,7 +62,7 @@ object Form1: TForm1
     Left = 328
     Top = 408
     Width = 153
-    Height = 13
+    Height = 17
     AutoSize = False
     Caption = 'Score award for this choice:'
   end
@@ -139,10 +140,10 @@ object Form1: TForm1
     OnClick = btn3Click
   end
   object btn4: TButton
-    Left = 584
-    Top = 320
+    Left = 583
+    Top = 319
     Width = 121
-    Height = 25
+    Height = 27
     Caption = 'Delete choice'
     TabOrder = 6
     OnClick = btn4Click
@@ -164,7 +165,7 @@ object Form1: TForm1
   end
   object chkendgame: TCheckBox
     Left = 328
-    Top = 448
+    Top = 462
     Width = 233
     Height = 25
     Caption = 'This choice causes the game to end'
@@ -189,7 +190,7 @@ object Form1: TForm1
   end
   object edtchoicescore: TEdit
     Left = 328
-    Top = 424
+    Top = 427
     Width = 105
     Height = 21
     TabOrder = 12
@@ -244,7 +245,13 @@ object Form1: TForm1
       Top = 40
       Width = 209
       Height = 177
-      ItemHeight = 13
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Arial'
+      Font.Style = []
+      ItemHeight = 18
+      ParentFont = False
       TabOrder = 0
       OnClick = lstcommandsClick
     end
@@ -283,7 +290,9 @@ object Form1: TForm1
         'RandomNumber'
         'SetRandomMin'
         'SetRandomMax'
-        'ExecuteRandom')
+        'ExecuteRandom'
+        'RunScript'
+        'PlaySound')
     end
     object cbbvarsel: TComboBox
       Left = 240
@@ -300,6 +309,16 @@ object Form1: TForm1
       Height = 105
       TabOrder = 5
       OnKeyUp = mmoparamvalKeyUp
+    end
+    object ScriptSelector: TComboBox
+      Left = 240
+      Top = 136
+      Width = 273
+      Height = 21
+      TabOrder = 6
+      Text = 'ScriptSelector'
+      Visible = False
+      OnClick = ScriptSelectorClick
     end
   end
   object newnodename: TEdit
@@ -337,7 +356,7 @@ object Form1: TForm1
   end
   object gamewinner: TCheckBox
     Left = 328
-    Top = 476
+    Top = 493
     Width = 233
     Height = 25
     Caption = 'This choice causes game win condition'
@@ -345,19 +364,19 @@ object Form1: TForm1
     OnClick = gamewinnerClick
   end
   object Button2: TButton
-    Left = 968
+    Left = 975
     Top = 319
     Width = 137
-    Height = 25
+    Height = 27
     Caption = 'Edit choice commands...'
     TabOrder = 20
     OnClick = Button2Click
   end
   object Button3: TButton
-    Left = 832
-    Top = 321
+    Left = 848
+    Top = 319
     Width = 121
-    Height = 25
+    Height = 27
     Caption = 'Edit choice conditions...'
     TabOrder = 21
     OnClick = Button3Click
@@ -370,6 +389,15 @@ object Form1: TForm1
     Caption = 'Clone Node'
     TabOrder = 22
     OnClick = Button4Click
+  end
+  object Button5: TButton
+    Left = 328
+    Top = 524
+    Width = 75
+    Height = 25
+    Caption = 'Preview node'
+    TabOrder = 23
+    OnClick = Button5Click
   end
   object DataReader: TXMLDocument
     Left = 240
@@ -400,9 +428,9 @@ object Form1: TForm1
         Caption = 'Edit Metadata'
         OnClick = Metadata1Click
       end
-      object CompiletoBinary1: TMenuItem
-        Caption = 'Compile to Binary'
-        OnClick = CompiletoBinary1Click
+      object Compileadventure1: TMenuItem
+        Caption = 'Compile adventure'
+        OnClick = Compileadventure1Click
       end
       object N2: TMenuItem
         Caption = '-'
@@ -433,6 +461,18 @@ object Form1: TForm1
       object Scripts1: TMenuItem
         Caption = 'Scripts...'
         OnClick = Scripts1Click
+      end
+      object Compilersettings1: TMenuItem
+        Caption = 'Project settings...'
+        OnClick = Compilersettings1Click
+      end
+      object Additionalfiles1: TMenuItem
+        Caption = 'Additional files...'
+        OnClick = Additionalfiles1Click
+      end
+      object Audiodevices1: TMenuItem
+        Caption = 'Audio devices...'
+        OnClick = Audiodevices1Click
       end
     end
     object Help1: TMenuItem

@@ -478,8 +478,6 @@ begin
     else
     begin
     writeln('Checksum mismatch on '+packfile.files[index].filename);
-    writeln('expected: ',md5digesttostr(checksum_infile));
-    writeln('got: ',md5digesttostr(checksum_outfile));
     end;
     packfile.files[index].file_opened := True;
     if fullpath = True then
@@ -578,7 +576,6 @@ begin
     packfile.files[packfile.numfiles].size_compressed := returnfilesize(filename);
   packfile.offset_to_files := packfile.offset_to_files + 4;
   try
-
     gievmemd5 := md5file(filename);
   except
     on

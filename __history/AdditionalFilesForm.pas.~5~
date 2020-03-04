@@ -3,8 +3,8 @@ unit AdditionalFilesForm;
 interface
 
 uses
-  Winapi.Windows, AdventureFile, ACSoundLib,Winapi.Messages, System.SysUtils,
-  System.Variants, Dynamic_bass,  ID3v1library, id3v2library,
+  Winapi.Windows, AdventureFile, Winapi.Messages, System.SysUtils,
+  System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, JvExMask,
   JvToolEdit;
@@ -27,8 +27,6 @@ type
     Label5: TLabel;
     typeselector: TComboBox;
     Label6: TLabel;
-    Button4: TButton;
-    Button6: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure filedescKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -37,8 +35,6 @@ type
     procedure typeselectorClick(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
-    procedure Button6Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -48,10 +44,8 @@ type
 var
   Form10: TForm10;
   filetemp: IXMLFileType;
-  id3v1: TID3v1Tag;
-  id3v2: TID3v2Tag;
 
-  procedure UpdateAdditionalFiles;
+procedure UpdateAdditionalFiles;
 
 implementation
 
@@ -95,93 +89,13 @@ begin
   UpdateAdditionalFiles;
 end;
 
-procedure TForm10.Button4Click(Sender: TObject);
-begin
-if (extractfileext(JvFilenameEdit1.FileName)='.mp3')
-or (extractfileext(JvFilenameEdit1.FileName)='.flac') or
- (extractfileext(JvFilenameEdit1.FileName)='.wav')
-then
-begin
-   PlayMusic(jvfilenameedit1.FileName, -1);
-end else
-begin
-   PlayModule(jvfilenameedit1.FileName);
-
-end;
-end;
-
-function GetMediafileTitle(filename: string): string;
-var
-  ext: string;
-  fname: pointer;
-  modhandle: HMUSIC;
-  streamhandle: HSTREAM;
-  tags: ansistring;
-begin
- result:='';
- ext := ExtractFileExt(filename);
- if (ext = '.xm') or (ext = '.mod') or (ext='.s3m') or (ext = '.it') then
- begin
- fname:=pchar(filename);
-   modhandle := BASS_MusicLoad(false, fname, 0, 0, 0 or BASS_UNICODE, 0);
-   if modhandle<>0 then
-   begin
-     tags := BASS_channelgettags(modhandle, BASS_TAG_MUSIC_NAME);
-     if tags<>'' then
-
-     result:=tags;
-
-   end;
- end;
- if (ext = '.mp3') then
- begin
-   id3v2 := TID3v2Tag.Create;
-   id3v2.LoadFromFile(filename);
-   if id3v2.Loaded then
-   begin
-     writeln('Found tags...');
-     writeln('Artist: ',id3v2.GetUnicodeText('TPE1'));
-     writeln('Title: ',id3v2.GetUnicodeText('TIT2'));
-     result := id3v2.GetUnicodeText('TPE1')+' - '+id3v2.GetUnicodeText('TIT2');
-   end else
-   begin
-     writeln('ID3v1 fallback...');
-     id3v1 := TID3v1Tag.Create;
-     id3v1.LoadFromFile(filename);
-     if id3v1.Loaded=True then
-     begin
-       writeln('Artist: ',id3v1.Artist);
-       writeln('Title: ',id3v1.Title);
-
-       result:=id3v1.Artist + ' - '+id3v1.Title;
-
-     end;
-   end;
- end;
-end;
-
 procedure TForm10.Button5Click(Sender: TObject);
-var str: string;
 begin
-  filepath.text := extractfiledir(JvFilenameEdit1.filename);
-  filename.text := extractfilename(JvFilenameEdit1.filename);
-  filetemp.Name := filename.text;
-  filetemp.Path := filepath.text;
-str := GetMediafileTitle(jvfilenameedit1.filename);
-  if str<>'' then filedesc.Text := str;
-  filetemp.Text := str;
-  UpdateAdditionalFilesSel;
-end;
-
-procedure TForm10.Button6Click(Sender: TObject);
-begin
-if BASS_ChannelIsActive(musicstream)=BASS_ACTIVE_PLAYING then
-  BASS_ChannelStop(musicstream);
-
-if BASS_ChannelIsActive(
-modulestream)=BASS_ACTIVE_PLAYING then
-  BASS_ChannelStop(modulestream);
-
+filepath.Text := extractfiledir(JvFilenameEdit1.FileName);
+filename.Text := extractfilename(jvfilenameedit1.FileName);
+filetemp.Name := filename.Text;
+filetemp.Path := filepath.text;
+UpdateAdditionalFilesSel;
 end;
 
 procedure TForm10.filedescKeyUp(Sender: TObject; var Key: Word;

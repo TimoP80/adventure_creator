@@ -3,7 +3,7 @@ unit ChoiceCommandsForm;
 interface
 
 uses
-  Winapi.Windows, AdventureFile,masks, Winapi.Messages, System.SysUtils,
+  Winapi.Windows, AdventureFile, Winapi.Messages, System.SysUtils,
   System.Variants, System.Classes, AdventureBinary, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
 
@@ -122,39 +122,10 @@ begin
 
 end;
 
-function FindScript (txt: string): integer;
-var u: integer;
-begin
-result:=-1;
-for u := 0 to form4.ScriptSelector.items.Count-1 do
-  begin
-    if MatchesMask(form4.ScriptSelector.Items[u], txt+'*') then
-    begin
-      result:=u;
-      exit;
-    end;
-  end;
-end;
-
 procedure TForm4.lstcommandsClick(Sender: TObject);
 begin
   command := commandlist.CMD[lstcommands.itemindex];
   cbbcmd.itemindex := cbbcmd.items.IndexOf(command.Name);
-   if command.Name = 'RunScript' then
-  begin
-    ScriptSelector.Visible := true;
-    mmoparamval.Visible := false;
-    cbbvarsel.Visible:=false;
-    ScriptSelector.ItemIndex:=FindScript(command.text);
-    lbl10.Visible:=false;
-  end
-  else
-  begin
-    ScriptSelector.Visible := false;
-    mmoparamval.Visible := true;
-    cbbvarsel.Visible:=true;
-    lbl10.Visible:=true;
-  end;
   cbbvarsel.itemindex := cbbvarsel.items.IndexOf(command.Variable);
   mmoparamval.Text := command.Text;
 end;

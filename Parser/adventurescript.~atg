@@ -291,7 +291,7 @@ Param = (_string
  .) |
   identifier 
   (. 
-  AddParam(instruction_temp, lexstring, DATA_TYPE_PARAMETER_VARIABLEDEF);
+  AddParam(instruction_temp, lexstring, DATA_TYPE_PARAMETER_VARIABLEREF);
  
   .) ) .
 RandomChance = "RandomChance" 
@@ -400,7 +400,7 @@ SetVar = "SetVar" "$" identifier
   AddParam(instruction_temp,parse_string(LexString),DATA_TYPE_SWITCH_LABEL_DATA);
   NextInstruction(CurrentScript, instruction_temp);
  .) |number (. instruction_temp := AddInstruction(currentscript, OP_SWITCH_LABEL);
-  AddParam(instruction_temp,strtotine(LexString),DATA_TYPE_SWITCH_LABEL_DATA);
+  AddParam(instruction_temp,strtoint(LexString),DATA_TYPE_SWITCH_LABEL_DATA);
   NextInstruction(CurrentScript, instruction_temp);
  .)|identifier (.
   instruction_temp := AddInstruction(currentscript, OP_SWITCH_LABEL);
@@ -418,7 +418,18 @@ SwitchStatement = "switch" (.   instruction_temp := AddInstruction(currentscript
             "}" (. instruction_temp := AddInstruction(currentscript, OP_SWITCH_END);
   NextInstruction(CurrentScript, instruction_temp);
  .) . 
-                         
+
+ForLoop = "for" 
+           (. 
+             instruction_temp := AddInstruction(currentscript, OP_FOR_LOOP);
+           .) 
+           identifier (. AddParam(instruction_temp,LexString,DATA_TYPE_FOR_LABEL);
+   .) "=" (number (.AddParam(instruction_temp,strtoint(LexString),DATA_TYPE_FOR_START); .) | identifier (.AddParam(instruction_temp,LexString,DATA_TYPE_FOR_START); .)) "to" (number (.AddParam(instruction_temp,strtoint(LexString),DATA_TYPE_FOR_STOP); .) | identifier (.AddParam(instruction_temp,LexString,DATA_TYPE_FOR_STOP); .))
+           (. NextInstruction(instruction_temp); .)  "{" (.    instruction_temp := AddInstruction(currentscript, OP_FOR_BEGIN); NextInstruction(instruction_temp);
+           .)
+             Command {Command}
+             "}" (.    instruction_temp := AddInstruction(currentscript, OP_FOR_END); NextInstruction(instruction_temp);
+           .).                        
 
 Command = (RegularCommand | SetVar | RandomChance)  ";" .
 
@@ -452,7 +463,7 @@ FuncDefinition = ("int"
   NextInstruction(CurrentScript, instruction_temp);
  .)
 
-  {(Command|IfStatement|SwitchStatement)} "}" 
+  {(Command|IfStatement|SwitchStatement|ForLoop)} "}" 
   (.
   instruction_temp := AddInstruction(CurrentScript, OP_FUNCTIONEND);
   NextInstruction(CurrentScript, instruction_temp);
@@ -463,7 +474,7 @@ FuncDefinition = ("int"
  AddVariable(CurrentScript, name_temp); 
  .) ["=" (_string 
  (. 
- SetVariableValue(CurrentScript, name_temp, parse_string(lexstring))); 
+ SetVariableValue(CurrentScript, name_temp, parse_string(lexstring)); 
  .) |number 
  
  (. 

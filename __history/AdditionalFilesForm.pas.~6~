@@ -3,7 +3,7 @@ unit AdditionalFilesForm;
 interface
 
 uses
-  Winapi.Windows, AdventureFile, ACSoundLib,Winapi.Messages, System.SysUtils,
+  Winapi.Windows, AdventureFile, Winapi.Messages, System.SysUtils,
   System.Variants, Dynamic_bass,  ID3v1library, id3v2library,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, JvExMask,
@@ -27,8 +27,6 @@ type
     Label5: TLabel;
     typeselector: TComboBox;
     Label6: TLabel;
-    Button4: TButton;
-    Button6: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure filedescKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -37,8 +35,6 @@ type
     procedure typeselectorClick(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
-    procedure Button6Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -93,21 +89,6 @@ procedure TForm10.Button2Click(Sender: TObject);
 begin
   adventuredata.AdditionalFiles.Delete(ListBox1.ItemIndex);
   UpdateAdditionalFiles;
-end;
-
-procedure TForm10.Button4Click(Sender: TObject);
-begin
-if (extractfileext(JvFilenameEdit1.FileName)='.mp3')
-or (extractfileext(JvFilenameEdit1.FileName)='.flac') or
- (extractfileext(JvFilenameEdit1.FileName)='.wav')
-then
-begin
-   PlayMusic(jvfilenameedit1.FileName, -1);
-end else
-begin
-   PlayModule(jvfilenameedit1.FileName);
-
-end;
 end;
 
 function GetMediafileTitle(filename: string): string;
@@ -171,17 +152,6 @@ str := GetMediafileTitle(jvfilenameedit1.filename);
   if str<>'' then filedesc.Text := str;
   filetemp.Text := str;
   UpdateAdditionalFilesSel;
-end;
-
-procedure TForm10.Button6Click(Sender: TObject);
-begin
-if BASS_ChannelIsActive(musicstream)=BASS_ACTIVE_PLAYING then
-  BASS_ChannelStop(musicstream);
-
-if BASS_ChannelIsActive(
-modulestream)=BASS_ACTIVE_PLAYING then
-  BASS_ChannelStop(modulestream);
-
 end;
 
 procedure TForm10.filedescKeyUp(Sender: TObject; var Key: Word;

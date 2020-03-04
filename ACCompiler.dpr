@@ -62,7 +62,7 @@ begin
   config.WriteBool('Main Config','AudioEnabled',AdventureData.ProjectSettings.AudioEnabled);
   config.WriteInteger('Main Config','AudioVolume',AdventureData.ProjectSettings.AudioVolume);
   writeln('Compressing executable with UPX');
-  ShellExecute(0 , 'open', 'upx.exe', pwidechar(changefileext(ParamStr(1), '.exe')+' --best'), pwidechar(GetCurrentDir), SW_SHOWNORMAL);
+  ShellExecute(0 , 'open', 'upx.exe', pwidechar(changefileext(ParamStr(1), '.exe')+' --best'), pwidechar(GetCurrentDir), SW_HIDE);
   writeln('Bimary file "' + changefileext(ParamStr(1), '.exe') + '" created.');
   writeln('Configuration file "' + changefileext(ParamStr(1), '.ini') + '" created.');
   writeln;

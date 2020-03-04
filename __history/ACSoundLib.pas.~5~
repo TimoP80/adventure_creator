@@ -258,7 +258,7 @@ begin
 
   else
   begin
-  writeln('PlayModule(): Playback of ',soundfilez,' failed!');
+  writeln('Playback of ',soundfilez,' failed!');
   writeln('ERROR code=',BASS_ErrorGetCode);
  halt;
   end;
@@ -301,7 +301,7 @@ begin
 
   else
   begin
-  writeln('PlayMusic(): Playback of ',soundfilez,' failed!');
+  writeln('Playback of ',soundfilez,' failed!');
   halt;
   end;
 end;

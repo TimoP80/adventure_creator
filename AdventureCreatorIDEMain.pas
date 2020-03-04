@@ -3,7 +3,7 @@ unit AdventureCreatorIDEMain;
 interface
 
 uses
-  Windows, Inifiles, vfsengine, ShellApi, ACSoundLib, Messages, AdventureFile, AdventureScript, AdventureBinary, SysUtils,
+  Windows, Inifiles, vfsengine, ShellApi,Masks, ACSoundLib, Messages, AdventureFile, AdventureScript, AdventureBinary, SysUtils,
   Variants,
   Classes, Graphics,
   Controls, Forms,
@@ -986,6 +986,8 @@ end;
 
 procedure TForm1.nodes_treeClick(Sender: TObject);
 begin
+if nodes_tree.Selected=nil then exit;
+
   TheNode := FindNode(nodes_tree.Selected.Text);
   mmonodetext.Text := TheNode.DescriptionText;
   mmonodetext.Text := Stringreplace(mmonodetext.Text, #10, '\n',
@@ -1011,11 +1013,40 @@ begin
   UpdateNodeLists;
 end;
 
+function FindScript (txt: string): integer;
+var u: integer;
+begin
+result:=-1;
+for u := 0 to form4.ScriptSelector.items.Count-1 do
+  begin
+    if MatchesMask(form4.ScriptSelector.Items[u], txt+'*') then
+    begin
+      result:=u;
+      exit;
+    end;
+  end;
+end;
+
 procedure TForm1.lstcommandsClick(Sender: TObject);
 begin
   thecmd := TheNode.NodeCommands.CMD[lstcommands.itemindex];
   cbbcmd.itemindex := cbbcmd.Items.IndexOf(thecmd.Name);
   cbbvarsel.itemindex := cbbvarsel.Items.IndexOf(thecmd.Variable);
+   if thecmd.Name = 'RunScript' then
+  begin
+    ScriptSelector.Visible := true;
+    mmoparamval.Visible := false;
+    cbbvarsel.Visible:=false;
+    ScriptSelector.ItemIndex:=FindScript(command.text);
+    lbl10.Visible:=false;
+  end
+  else
+  begin
+    ScriptSelector.Visible := false;
+    mmoparamval.Visible := true;
+    cbbvarsel.Visible:=true;
+    lbl10.Visible:=true;
+  end;
   mmoparamval.Text := thecmd.Text;
 end;
 

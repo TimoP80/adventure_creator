@@ -130,9 +130,6 @@ object Form10: TForm10
     Top = 229
     Width = 355
     Height = 21
-    Filter = 
-      'Media files (*.mp3, *.wav, *.xm, *.flac, *.mod, *.it, *.s3m)|*.m' +
-      'p3;*.wav;*.xm;*.it;*.mod;*.s3m;*.flac'
     TabOrder = 8
     Text = ''
   end
@@ -147,23 +144,5 @@ object Form10: TForm10
       'audio'
       'text'
       'xml')
-  end
-  object Button4: TButton
-    Left = 624
-    Top = 256
-    Width = 75
-    Height = 25
-    Caption = 'Play'
-    TabOrder = 10
-    OnClick = Button4Click
-  end
-  object Button6: TButton
-    Left = 705
-    Top = 256
-    Width = 75
-    Height = 25
-    Caption = 'Stop'
-    TabOrder = 11
-    OnClick = Button6Click
   end
 end

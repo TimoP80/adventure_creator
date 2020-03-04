@@ -37,19 +37,44 @@ type
   end;
 
 const
+
+  (*
+
+    Execution mode constants
+
+  *)
+
   EXEC_MODE_NORMAL = $4000;
   EXEC_MODE_SETVAR = $4001;
   EXEC_MODE_CONDITION = $4002;
   EXEC_MODE_SWITCH = $4003;
+  EXEC_MODE_FOR_LOOP = $4004;
+  (*
+
+    Condition compare mode constants
+
+  *)
 
   COMPARE_MODE_STRING = $4500;
   COMPARE_MODE_INTEGER = $4501;
+
+  (*
+
+    Expression modes
+
+  *)
 
   MODE_ADD = $5000;
   MODE_SUBTRACT = $5001;
   MODE_DIVIDE = $5002;
   MODE_MULTIPLY = $5003;
   MODE_ASSIGN = $5004;
+
+  (*
+
+    Main opcodes
+
+  *)
 
   OP_BEGININSTRUCTION = $8000;
   OP_ENDINSTRUCTION = $8001;
@@ -86,13 +111,34 @@ const
   OP_FOR_LOOP = $8020;
   OP_FOR_BEGIN = $8021;
   OP_FOR_END = $8022;
+  OP_WHILE_LOOP = $8023;
+  OP_WHILE_BEGIN = $8024;
+  OP_WHILE_END = $8025;
+
+  (*
+
+    Function return types
+
+  *)
 
   RETURN_TYPE_VOID = $4000;
   RETURN_TYPE_INTEGER = $4001;
   RETURN_TYPE_STRING = $4002;
 
+  (*
+
+    Parameter types
+
+  *)
+
   PARAM_TYPE_INT = $5000;
   PARAM_TYPE_STRING = $5001;
+
+  (*
+
+    Parameter data types
+
+  *)
 
   DATA_TYPE_PARAMETER = $A001;
   DATA_TYPE_RETURN_TYPE = $A002;
@@ -111,7 +157,10 @@ const
   DATA_TYPE_PARAMETER_VARIABLEREF = $A015;
   DATA_TYPE_PARAMETER_INT = $A016;
   DATA_TYPE_SWITCH_VAR = $A017;
-  DATA_TYPE_SWITCH_LABEL_DATA =$A018;
+  DATA_TYPE_SWITCH_LABEL_DATA = $A018;
+  DATA_TYPE_FOR_VARIABLE = $A019;
+  DATA_TYPE_FOR_START = $A020;
+  DATA_TYPE_FOR_STOP = $A021;
 
   IF_CONNECT_AND = $C000;
   IF_CONNECT_OR = $C001;
@@ -197,7 +246,7 @@ var
   instruction_ended: boolean;
   built_in_functions: TStrings;
 
-function DecodeInstruction (i: integer; instr: instruction): string;
+function DecodeInstruction(i: integer; instr: instruction): string;
 function AddInstruction(var TheScript: Script; inst_type: integer): instruction;
 procedure NextInstruction(var TheScript: Script; prev_instruction: instruction);
 procedure AddParam(var instruction: instruction; param: variant;
@@ -277,6 +326,13 @@ begin
     begin
       strdata := instr.inst_params[i].data;
       result := result + strdata;
+    end else
+     if vartype(instr.inst_params[i].data) = varWord then
+  begin
+    //  writeln('Datatype: ',vartype(instr.inst_params[i].data));
+      intdata := instr.inst_params[i].data;
+      result := result + inttostr(intdata);
+
     end;
 
     if i < instr.inst_paramcount - 1 then
@@ -285,12 +341,11 @@ begin
 
 end;
 
-function DecodeInstruction (i: integer; instr: instruction): string;
+function DecodeInstruction(i: integer; instr: instruction): string;
 begin
 
-result := format('%0.4x: %s %s',
-      [i, OpcodeToStr(instr.inst_type),
-      GetParams(instr)])
+  result := format('%0.4x: %s %s', [i, OpcodeToStr(instr.inst_type),
+    GetParams(instr)])
 
 end;
 
@@ -558,9 +613,10 @@ begin
   begin
     // code here for current node changes
     // can't do it elsewhere but ACEngine.exe
-    if IsVariable(thescript, instr.inst_params[1].data) then
-    currentnode := GetVariableValue(thescript, instr.inst_params[1].data) else
-    currentnode := instr.inst_params[1].data;
+    if IsVariable(TheScript, instr.inst_params[1].data) then
+      currentnode := GetVariableValue(TheScript, instr.inst_params[1].data)
+    else
+      currentnode := instr.inst_params[1].data;
 
   end
   else if funcname = 'Random' then
@@ -577,25 +633,28 @@ begin
   end
   else if funcname = 'PlaySound' then
   begin
-     windowstemp := getenvironmentvariable('TEMP');
-    PlaySound(windowstemp+'\'+instr.inst_params[1].data);
+    windowstemp := getenvironmentvariable('TEMP');
+    PlaySound(windowstemp + '\' + instr.inst_params[1].data);
   end
-    else if funcname = 'PlayModule' then
+  else if funcname = 'PlayModule' then
   begin
-     windowstemp := getenvironmentvariable('TEMP');
-    PlayModule(windowstemp+'\'+instr.inst_params[1].data);
+    windowstemp := getenvironmentvariable('TEMP');
+    PlayModule(windowstemp + '\' + instr.inst_params[1].data);
   end
   else if funcname = 'PlayMusic' then
   begin
-     windowstemp := getenvironmentvariable('TEMP');
-    PlayMusic(windowstemp+'\'+instr.inst_params[1].data, -1);
+    windowstemp := getenvironmentvariable('TEMP');
+    PlayMusic(windowstemp + '\' + instr.inst_params[1].data, -1);
   end
 
   else if funcname = 'WaitForKeyPress' then
   begin
     ch := readkey;
   end
-
+  else if funcname = 'PrintHeader' then
+  begin
+    PrintHeader;
+  end
   else if funcname = 'ClrEol' then
   begin
     ClrEol;
@@ -640,20 +699,21 @@ begin
     // if not, then initialize
     // if it does, then nothing happens here
 
-    index:=FindStringList(instr.inst_params[2].data);
-    if index=-1 then
+    index := FindStringList(instr.inst_params[2].data);
+    if index = -1 then
     begin
-    SetLength(RandomStringLists, RandomStringListCnt + 1);
-    RandomStringLists[RandomStringListCnt].name_id := instr.inst_params[1].data;
-    RandomStringLists[RandomStringListCnt].stringcnt := 0;
-    inc(RandomStringListCnt);
+      SetLength(RandomStringLists, RandomStringListCnt + 1);
+      RandomStringLists[RandomStringListCnt].name_id :=
+        instr.inst_params[1].data;
+      RandomStringLists[RandomStringListCnt].stringcnt := 0;
+      inc(RandomStringListCnt);
     end;
 
   end
   else if funcname = 'CombineStrings' then
   begin
 
-   output := '';
+    output := '';
     for z := 1 to instr.inst_paramcount - 1 do
     begin
       if instr.inst_params[z].data_type = DATA_TYPE_PARAMETER_VARIABLEREF then
@@ -670,7 +730,11 @@ begin
         output := output + instr.inst_params[z].data;
     end;
 
-   resultstorage := output;
+    resultstorage := output;
+  end
+  else if funcname = 'Return' then
+  begin
+
   end
   else if funcname = 'AddToRandomList' then
   begin
@@ -713,10 +777,11 @@ begin
       throw := random(100 - RandomChanceTable[i].probability);
       if throw < RandomChanceTable[i].probability then
       begin
-       writeln('Throw ',throw,' = HIT!');
+        writeln('Throw ', throw, ' = HIT!');
         AddToList(i, list, listcnt);
-      end else
-        writeln('Throw ',throw,' = MISS!');
+      end
+      else
+        writeln('Throw ', throw, ' = MISS!');
 
     end;
     index := random(listcnt);
@@ -863,7 +928,7 @@ var
   finaldata: variant;
   condition_variable: string;
   case_var_value_str: string;
-
+  case_var_label_str: string;
   condition_value: variant;
   condition_eval: integer;
   condition_eval_value: variant;
@@ -879,6 +944,12 @@ var
   instruction_param_data: variant;
   if_position: integer;
   if_else_position: integer;
+  for_start_pos, for_end_pos: integer;
+  for_loop_count: integer;
+  for_loop_max: integer;
+ case_match: boolean;
+
+  for_loop_var_name: string;
   jump_position: integer;
   finalresult: integer;
   condition_was_true: boolean;
@@ -893,43 +964,98 @@ begin
   numifopcodes := 0;
   while (current_instruction <> OP_FUNCTIONEND) do
   begin
-
     current_instruction := TheScript.instructions[x].inst_type;
-    case current_instruction of
-      OP_SWITCH_VAR:
-      begin
-        case_var_value_str := GetVariableValue(thescript, thescript.instructions[x].inst_params[0].data);
-        execution_mode:=EXEC_MODE_SWITCH;
-
-      end;
-      OP_SWITCH_LABEL_CODE_BEGIN:
-      begin
-
-      end;
-      OP_SWITCH_LABEL_CODE_END:
-      begin
-       x:=FindOpcode(thescript,x+1, OP_SWITCH_END);
-
-      end;
-      OP_SWITCH_BEGIN:
-      begin
-
-      end;
-      OP_SWITCH_END:
-      begin
-       execution_mode:=EXEC_MODE_NORMAL;
-      end;
-      OP_SWITCH_LABEL:
-      begin
-        if case_var_value_str = thescript.instructions[x].inst_params[0].data then
+     case current_instruction of
+      OP_FOR_LOOP:
         begin
-         x:=FindOpcode(thescript,x+1, OP_SWITCH_LABEL_CODE_BEGIN);
-         end
-        else
-        begin
-         x:=FindOpcode(thescript,x+1, OP_SWITCH_LABEL);
+          for_loop_var_name := TheScript.instructions[x].inst_params[0].data;
+          if IsVariable(TheScript, TheScript.instructions[x].inst_params[2].data)
+          then
+            for_loop_max := GetVariableValue(TheScript,
+              TheScript.instructions[x].inst_params[2].data)
+          else
+
+            for_loop_max := TheScript.instructions[x].inst_params[2].data;
+          for_start_pos := FindOpcode(TheScript, x + 1, OP_FOR_BEGIN);
+          for_end_pos := FindOpcode(TheScript, x + 1, OP_FOR_END);
+          for_loop_count := 0;
+
+          execution_mode := EXEC_MODE_FOR_LOOP;
         end;
-      end;
+      OP_FOR_BEGIN:
+        begin
+
+        end;
+      OP_FOR_END:
+
+        begin
+          if for_loop_count = for_loop_max then
+          begin
+            execution_mode := EXEC_MODE_NORMAL;
+          end
+          else
+          begin
+            inc(for_loop_count);
+            SetVariableValue(TheScript, for_loop_var_name, for_loop_count);
+            x := for_start_pos;
+          end;
+        end;
+      OP_SWITCH_VAR:
+        begin
+        case_match:=false;
+          case_var_value_str := GetVariableValue(TheScript,
+            TheScript.instructions[x].inst_params[0].data);
+          execution_mode := EXEC_MODE_SWITCH;
+
+        end;
+      OP_SWITCH_LABEL_CODE_BEGIN:
+        begin
+
+        end;
+      OP_SWITCH_LABEL_CODE_END:
+        begin
+        if case_match=true then
+         begin
+           x := FindOpcode(TheScript, x + 1, OP_SWITCH_END);
+          end;
+        end;
+      OP_SWITCH_BEGIN:
+        begin
+
+        end;
+      OP_SWITCH_END:
+        begin
+          execution_mode := EXEC_MODE_NORMAL;
+        end;
+      OP_SWITCH_LABEL:
+        begin
+        if (vartype(TheScript.instructions[x].inst_params[0].data)=varInteger) then
+         begin
+           case_var_label_str := inttostr(TheScript.instructions[x].inst_params[0].data);
+
+         end else
+         begin
+           case_var_label_str := TheScript.instructions[x].inst_params[0].data;
+
+         end;
+         if case_var_label_str= 'Default' then
+         begin
+           if case_match = false then
+            x := FindOpcode(TheScript, x + 1, OP_SWITCH_LABEL_CODE_BEGIN);
+
+         end else
+         if case_var_value_str = case_var_label_str
+          then
+          begin
+          case_match:=True;
+            x := FindOpcode(TheScript, x + 1, OP_SWITCH_LABEL_CODE_BEGIN);
+          end
+          else
+          begin
+          case_match:=false;
+             x := FindOpcode(TheScript, x + 1, OP_SWITCH_LABEL)-1;
+          end;
+        end;
       OP_CONDITION_BLOCK_START:
         begin
 
@@ -1166,10 +1292,10 @@ begin
           end;
         end;
       OP_IF_CONNECTOR:
-      begin
-        // add code here
-        if_connector := TheScript.instructions[x].inst_params[0].data;
-      end;
+        begin
+          // add code here
+          if_connector := TheScript.instructions[x].inst_params[0].data;
+        end;
       OP_SETVAR:
         begin
           execution_mode := EXEC_MODE_SETVAR;
@@ -1284,6 +1410,7 @@ begin
   built_in_functions.Add('PlaySound');
   built_in_functions.Add('PlayModule');
   built_in_functions.Add('PlayMusic');
+  built_in_functions.Add('PrintHeader');
 end;
 
 function ParamTypeToStr(paramtype: integer): string;
@@ -1321,7 +1448,12 @@ begin
       result := 'DATA_TYPE_FUNCTION_PARAMETER';
     DATA_TYPE_FUNCTION_PARAMETER_TYPE:
       result := 'DATA_TYPE_FUNCTION_PARAMETER_TYPE';
-
+    DATA_TYPE_FOR_VARIABLE:
+      result := 'DATA_TYPE_FOR_VARIABLE';
+    DATA_TYPE_FOR_START:
+      result := 'DATA_TYPE_FOR_START';
+    DATA_TYPE_FOR_STOP:
+      result := 'DATA_TYPE_FOR_STOP';
   else
     result := 'DATA_TYPE_UNKNOWN';
   end;
@@ -1381,17 +1513,23 @@ begin
     OP_IF_ELSE:
       result := 'OP_IF_ELSE';
     OP_SWITCH_VAR:
-      result:='OP_SWITCH_VAR';
+      result := 'OP_SWITCH_VAR';
     OP_SWITCH_LABEL:
-     result:='OP_SWITCH_LABEL';
-     OP_SWITCH_LABEL_CODE_BEGIN:
-     result:='OP_SWITCH_LABEL_CODE_BEGIN';
-     OP_SWITCH_LABEL_CODE_END:
-     result:='OP_SWITCH_LABEL_CODE_END';
-     OP_SWITCH_BEGIN:
-     result:='OP_SWITCH_BEGIN';
-     OP_SWITCH_END:
-     result:='OP_SWITCH_END';
+      result := 'OP_SWITCH_LABEL';
+    OP_SWITCH_LABEL_CODE_BEGIN:
+      result := 'OP_SWITCH_LABEL_CODE_BEGIN';
+    OP_SWITCH_LABEL_CODE_END:
+      result := 'OP_SWITCH_LABEL_CODE_END';
+    OP_SWITCH_BEGIN:
+      result := 'OP_SWITCH_BEGIN';
+    OP_SWITCH_END:
+      result := 'OP_SWITCH_END';
+    OP_FOR_LOOP:
+      result := 'OP_FOR_LOOP';
+    OP_FOR_BEGIN:
+      result := 'OP_FOR_BEGIN';
+    OP_FOR_END:
+      result := 'OP_FOR_END';
   else
 
     result := 'OP_UNKNOWN (' + format('%0.4x', [opcode]) + ')';
@@ -1838,8 +1976,8 @@ var
 begin
   SetLength(TheScript.instructions, 0);
   TheScript.instruction_count := 0;
-  setlength(thescript.variables, 0);
-  thescript.variablecnt:=0;
+  SetLength(TheScript.variables, 0);
+  TheScript.variablecnt := 0;
 
   TheScript.script_name := name;
   TheScript.script_filename := filename;

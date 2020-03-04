@@ -11,7 +11,6 @@ object Form11: TForm11
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  Position = poMainFormCenter
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
@@ -70,11 +69,11 @@ object Form11: TForm11
   object edtdevicedriver: TEdit
     Left = 383
     Top = 81
-    Width = 429
+    Width = 418
     Height = 21
     TabOrder = 3
   end
-  object DeviceEnabledFlag: TCheckBox
+  object CheckBox1: TCheckBox
     Left = 383
     Top = 131
     Width = 177
@@ -82,7 +81,7 @@ object Form11: TForm11
     Caption = 'BASS_DEVICE_ENABLED'
     TabOrder = 4
   end
-  object DeviceInitFlag: TCheckBox
+  object CheckBox2: TCheckBox
     Left = 383
     Top = 153
     Width = 177
@@ -90,21 +89,12 @@ object Form11: TForm11
     Caption = 'BASS_DEVICE_INIT'
     TabOrder = 5
   end
-  object DeviceDefaultFlag: TCheckBox
+  object CheckBox3: TCheckBox
     Left = 383
     Top = 177
     Width = 177
     Height = 26
     Caption = 'BASS_DEVICE_DEFAULT'
     TabOrder = 6
-  end
-  object Button1: TButton
-    Left = 618
-    Top = 127
-    Width = 194
-    Height = 25
-    Caption = 'Init Sound with this Device'
-    TabOrder = 7
-    OnClick = Button1Click
   end
 end
