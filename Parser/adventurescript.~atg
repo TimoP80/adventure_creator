@@ -419,12 +419,12 @@ SwitchStatement = "switch" (.   instruction_temp := AddInstruction(currentscript
   NextInstruction(CurrentScript, instruction_temp);
  .) . 
 
-ForLoop = "for" 
+ForLoop = "for" "("
            (. 
              instruction_temp := AddInstruction(currentscript, OP_FOR_LOOP);
            .) 
            identifier (. AddParam(instruction_temp,LexString,DATA_TYPE_FOR_LABEL);
-   .) "=" (number (.AddParam(instruction_temp,strtoint(LexString),DATA_TYPE_FOR_START); .) | identifier (.AddParam(instruction_temp,LexString,DATA_TYPE_FOR_START); .)) "to" (number (.AddParam(instruction_temp,strtoint(LexString),DATA_TYPE_FOR_STOP); .) | identifier (.AddParam(instruction_temp,LexString,DATA_TYPE_FOR_STOP); .))
+   .) ")" "=" (number (.AddParam(instruction_temp,strtoint(LexString),DATA_TYPE_FOR_START); .) | identifier (.AddParam(instruction_temp,LexString,DATA_TYPE_FOR_START); .)) "to" (number (.AddParam(instruction_temp,strtoint(LexString),DATA_TYPE_FOR_STOP); .) | identifier (.AddParam(instruction_temp,LexString,DATA_TYPE_FOR_STOP); .))
            (. NextInstruction(instruction_temp); .)  "{" (.    instruction_temp := AddInstruction(currentscript, OP_FOR_BEGIN); NextInstruction(instruction_temp);
            .)
              Command {Command}
@@ -463,7 +463,7 @@ FuncDefinition = ("int"
   NextInstruction(CurrentScript, instruction_temp);
  .)
 
-  {(Command|IfStatement|SwitchStatement|ForLoop)} "}" 
+  {(Command|IfStatement|SwitchStatement)} "}" 
   (.
   instruction_temp := AddInstruction(CurrentScript, OP_FUNCTIONEND);
   NextInstruction(CurrentScript, instruction_temp);

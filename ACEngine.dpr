@@ -490,7 +490,7 @@ begin
         GotoXY(7, wherey);
         if GetNodeVisibilityByCondition(nodeind, z)=true then
         begin
-         writeln(alphabets[z], '. ', txt);
+         writeln(alphabets[choicemappingcount], '. ', txt);
         choicemappings[choicemappingcount].letter := alphabets[choicemappingcount];
         choicemappings[choicemappingcount].number := z;
            inc(choicemappingcount);
@@ -500,6 +500,9 @@ begin
 
       end;
       writeln;
+    end else
+    begin
+      writeln('Runtime Engine Error: This node contains no choices.');
     end;
 
   end;

@@ -97,7 +97,15 @@ end;
 
 procedure TForm10.Button4Click(Sender: TObject);
 begin
-if (extractfileext(JvFilenameEdit1.FileName)='.mp3')
+
+if BASS_ChannelIsActive(musicstream)=BASS_ACTIVE_PLAYING then
+  BASS_ChannelStop(musicstream);
+
+if BASS_ChannelIsActive(
+modulestream)=BASS_ACTIVE_PLAYING then
+  BASS_ChannelStop(modulestream);
+
+  if (extractfileext(JvFilenameEdit1.FileName)='.mp3')
 or (extractfileext(JvFilenameEdit1.FileName)='.flac') or
  (extractfileext(JvFilenameEdit1.FileName)='.wav')
 then
@@ -139,20 +147,14 @@ begin
    id3v2.LoadFromFile(filename);
    if id3v2.Loaded then
    begin
-     writeln('Found tags...');
-     writeln('Artist: ',id3v2.GetUnicodeText('TPE1'));
-     writeln('Title: ',id3v2.GetUnicodeText('TIT2'));
-     result := id3v2.GetUnicodeText('TPE1')+' - '+id3v2.GetUnicodeText('TIT2');
+       result := id3v2.GetUnicodeText('TPE1')+' - '+id3v2.GetUnicodeText('TIT2');
    end else
    begin
-     writeln('ID3v1 fallback...');
-     id3v1 := TID3v1Tag.Create;
+      id3v1 := TID3v1Tag.Create;
      id3v1.LoadFromFile(filename);
      if id3v1.Loaded=True then
      begin
-       writeln('Artist: ',id3v1.Artist);
-       writeln('Title: ',id3v1.Title);
-
+     
        result:=id3v1.Artist + ' - '+id3v1.Title;
 
      end;

@@ -1399,6 +1399,12 @@ begin
   built_in_functions.Add('GetFromRandomList');
   built_in_functions.Add('CombineStrings');
 
+  built_in_functions.Add('AddValues');
+  built_in_functions.Add('SubtractValues');
+  built_in_functions.Add('MultiplyValues');
+  built_in_functions.Add('DivideValues');
+
+
   built_in_functions.Add('InitRandomChance');
   built_in_functions.Add('ExecuteRandomChance');
   built_in_functions.Add('ReadInput');
