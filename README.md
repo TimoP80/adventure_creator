@@ -34,3 +34,18 @@ For compiling the IDE, the following components are needed:
 
 WARNING! This project is not fully documented yet, documentation is a work in progress as the engine is 
 being developed to its full form.
+
+## New Modular Parser Architecture (v0.93+)
+
+Starting from version 0.93, the Adventure Scripting Language uses a new modular parser architecture:
+
+- **ScriptLexer.pas** - Clean lexical analyzer with comprehensive token support
+- **ScriptParser.pas** - Recursive descent parser with direct bytecode generation
+- **ScriptAST.pas** - Abstract Syntax Tree node definitions
+- **ScriptParserTests.pas** - Unit tests for the parser
+
+The new parser provides:
+- Better maintainability with clean separation of concerns
+- Comprehensive error reporting with line/column information
+- Unit tests for validation
+- Backward compatibility with existing scripts through the AdventureScript wrapper

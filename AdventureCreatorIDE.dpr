@@ -25,8 +25,8 @@ uses
 begin
 
   Application.Initialize;
+  TStyleManager.TrySetStyle('Smokey Quartz Kamri');
   Application.Title := 'Adventure Creator IDE';
-  TStyleManager.TrySetStyle('Onyx Blue');
   Application.CreateForm(TForm1, Form1);
   Application.CreateForm(TForm2, Form2);
   Application.CreateForm(TForm3, Form3);
