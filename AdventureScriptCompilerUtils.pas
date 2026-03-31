@@ -538,6 +538,45 @@ begin
   inc(RandomChanceCnt);
 end;
 
+procedure PushExpressionValue(var Stack: TArrayofVariant; var StackCount: integer;
+  const Value: variant);
+begin
+  SetLength(Stack, StackCount + 1);
+  Stack[StackCount] := Value;
+  inc(StackCount);
+end;
+
+function PopExpressionValue(var Stack: TArrayofVariant; var StackCount: integer)
+  : variant;
+begin
+  if StackCount = 0 then
+  begin
+    Result := Null;
+    Exit;
+  end;
+
+  dec(StackCount);
+  Result := Stack[StackCount];
+  SetLength(Stack, StackCount);
+end;
+
+function ApplyExpressionOperator(const LeftValue, RightValue: variant;
+  Opcode: integer): variant;
+begin
+  case Opcode of
+    OP_ADD:
+      Result := LeftValue + RightValue;
+    OP_SUBTRACT:
+      Result := LeftValue - RightValue;
+    OP_MULTIPLY:
+      Result := LeftValue * RightValue;
+    OP_DIVIDE:
+      Result := LeftValue div RightValue;
+  else
+    Result := RightValue;
+  end;
+end;
+
 function FindStringList(strid: string): integer;
 var
   i: integer;
@@ -942,6 +981,10 @@ var
   compare_mode: integer;
   intermediatedata: variant;
   instruction_param_data: variant;
+  expression_stack: TArrayofVariant;
+  expression_stack_count: integer;
+  left_operand: variant;
+  right_operand: variant;
   if_position: integer;
   if_else_position: integer;
   for_start_pos, for_end_pos: integer;
@@ -961,6 +1004,9 @@ begin
   current_instruction := TheScript.instructions[x].inst_type;
   execution_mode := EXEC_MODE_NORMAL;
   function_called := false;
+  funcresult := Null;
+  intermediatedata := Null;
+  expression_stack_count := 0;
   numifopcodes := 0;
   while (current_instruction <> OP_FUNCTIONEND) do
   begin
@@ -1234,19 +1280,65 @@ begin
         end;
       OP_ADD:
         begin
-          last_mode := MODE_ADD;
+          if (execution_mode = EXEC_MODE_SETVAR) and
+            (expression_stack_count >= 2) then
+          begin
+            right_operand := PopExpressionValue(expression_stack,
+              expression_stack_count);
+            left_operand := PopExpressionValue(expression_stack,
+              expression_stack_count);
+            PushExpressionValue(expression_stack, expression_stack_count,
+              ApplyExpressionOperator(left_operand, right_operand, OP_ADD));
+          end
+          else
+            last_mode := MODE_ADD;
         end;
       OP_SUBTRACT:
         begin
-          last_mode := MODE_SUBTRACT;
+          if (execution_mode = EXEC_MODE_SETVAR) and
+            (expression_stack_count >= 2) then
+          begin
+            right_operand := PopExpressionValue(expression_stack,
+              expression_stack_count);
+            left_operand := PopExpressionValue(expression_stack,
+              expression_stack_count);
+            PushExpressionValue(expression_stack, expression_stack_count,
+              ApplyExpressionOperator(left_operand, right_operand,
+              OP_SUBTRACT));
+          end
+          else
+            last_mode := MODE_SUBTRACT;
         end;
       OP_MULTIPLY:
         begin
-          last_mode := MODE_MULTIPLY;
+          if (execution_mode = EXEC_MODE_SETVAR) and
+            (expression_stack_count >= 2) then
+          begin
+            right_operand := PopExpressionValue(expression_stack,
+              expression_stack_count);
+            left_operand := PopExpressionValue(expression_stack,
+              expression_stack_count);
+            PushExpressionValue(expression_stack, expression_stack_count,
+              ApplyExpressionOperator(left_operand, right_operand,
+              OP_MULTIPLY));
+          end
+          else
+            last_mode := MODE_MULTIPLY;
         end;
       OP_DIVIDE:
         begin
-          last_mode := MODE_DIVIDE;
+          if (execution_mode = EXEC_MODE_SETVAR) and
+            (expression_stack_count >= 2) then
+          begin
+            right_operand := PopExpressionValue(expression_stack,
+              expression_stack_count);
+            left_operand := PopExpressionValue(expression_stack,
+              expression_stack_count);
+            PushExpressionValue(expression_stack, expression_stack_count,
+              ApplyExpressionOperator(left_operand, right_operand, OP_DIVIDE));
+          end
+          else
+            last_mode := MODE_DIVIDE;
         end;
       //
       // note: if the parameter is not number or string, then it is a variable reference
@@ -1263,32 +1355,34 @@ begin
 
             instruction_param_data := TheScript.instructions[x]
               .inst_params[0].data;
-          case last_mode of
-            MODE_ASSIGN:
-              begin
-                intermediatedata := TheScript.instructions[x]
-                  .inst_params[0].data;
-              end;
-            MODE_ADD:
-              begin
-                intermediatedata := intermediatedata + TheScript.instructions[x]
-                  .inst_params[0].data;
-              end;
-            MODE_SUBTRACT:
-              begin
-                intermediatedata := intermediatedata - TheScript.instructions[x]
-                  .inst_params[0].data;
-              end;
-            MODE_DIVIDE:
-              begin
-                intermediatedata := intermediatedata div TheScript.instructions
-                  [x].inst_params[0].data;
-              end;
-            MODE_MULTIPLY:
-              begin
-                intermediatedata := intermediatedata * TheScript.instructions[x]
-                  .inst_params[0].data;
-              end;
+          if execution_mode = EXEC_MODE_SETVAR then
+            PushExpressionValue(expression_stack, expression_stack_count,
+              instruction_param_data)
+          else
+          begin
+            case last_mode of
+              MODE_ASSIGN:
+                begin
+                  intermediatedata := instruction_param_data;
+                end;
+              MODE_ADD:
+                begin
+                  intermediatedata := intermediatedata + instruction_param_data;
+                end;
+              MODE_SUBTRACT:
+                begin
+                  intermediatedata := intermediatedata - instruction_param_data;
+                end;
+              MODE_DIVIDE:
+                begin
+                  intermediatedata := intermediatedata div
+                    instruction_param_data;
+                end;
+              MODE_MULTIPLY:
+                begin
+                  intermediatedata := intermediatedata * instruction_param_data;
+                end;
+            end;
           end;
         end;
       OP_IF_CONNECTOR:
@@ -1300,6 +1394,11 @@ begin
         begin
           execution_mode := EXEC_MODE_SETVAR;
           last_mode := MODE_ASSIGN;
+          SetLength(expression_stack, 0);
+          expression_stack_count := 0;
+          intermediatedata := Null;
+          funcresult := Null;
+          function_called := false;
           variable_to_manipulate := TheScript.instructions[x]
             .inst_params[0].data;
         end;
@@ -1314,28 +1413,34 @@ begin
         end;
       OP_ENDINSTRUCTION:
         begin
-          finaldata := intermediatedata;
-          if (function_called = true) and (varisnull(funcresult) = false) then
-          begin
-            finaldata := funcresult;
-            function_called := false;
-            funcresult := Null;
-          end;
+          if expression_stack_count > 0 then
+            finaldata := expression_stack[expression_stack_count - 1]
+          else
+            finaldata := intermediatedata;
 
           if execution_mode = EXEC_MODE_SETVAR then
           begin
             SetVariableValue(TheScript, variable_to_manipulate, finaldata);
           end;
+          SetLength(expression_stack, 0);
+          expression_stack_count := 0;
           execution_mode := EXEC_MODE_NORMAL;
+          function_called := false;
+          funcresult := Null;
         end;
       OP_FUNCTIONCALL:
         begin
+          funcresult := Null;
           if built_in_functions.indexof(TheScript.instructions[x].inst_params[0]
             .data) <> -1 then
           begin
-            function_called := true;
+            function_called := (execution_mode = EXEC_MODE_SETVAR);
             CallBuiltInFunction(TheScript, TheScript.instructions[x],
-              TheScript.instructions[x].inst_params[0].data, funcresult)
+              TheScript.instructions[x].inst_params[0].data, funcresult);
+            if (execution_mode = EXEC_MODE_SETVAR) and
+              (not VarIsNull(funcresult)) then
+              PushExpressionValue(expression_stack, expression_stack_count,
+                funcresult);
           end
           else
           begin

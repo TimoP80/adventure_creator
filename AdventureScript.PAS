@@ -64,15 +64,18 @@ type
   protected
     procedure Get; override;
     function ErrorStr(const ErrorCode: Integer; const Data: ansistring): ansistring; override;
-    
+
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    
+
     procedure Execute;
     function GetScanner: TAdventureScriptScanner;
     procedure Parse;
-    
+
+    // Public wrapper for protected ErrorStr method
+    function GetErrorString(const ErrorCode: Integer; const Data: ansistring): string;
+
     property ErrorList;
     property ListStream;
     property SourceStream;
@@ -222,7 +225,7 @@ begin
   // Legacy - handled in Execute
 end;
 
-function TAdventureScript.ErrorStr(const ErrorCode: Integer; 
+function TAdventureScript.ErrorStr(const ErrorCode: Integer;
   const Data: ansistring): ansistring;
 begin
   case ErrorCode of
@@ -290,6 +293,12 @@ begin
         Result := Result + ansistring(' (' + string(Data) + ')');
     end;
   end;
+end;
+
+function TAdventureScript.GetErrorString(const ErrorCode: Integer;
+  const Data: ansistring): string;
+begin
+  Result := string(ErrorStr(ErrorCode, Data));
 end;
 
 procedure TAdventureScript.Execute;

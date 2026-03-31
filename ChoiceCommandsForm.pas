@@ -3,7 +3,7 @@ unit ChoiceCommandsForm;
 interface
 
 uses
-  Winapi.Windows, AdventureFile,masks, Winapi.Messages, System.SysUtils,
+  Winapi.Windows, AdventureFile, Masks, Winapi.Messages, System.SysUtils,
   System.Variants, System.Classes, AdventureBinary, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
 

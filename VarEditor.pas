@@ -44,6 +44,7 @@ procedure UpdateVarList;
 var
   u: integer;
 begin
+  if AdventureData = nil then Exit;
   Form3.lstvarlist.items.clear;
   for u := 0 to AdventureData.Variables.Count - 1 do
   begin

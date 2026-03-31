@@ -84,6 +84,9 @@ type
     procedure ParseSetVarStatement;
     procedure ParseRandomChanceStatement;
     procedure ParseCondition;
+    procedure ParseFunctionCall(const Name: string);
+    procedure ParseFunctionArgument;
+    procedure EmitExpressionOperator(TokenType: TTokenType);
     function ParseExpression: Integer;  // Returns data type
     function ParseTerm: Integer;
     function ParseFactor: Integer;
@@ -213,7 +216,27 @@ end;
 procedure TScriptParser.FinishInstruction(Instr: instruction);
 begin
   if Assigned(FCurrentScript) then
-    NextInstruction(FCurrentScript^, Instr);
+    NextInstruction(FCurrentScript^, FLastInstruction);
+end;
+
+procedure TScriptParser.EmitExpressionOperator(TokenType: TTokenType);
+var
+  Instr: instruction;
+begin
+  case TokenType of
+    ttPlus:
+      Instr := EmitInstruction(OP_ADD);
+    ttMinus:
+      Instr := EmitInstruction(OP_SUBTRACT);
+    ttStar:
+      Instr := EmitInstruction(OP_MULTIPLY);
+    ttSlash:
+      Instr := EmitInstruction(OP_DIVIDE);
+  else
+    Exit;
+  end;
+
+  FinishInstruction(Instr);
 end;
 
 procedure TScriptParser.Parse(Script: PScript);
@@ -480,20 +503,7 @@ begin
   
   if Check(ttLParen) then
   begin
-    // It's a function call
-    Instr := EmitInstruction(OP_FUNCTIONCALL);
-    EmitParam(Name, DATA_TYPE_FUNCTION_NAME);
-    FinishInstruction(Instr);
-    
-    // Parse arguments
-    Advance;  // Consume (
-    while not FHaveErrors and not Check(ttRParen) do
-    begin
-      ParseValue;
-      if Check(ttComma) then
-        Advance;
-    end;
-    Expect(ttRParen);
+    ParseFunctionCall(Name);
   end
   else if Check(ttDollar) then
   begin
@@ -714,6 +724,9 @@ begin
   
   // Parse expression
   ParseExpression;
+
+  Instr := EmitInstruction(OP_ENDINSTRUCTION);
+  FinishInstruction(Instr);
 end;
 
 procedure TScriptParser.ParseRandomChanceStatement;
@@ -863,37 +876,97 @@ begin
   FinishInstruction(Instr);
 end;
 
+procedure TScriptParser.ParseFunctionCall(const Name: string);
+var
+  Instr: instruction;
+begin
+  Instr := EmitInstruction(OP_FUNCTIONCALL);
+  EmitParam(Name, DATA_TYPE_FUNCTION_NAME);
+
+  Expect(ttLParen);
+  while not FHaveErrors and not Check(ttRParen) do
+  begin
+    ParseFunctionArgument;
+    if Check(ttComma) then
+      Advance
+    else if not Check(ttRParen) then
+      ErrorExpected('"," or ")"');
+  end;
+  Expect(ttRParen);
+
+  FinishInstruction(Instr);
+end;
+
+procedure TScriptParser.ParseFunctionArgument;
+begin
+  if Check(ttDollar) then
+  begin
+    Advance;
+    if not Check(ttIdentifier) then
+    begin
+      ErrorExpected('variable name');
+      Exit;
+    end;
+
+    EmitParam(FCurrentToken.Value, DATA_TYPE_PARAMETER_VARIABLEREF);
+    Advance;
+    Exit;
+  end;
+
+  case FCurrentToken.TokenType of
+    ttIdentifier:
+      begin
+        EmitParam(FCurrentToken.Value, DATA_TYPE_PARAMETER_VARIABLEREF);
+        Advance;
+      end;
+
+    ttNumber:
+      begin
+        EmitParam(StrToIntDef(FCurrentToken.Value, 0), DATA_TYPE_PARAMETER_INT);
+        Advance;
+      end;
+
+    ttString:
+      begin
+        EmitParam(ParseStringLiteral(FCurrentToken.Value),
+          DATA_TYPE_PARAMETER_STRING);
+        Advance;
+      end;
+
+  else
+    ErrorExpected('function argument');
+  end;
+end;
+
 function TScriptParser.ParseExpression: Integer;
+var
+  OperatorToken: TTokenType;
 begin
   Result := ParseTerm;
   
   while Check(ttPlus) or Check(ttMinus) do
   begin
-    if Check(ttPlus) then
-      Result := MODE_ADD
-    else
-      Result := MODE_SUBTRACT;
-      
+    OperatorToken := FCurrentToken.TokenType;
     Advance;  // Consume operator
-    
     ParseTerm;
+    EmitExpressionOperator(OperatorToken);
+    Result := COMPARE_MODE_INTEGER;
   end;
 end;
 
 function TScriptParser.ParseTerm: Integer;
+var
+  OperatorToken: TTokenType;
 begin
   Result := ParseFactor;
   
   while Check(ttStar) or Check(ttSlash) do
   begin
-    if Check(ttStar) then
-      Result := MODE_MULTIPLY
-    else
-      Result := MODE_DIVIDE;
-      
+    OperatorToken := FCurrentToken.TokenType;
     Advance;  // Consume operator
-    
     ParseFactor;
+    EmitExpressionOperator(OperatorToken);
+    Result := COMPARE_MODE_INTEGER;
   end;
 end;
 
@@ -913,10 +986,7 @@ begin
         // Check if it is a function call
         if Check(ttLParen) then
         begin
-          // Function call
-          Instr := EmitInstruction(OP_FUNCTIONCALL);
-          EmitParam(IdentifierName, COMPARE_MODE_STRING);
-          FinishInstruction(Instr);
+          ParseFunctionCall(IdentifierName);
         end
         else
         begin
@@ -954,9 +1024,13 @@ begin
       
     ttMinus:
       begin
+        Instr := EmitInstruction(OP_EXPRESSIONDATA);
+        EmitParam(0, COMPARE_MODE_INTEGER);
+        FinishInstruction(Instr);
         Advance;  // Consume -
         Result := ParseFactor;
-        // Could emit unary minus instruction here
+        EmitExpressionOperator(ttMinus);
+        Result := COMPARE_MODE_INTEGER;
       end;
       
   else

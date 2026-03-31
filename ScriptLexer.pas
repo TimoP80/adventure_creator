@@ -29,7 +29,7 @@ type
     ttEOF,              // End of file
     ttIdentifier,        // Variable/function names
     ttNumber,            // Decimal numbers
-    ttHexNumber,         // Hexadecimal numbers ($ followed by hex digits)
+    ttHexNumber,         // Hexadecimal numbers (0x followed by hex digits)
     ttString,            // String literals ("...")
     ttChar,              // Character literals ('...')
     ttKeyword,           // Reserved keywords
@@ -111,7 +111,6 @@ type
     procedure SkipComment;
     function ReadString(Quote: Char): string;
     function ReadNumber: string;
-    function ReadHexNumber: string;
     function ReadIdentifier: string;
 
   public
@@ -420,19 +419,6 @@ begin
   end;
 end;
 
-function TScriptLexer.ReadHexNumber: string;
-begin
-  Result := '';
-  
-  ReadChar; // Skip $
-  
-  while IsHexDigit(FCurrentChar) do
-  begin
-    Result := Result + FCurrentChar;
-    ReadChar;
-  end;
-end;
-
 function TScriptLexer.ReadIdentifier: string;
 begin
   Result := '';
@@ -514,15 +500,6 @@ begin
       Result.TokenType := ttHexNumber
     else
       Result.TokenType := ttNumber;
-    Exit;
-  end;
-  
-  // Hex number with $ prefix
-  if FCurrentChar = '$' then
-  begin
-    TokenValue := '$' + ReadHexNumber;
-    Result.Value := TokenValue;
-    Result.TokenType := ttHexNumber;
     Exit;
   end;
   

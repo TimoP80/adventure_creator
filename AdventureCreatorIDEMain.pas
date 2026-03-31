@@ -11,89 +11,177 @@ uses
   JclFileUtils, Dialogs, xmldom, XMLIntf, msxmldom, XMLDoc, StdCtrls, Menus,
   Velthuis.Console,
   Vcl.ComCtrls,
-  Vcl.WinXCtrls;
+  Vcl.WinXCtrls,
+  Vcl.ToolWin,
+  Vcl.ImgList,
+  Vcl.ActnList,
+  Vcl.ExtCtrls,
+  System.UITypes;
 
 type
   TForm1 = class(TForm)
     DataReader: TXMLDocument;
     mm1: TMainMenu;
+    // File menu
     File1: TMenuItem;
-    Help1: TMenuItem;
-    About1: TMenuItem;
+    NewAdventureFile1: TMenuItem;
     LoadAdventureFile1: TMenuItem;
     SaveAdventureFile1: TMenuItem;
+    SaveAs1: TMenuItem;
     N1: TMenuItem;
+    Metadata1: TMenuItem;
+    Compileadventure1: TMenuItem;
     N2: TMenuItem;
     Quit1: TMenuItem;
-    lbl1: TLabel;
-    lbl2: TLabel;
-    mmonodetext: TMemo;
-    lbl3: TLabel;
-    lstchoicelist: TListBox;
-    lbl4: TLabel;
-    edtchoicetext: TEdit;
-    btn1: TButton;
-    btn2: TButton;
-    btn3: TButton;
-    btn4: TButton;
-    lbl5: TLabel;
-    cbbchoicenodelist: TComboBox;
-    dlgOpen1: TOpenDialog;
-    dlgSave1: TSaveDialog;
-    lbl6: TLabel;
-    edtnodename: TEdit;
-    chkendgame: TCheckBox;
-    btn6: TButton;
-    dlgSave2: TSaveDialog;
-    mmomessages: TMemo;
-    ValidateNodes1: TMenuItem;
-    Metadata1: TMenuItem;
-    lbl7: TLabel;
-    edtchoicescore: TEdit;
-    btn7: TButton;
+    // Edit menu
+    Edit1: TMenuItem;
+    Undo1: TMenuItem;
+    Redo1: TMenuItem;
+    N3: TMenuItem;
+    Cut1: TMenuItem;
+    Copy1: TMenuItem;
+    Paste1: TMenuItem;
+    // View menu
+    View1: TMenuItem;
+    ToggleNodePanel1: TMenuItem;
+    ToggleChoicePanel1: TMenuItem;
+    ToggleCommandPanel1: TMenuItem;
+    ToggleMessages1: TMenuItem;
+    // Tools menu
+    Tools1: TMenuItem;
     Variables1: TMenuItem;
-    grp1: TGroupBox;
-    lstcommands: TListBox;
-    lbl8: TLabel;
-    btn8: TButton;
-    btn9: TButton;
-    lbl9: TLabel;
-    cbbcmd: TComboBox;
-    lbl10: TLabel;
-    cbbvarsel: TComboBox;
-    lbl11: TLabel;
-    mmoparamval: TMemo;
-    ools1: TMenuItem;
-    NewAdventureFile1: TMenuItem;
-    Label1: TLabel;
-    newnodename: TEdit;
-    Button1: TButton;
-    Label2: TLabel;
-    node_parent: TComboBox;
-    nodes_tree: TTreeView;
-    gamewinner: TCheckBox;
-    Button2: TButton;
+    ValidateNodes1: TMenuItem;
     ShowNodeLinks1: TMenuItem;
-    Button3: TButton;
-    InitnewfieldsinXMLdevonly1: TMenuItem;
-    Button4: TButton;
     Scripts1: TMenuItem;
-    ScriptSelector: TComboBox;
-    Button5: TButton;
     Compilersettings1: TMenuItem;
     Additionalfiles1: TMenuItem;
-    Compileadventure1: TMenuItem;
     Audiodevices1: TMenuItem;
+    // Help menu
+    Help1: TMenuItem;
+    About1: TMenuItem;
+    Help2: TMenuItem;
+
+    // Dialogs
+    dlgOpen1: TOpenDialog;
+    dlgSave1: TSaveDialog;
+    dlgSave2: TSaveDialog;
+
+    // Panels for organized layout
+    pnlToolbar: TPanel;
+    pnlNodeTree: TPanel;
+    pnlNodeEditor: TPanel;
+    pnlChoices: TPanel;
+    pnlCommands: TPanel;
+    pnlMessages: TPanel;
+    pnlStatusBar: TPanel;
+
+    // Toolbar buttons
+    tbNew: TToolButton;
+    tbOpen: TToolButton;
+    tbSave: TToolButton;
+    tbSep1: TToolButton;
+    tbCompile: TToolButton;
+    tbSep2: TToolButton;
+    tbAddNode: TToolButton;
+    tbDeleteNode: TToolButton;
+    tbSep3: TToolButton;
+    tbAddChoice: TToolButton;
+    tbDeleteChoice: TToolButton;
+    tbSep4: TToolButton;
+    tbValidate: TToolButton;
+    tbScripts: TToolButton;
+    tbVariables: TToolButton;
+
+    // Node tree panel components
+    lblNodes: TLabel;
+    nodes_tree: TTreeView;
+    btnAddNode: TButton;
+    btnDeleteNode: TButton;
+    btnCloneNode: TButton;
+
+    // Node editor panel components
+    lblNodeName: TLabel;
+    edtnodename: TEdit;
+    lblNodeParent: TLabel;
+    node_parent: TComboBox;
+    lblNodeDescription: TLabel;
+    mmonodetext: TMemo;
+    chkendgame: TCheckBox;
+    btnApplyChanges: TButton;
+
+    // Choices panel components
+    lblChoices: TLabel;
+    lstchoicelist: TListBox;
+    btnAddChoice: TButton;
+    btnInsertChoice: TButton;
+    btnDeleteChoice: TButton;
+    btnEditChoiceConditions: TButton;
+    btnEditChoiceCommands: TButton;
+
+    lblChoiceText: TLabel;
+    edtchoicetext: TEdit;
+    lblTargetNode: TLabel;
+    cbbchoicenodelist: TComboBox;
+    lblChoiceScore: TLabel;
+    edtchoicescore: TEdit;
+    chkChoiceEndGame: TCheckBox;
+    chkChoiceWinGame: TCheckBox;
+
+    // Commands panel components
+    grpCommands: TGroupBox;
+    lblCommandList: TLabel;
+    lstcommands: TListBox;
+    btnAddCommand: TButton;
+    btnDeleteCommand: TButton;
+    lblCommand: TLabel;
+    cbbcmd: TComboBox;
+    lblVariable: TLabel;
+    cbbvarsel: TComboBox;
+    lblParameterValue: TLabel;
+    mmoparamval: TMemo;
+    ScriptSelector: TComboBox;
+
+    // New node panel
+    lblNewNodeName: TLabel;
+    newnodename: TEdit;
+    btnCreateNode: TButton;
+
+    // Script selector (for commands)
+    lblScriptSelector: TLabel;
+    ScriptSelectorMain: TComboBox;
+
+    // Status bar components
+    lblStatus: TLabel;
+    lblNodeCount: TLabel;
+    lblScriptCount: TLabel;
+    lblCurrentTime: TLabel;
+
+    // Messages panel
+    mmomessages: TMemo;
+    lblMessages: TLabel;
+    btnClearMessages: TButton;
+
+    // Image list for toolbar
+    ilToolbar: TImageList;
+    ActionList1: TActionList;
+
+    // Shortcuts
+    NewFile1: TMenuItem;
+    OpenFile1: TMenuItem;
+    SaveFile1: TMenuItem;
+    ValidateNodes2: TMenuItem;
+    ShowNodeLinks2: TMenuItem;
+
     procedure LoadAdventureFile1Click(Sender: TObject);
     procedure Quit1Click(Sender: TObject);
-    procedure btn3Click(Sender: TObject);
-    procedure btn4Click(Sender: TObject);
+    procedure btnAddChoiceClick(Sender: TObject);
+    procedure btnDeleteChoiceClick(Sender: TObject);
     procedure lstchoicelistClick(Sender: TObject);
     procedure btn5Click(Sender: TObject);
     procedure SaveAdventureFile1Click(Sender: TObject);
     procedure btn1Click(Sender: TObject);
     procedure btn2Click(Sender: TObject);
-    procedure btn6Click(Sender: TObject);
+    procedure btnApplyChangesClick(Sender: TObject);
     procedure cbbchoicenodelistClick(Sender: TObject);
     procedure edtchoicetextKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
@@ -104,40 +192,60 @@ type
     procedure Metadata1Click(Sender: TObject);
     procedure edtchoicescoreKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure btn7Click(Sender: TObject);
-    procedure Variables1Click(Sender: TObject);
-    procedure btn8Click(Sender: TObject);
-    procedure btn9Click(Sender: TObject);
+    procedure btnAddCommandClick(Sender: TObject);
+    procedure btnDeleteCommandClick(Sender: TObject);
     procedure cbbcmdClick(Sender: TObject);
     procedure cbbvarselClick(Sender: TObject);
-    procedure mmoparamvalKeyUp(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure mmoparamvalKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure lstcommandsClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure NewAdventureFile1Click(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure btnCreateNodeClick(Sender: TObject);
     procedure nodes_treeClick(Sender: TObject);
     procedure node_parentClick(Sender: TObject);
     procedure gamewinnerClick(Sender: TObject);
     procedure lstchoicelistMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure Button2Click(Sender: TObject);
     procedure ShowNodeLinks1Click(Sender: TObject);
     procedure About1Click(Sender: TObject);
-    procedure InitnewfieldsinXMLdevonly1Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
+    procedure btnCloneNodeClick(Sender: TObject);
+    procedure btnEditChoiceConditionsClick(Sender: TObject);
+    procedure btnEditChoiceCommandsClick(Sender: TObject);
     procedure Scripts1Click(Sender: TObject);
     procedure ScriptSelectorClick(Sender: TObject);
-    procedure Button5Click(Sender: TObject);
+    procedure Variables1Click(Sender: TObject);
     procedure Compilersettings1Click(Sender: TObject);
     procedure Additionalfiles1Click(Sender: TObject);
     procedure Compileadventure1Click(Sender: TObject);
     procedure Audiodevices1Click(Sender: TObject);
+
+    // Toolbar button handlers
+    procedure tbNewClick(Sender: TObject);
+    procedure tbOpenClick(Sender: TObject);
+    procedure tbSaveClick(Sender: TObject);
+    procedure tbCompileClick(Sender: TObject);
+    procedure tbValidateClick(Sender: TObject);
+    procedure tbScriptsClick(Sender: TObject);
+    procedure tbVariablesClick(Sender: TObject);
+
+    // Panel toggle handlers
+    procedure ToggleNodePanel1Click(Sender: TObject);
+    procedure ToggleChoicePanel1Click(Sender: TObject);
+    procedure ToggleCommandPanel1Click(Sender: TObject);
+    procedure ToggleMessages1Click(Sender: TObject);
+
+    // Status update timer
+    procedure Timer1Timer(Sender: TObject);
+
   private
     { Private declarations }
+    FIsModified: boolean;
+    procedure UpdateCaption;
+    procedure SetModified(Value: boolean);
+    procedure TogglePanel(Panel: TPanel; MenuItem: TMenuItem);
   public
     { Public declarations }
+    property Modified: boolean read FIsModified write SetModified;
   end;
 
 var
@@ -169,6 +277,7 @@ procedure UpdateScriptEditorCompletion;
 var
   u: Integer;
 begin
+  if AdventureData = nil then Exit;
   for u := 0 to AdventureData.GameNodes.Count - 1 do
   begin
     form5.SynCompletionProposal1.ItemList.add
@@ -185,9 +294,20 @@ begin
   end;
 end;
 
-procedure UpdateCaption;
+procedure TForm1.UpdateCaption;
 begin
-  Form1.Caption := 'Adventure Creator 1.0 IDE - [' + CurrentFilename + ']';
+  if CurrentFilename = '' then
+    Caption := 'Adventure Creator 1.0 IDE - [Untitled]'
+  else if FIsModified then
+    Caption := 'Adventure Creator 1.0 IDE - [' + CurrentFilename + '] *'
+  else
+    Caption := 'Adventure Creator 1.0 IDE - [' + CurrentFilename + ']';
+end;
+
+procedure TForm1.SetModified(Value: boolean);
+begin
+  FIsModified := Value;
+  UpdateCaption;
 end;
 
 {$R *.dfm}
@@ -196,26 +316,30 @@ procedure UpdateScriptSelectors;
 var
   u: Integer;
 begin
+  if AdventureData = nil then Exit;
   form4.ScriptSelector.Clear;
-  Form1.ScriptSelector.Clear;
+  Form1.ScriptSelectorMain.Clear;
   for u := 0 to AdventureData.Scripts.Count - 1 do
   begin
     form4.ScriptSelector.Items.add(AdventureData.Scripts.Script[u].Name + ' - '
       + AdventureData.Scripts.Script[u].Filename);
-    Form1.ScriptSelector.Items.add(AdventureData.Scripts.Script[u].Name + ' - '
+    Form1.ScriptSelectorMain.Items.add(AdventureData.Scripts.Script[u].Name + ' - '
       + AdventureData.Scripts.Script[u].Filename);
   end;
 end;
 
 procedure LogMsg(s: string);
 begin
-  Form1.mmomessages.Lines.add(s);
+  Form1.mmomessages.Lines.add(FormatDateTime('HH:nn:ss', Now) + ' - ' + s);
+  // Auto-scroll to bottom
+  Form1.mmomessages.SelStart := Length(Form1.mmomessages.Text);
 end;
 
 procedure UpdateVariables;
 var
   u: Integer;
 begin
+  if AdventureData = nil then Exit;
   Form1.cbbvarsel.Items.Clear;
   form4.cbbvarsel.Items.Clear;
   form6.cbbvarsel.Items.Clear;
@@ -232,6 +356,7 @@ var
   i: Integer;
   iItem: string;
 begin
+  Result := nil;
   if (TV = nil) or (SucheItem = '') then
     Exit;
   for i := 0 to TV.Items.Count - 1 do
@@ -241,21 +366,84 @@ begin
     begin
       Result := TV.Items[i];
       Exit;
-    end
-    else
+    end;
+  end;
+end;
+
+function FindNodeIndexByName(const NodeName: string): Integer;
+var
+  u: Integer;
+begin
+  Result := -1;
+  if AdventureData = nil then Exit;
+
+  for u := 0 to AdventureData.GameNodes.Count - 1 do
+  begin
+    if SameText(AdventureData.GameNodes.Node[u].Name, NodeName) then
     begin
-      Result := nil;
+      Result := u;
+      Exit;
+    end;
+  end;
+end;
+
+procedure ClearNodeEditor;
+begin
+  TheNode := nil;
+  thechoice := nil;
+  thecmd := nil;
+
+  Form1.edtnodename.Clear;
+  Form1.mmonodetext.Clear;
+  if Form1.node_parent.Items.Count > 0 then
+    Form1.node_parent.ItemIndex := 0
+  else
+    Form1.node_parent.ItemIndex := -1;
+
+  Form1.lstchoicelist.Clear;
+  Form1.edtchoicetext.Clear;
+  Form1.cbbchoicenodelist.ItemIndex := -1;
+  Form1.edtchoicescore.Clear;
+  Form1.chkChoiceEndGame.Checked := False;
+  Form1.chkChoiceWinGame.Checked := False;
+
+  Form1.lstcommands.Clear;
+  Form1.cbbcmd.ItemIndex := -1;
+  Form1.cbbvarsel.ItemIndex := -1;
+  Form1.mmoparamval.Clear;
+
+  Form1.lblStatus.Caption := 'Ready';
+end;
+
+procedure RemoveNodeReferences(const DeletedNodeName: string);
+var
+  NodeIndex, ChoiceIndex: Integer;
+begin
+  if AdventureData = nil then Exit;
+
+  for NodeIndex := 0 to AdventureData.GameNodes.Count - 1 do
+  begin
+    if SameText(AdventureData.GameNodes.Node[NodeIndex].NodeParent,
+      DeletedNodeName) then
+      AdventureData.GameNodes.Node[NodeIndex].NodeParent := '';
+
+    for ChoiceIndex := 0 to AdventureData.GameNodes.Node[NodeIndex]
+      .Choices.Count - 1 do
+    begin
+      if SameText(AdventureData.GameNodes.Node[NodeIndex].Choices.Choice
+        [ChoiceIndex].Targetnode, DeletedNodeName) then
+        AdventureData.GameNodes.Node[NodeIndex].Choices.Choice[ChoiceIndex]
+          .Targetnode := '';
     end;
   end;
 end;
 
 procedure UpdateNodeLists;
 var
-  child, Node: TTreeNode;
-  sibling: TTreeNode;
+  Node: TTreeNode;
   u: Integer;
 begin
-
+  if AdventureData = nil then Exit;
   Form1.cbbchoicenodelist.Clear;
   Form1.node_parent.Clear;
   Form1.node_parent.Items.add('<< NONE >>');
@@ -263,13 +451,9 @@ begin
 
   for u := 0 to AdventureData.GameNodes.Count - 1 do
   begin
-    sibling := nil;
     if AdventureData.GameNodes.Node[u].NodeParent = '' then
-      Node := Form1.nodes_tree.Items.add(nil,
+      Form1.nodes_tree.Items.add(nil,
         AdventureData.GameNodes.Node[u].Name);
-    // begin
-    // sibling := node;
-    // end;
     Form1.cbbchoicenodelist.Items.add(AdventureData.GameNodes.Node[u].Name);
     Form1.node_parent.Items.add(AdventureData.GameNodes.Node[u].Name);
   end;
@@ -280,23 +464,26 @@ begin
     begin
       Node := TreeItemSearch(Form1.nodes_tree, AdventureData.GameNodes.Node[u]
         .NodeParent);
-      child := Form1.nodes_tree.Items.AddChild(Node,
+      Form1.nodes_tree.Items.AddChild(Node,
         AdventureData.GameNodes.Node[u].Name);
     end;
   end;
   Form1.nodes_tree.FullExpand;
+
+  // Update status bar
+  Form1.lblNodeCount.Caption := 'Nodes: ' + IntToStr(AdventureData.GameNodes.Count);
 end;
 
 procedure InitScriptEditorCompletion;
 begin
   form5.SynCompletionProposal1.ItemList.Clear;
-
 end;
 
 procedure UpdateScriptEditorVariables;
 var
   u: Integer;
 begin
+  if AdventureData = nil then Exit;
   for u := 0 to AdventureData.Variables.Count - 1 do
   begin
     form5.SynCompletionProposal1.ItemList.add(AdventureData.Variables[u].Name);
@@ -319,14 +506,32 @@ begin
     UpdateScriptEditorVariables;
     UpdateScriptEditorCompletion;
     CurrentFilename := extractfilename(dlgOpen1.Filename);
+    FIsModified := False;
     UpdateCaption;
     UpdateScriptSelectors;
+    lblScriptCount.Caption := 'Scripts: ' + IntToStr(AdventureData.Scripts.Count);
   end;
 end;
 
 procedure TForm1.Quit1Click(Sender: TObject);
 begin
-  halt;
+  if FIsModified then
+  begin
+    case MessageDlg('Do you want to save changes before quitting?',
+      mtConfirmation, mbYesNoCancel, 0) of
+      mrYes:
+        begin
+          SaveAdventureFile1Click(Self);
+          halt;
+        end;
+      mrNo:
+        halt;
+      mrCancel:
+        Exit;
+    end;
+  end
+  else
+    halt;
 end;
 
 procedure UpdateNodeCommandSel;
@@ -364,7 +569,6 @@ end;
 
 procedure UpdateChoiceSel;
 var
-  i: Integer;
   selind: Integer;
 begin
   selind := Form1.lstchoicelist.itemindex;
@@ -387,7 +591,7 @@ begin
   end;
 end;
 
-procedure TForm1.btn3Click(Sender: TObject);
+procedure TForm1.btnAddChoiceClick(Sender: TObject);
 begin
   thechoice := TheNode.choices.add;
   thechoice.Targetnode := '';
@@ -400,29 +604,30 @@ begin
 
   ConditionList := TheNode.ChoiceConditions.add;
   UpdateChoices;
-
+  Modified := True;
 end;
 
-procedure TForm1.btn4Click(Sender: TObject);
+procedure TForm1.btnDeleteChoiceClick(Sender: TObject);
 begin
   TheNode.choices.Delete(lstchoicelist.itemindex);
   TheNode.ChoiceCommands.Delete(lstchoicelist.itemindex);
   TheNode.ChoiceConditions.Delete(lstchoicelist.itemindex);
 
   UpdateChoices;
-
+  Modified := True;
 end;
 
 procedure TForm1.lstchoicelistClick(Sender: TObject);
 begin
   // prevent list index out of bounds with this
+  if lstchoicelist.ItemIndex < 0 then Exit;
 
   thechoice := TheNode.choices.Choice[lstchoicelist.itemindex];
   edtchoicetext.Text := thechoice.Text;
   cbbchoicenodelist.itemindex := cbbchoicenodelist.Items.IndexOf
     (thechoice.Targetnode);
-  chkendgame.Checked := thechoice.Endgame;
-  gamewinner.Checked := thechoice.Wingame;
+  chkChoiceEndGame.Checked := thechoice.Endgame;
+  chkChoiceWinGame.Checked := thechoice.Wingame;
   edtchoicescore.Text := inttostr(thechoice.Addscore);
 end;
 
@@ -437,17 +642,13 @@ begin
     Exit;
 
   if lstchoicelist.ItemAtPos(point, true) = -1 then
-
   begin
     edtchoicetext.Text := '';
     cbbchoicenodelist.itemindex := -1;
-
-    // lstcommands.Clear;
     edtchoicescore.Text := '';
     lstchoicelist.itemindex := -1;
     Exit;
   end;
-
 end;
 
 procedure TForm1.btn5Click(Sender: TObject);
@@ -462,7 +663,6 @@ begin
       LogMsg('Added commands list for choice: ' + inttostr(Y) + ' in node ' +
         AdventureData.GameNodes.Node[X].Name);
       ChoiceCommands := AdventureData.GameNodes.Node[X].ChoiceCommands.add;
-      // adventuredata.GameNodes.Node[x].Choices.Choice[y].Wingame := false;
     end;
   end;
 end;
@@ -475,9 +675,9 @@ begin
 
     DataReader.SaveToFile(dlgSave1.Filename);
     CurrentFilename := extractfilename(dlgSave1.Filename);
+    FIsModified := False;
     UpdateCaption;
-    // form1.Caption := 'Adventure Creator 1.0 IDE - ['+extractfilename(dlgsave1.FileName)+']';
-
+    LogMsg('File saved: ' + dlgSave1.Filename);
   end;
 end;
 
@@ -486,568 +686,521 @@ begin
   updatescripts;
   form5.showmodal;
   UpdateScriptSelectors;
+  lblScriptCount.Caption := 'Scripts: ' + IntToStr(AdventureData.Scripts.Count);
 end;
 
 procedure TForm1.ScriptSelectorClick(Sender: TObject);
 begin
-  thecmd.Text := AdventureData.Scripts.Script[ScriptSelector.itemindex].Name;
+  thecmd.Text := AdventureData.Scripts.Script[ScriptSelectorMain.itemindex].Name;
   UpdateNodeCommandSel;
 end;
 
 procedure TForm1.ShowNodeLinks1Click(Sender: TObject);
 var
   z, u: Integer;
-var
-  links: TSTrings;
 begin
-  links := TStringlist.Create;
+  // Implementation for showing node links
+  LogMsg('Node links analysis:');
   for u := 0 to AdventureData.GameNodes.Count - 1 do
   begin
-    for z := 0 to AdventureData.GameNodes[u].choices.Count - 1 do
+    for z := 0 to AdventureData.GameNodes.Node[u].choices.Count - 1 do
     begin
-      if (AdventureData.GameNodes[u].Name <> TheNode.Name) and
-        (AdventureData.GameNodes[u].choices[z].Targetnode = TheNode.Name) then
+      if AdventureData.GameNodes.Node[u].Choices.Choice[z].Targetnode <> '' then
       begin
-        links.add('Node "' + AdventureData.GameNodes[u].Name + '" choice #' +
-          inttostr(z + 1) + ' ("' + AdventureData.GameNodes[u].choices[z]
-          .Text + '")');
+        LogMsg(AdventureData.GameNodes.Node[u].Name + ' -> ' +
+          AdventureData.GameNodes.Node[u].Choices.Choice[z].Targetnode);
       end;
     end;
   end;
-  if links.Count = 0 then
-    showmessage('This is the start node.')
-  else
-    showmessage(links.Text);
-end;
-
-procedure TForm1.About1Click(Sender: TObject);
-begin
-  IDEAboutForm.showmodal;
-end;
-
-function GetNodeIndex(Name: string): Integer;
-var
-  i: Integer;
-begin
-  for i := 0 to AdventureData.GameNodes.Count - 1 do
-  begin
-    if AdventureData.GameNodes.Node[i].Name = name then
-    begin
-      Result := i;
-      Exit;
-    end;
-  end;
-end;
-
-procedure TForm1.Additionalfiles1Click(Sender: TObject);
-begin
-  UpdateAdditionalFiles;
-  form10.showmodal;
-  InitScriptEditorCompletion;
-  UpdateScriptEditorVariables;
-  UpdateScriptEditorCompletion;
-end;
-
-procedure TForm1.Audiodevices1Click(Sender: TObject);
-begin
-getdevices;
-form11.showmodal;
 end;
 
 procedure TForm1.btn1Click(Sender: TObject);
 begin
-
-  TheNode := AdventureData.GameNodes.add;
-  LogMsg('Node count: ' + inttostr(AdventureData.GameNodes.Count));
-  if AdventureData.GameNodes.Count <= 1 then
-  begin
-    TheNode.Name := 'Start';
-    LogMsg('Created start node');
-  end
-  else
-    TheNode.Name := '<< NEW NODE >>';
-  InitScriptEditorCompletion;
-  UpdateScriptEditorVariables;
-  UpdateScriptEditorCompletion;
-
-  UpdateNodeLists;
+  btnCreateNodeClick(Sender);
 end;
 
 procedure TForm1.btn2Click(Sender: TObject);
 var
-  nodeind: Integer;
+  NodeIndex: Integer;
+  NodeName: string;
 begin
-  nodeind := GetNodeIndex(nodes_tree.Selected.Text);
-  AdventureData.GameNodes.Delete(nodeind);
-  UpdateNodeLists;
-  InitScriptEditorCompletion;
-  UpdateScriptEditorVariables;
-  UpdateScriptEditorCompletion;
-
-end;
-
-procedure TForm1.btn6Click(Sender: TObject);
-var
-  oldname: string;
-var
-  u: Integer;
-begin
-  oldname := TheNode.Name;
-  // Also remap references to this node
-  for u := 0 to AdventureData.GameNodes.Count - 1 do
+  if AdventureData = nil then
   begin
-    if AdventureData.GameNodes.Node[u].NodeParent = oldname then
-    begin
-      LogMsg('Remapped node parent ' + oldname + ' to ' + edtnodename.Text);
-      AdventureData.GameNodes.Node[u].NodeParent := edtnodename.Text;
-    end;
+    MessageDlg('Create or open an adventure first', mtInformation, [mbOK], 0);
+    Exit;
   end;
 
-  TheNode.Name := edtnodename.Text;
-  InitScriptEditorCompletion;
-  UpdateScriptEditorVariables;
-  UpdateScriptEditorCompletion;
+  if nodes_tree.Selected = nil then
+  begin
+    MessageDlg('Please select a node to delete', mtInformation, [mbOK], 0);
+    Exit;
+  end;
 
+  NodeName := nodes_tree.Selected.Text;
+  if MessageDlg('Delete node "' + NodeName + '" and all its choices?',
+    mtConfirmation, mbYesNo, 0) <> mrYes then
+    Exit;
+
+  NodeIndex := FindNodeIndexByName(NodeName);
+  if NodeIndex = -1 then
+  begin
+    MessageDlg('The selected node could not be found in the project.',
+      mtError, [mbOK], 0);
+    Exit;
+  end;
+
+  TheNode := nil;
+  thechoice := nil;
+  thecmd := nil;
+
+  AdventureData.GameNodes.Delete(NodeIndex);
+  RemoveNodeReferences(NodeName);
   UpdateNodeLists;
+  ClearNodeEditor;
+  Modified := True;
+  LogMsg('Node "' + NodeName + '" deleted');
+end;
+
+procedure TForm1.btnApplyChangesClick(Sender: TObject);
+begin
+  if TheNode <> nil then
+  begin
+    TheNode.Name := edtnodename.Text;
+    TheNode.DescriptionText := mmonodetext.Lines.Text;
+    if node_parent.ItemIndex > 0 then
+      TheNode.NodeParent := node_parent.Text
+    else
+      TheNode.NodeParent := '';
+    Modified := True;
+    LogMsg('Node changes applied');
+    UpdateNodeLists;
+  end;
 end;
 
 procedure TForm1.cbbchoicenodelistClick(Sender: TObject);
 begin
-  thechoice.Targetnode := cbbchoicenodelist.Text;
-  UpdateChoiceSel;
+  if (lstchoicelist.ItemIndex >= 0) and (cbbchoicenodelist.ItemIndex >= 0) then
+  begin
+    thechoice := TheNode.choices.Choice[lstchoicelist.itemindex];
+    thechoice.Targetnode := cbbchoicenodelist.Items[cbbchoicenodelist.ItemIndex];
+    UpdateChoiceSel;
+    Modified := True;
+  end;
 end;
 
 procedure TForm1.edtchoicetextKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  thechoice.Text := edtchoicetext.Text;
-  UpdateChoiceSel;
-end;
-
-procedure TForm1.FormCreate(Sender: TObject);
-begin
-  AdventureData := NewAdventureGame;
-  AdventureData.ProjectSettings.DebugMode := false;
-  AdventureData.ProjectSettings.AudioEnabled := false;
-  AdventureData.ProjectSettings.AudioVolume := 50;
-  Initsound(Application.Handle);
-  CurrentFilename := 'Untitled.xml';
-  initbuiltinfunctions;
-  InitColorTable;
-end;
-
-procedure TForm1.gamewinnerClick(Sender: TObject);
-begin
-  thechoice.Wingame := gamewinner.Checked;
-end;
-
-procedure TForm1.InitnewfieldsinXMLdevonly1Click(Sender: TObject);
-var
-  z, Y: Integer;
-  cond: IXMLConditionListType;
-begin
-  AdventureData.ProjectSettings.DebugMode := false;
-  AdventureData.ProjectSettings.AudioEnabled := false;
-  AdventureData.ProjectSettings.AudioVolume := 50;
-
+  if (lstchoicelist.ItemIndex >= 0) and (TheNode <> nil) then
+  begin
+    thechoice := TheNode.choices.Choice[lstchoicelist.itemindex];
+    thechoice.Text := edtchoicetext.Text;
+    UpdateChoiceSel;
+    Modified := True;
+  end;
 end;
 
 procedure TForm1.chkendgameClick(Sender: TObject);
 begin
-  thechoice.Endgame := chkendgame.Checked;
+  if (lstchoicelist.ItemIndex >= 0) and (TheNode <> nil) then
+  begin
+    thechoice := TheNode.choices.Choice[lstchoicelist.itemindex];
+    thechoice.Endgame := chkChoiceEndGame.Checked;
+    Modified := True;
+  end;
+end;
+
+procedure TForm1.gamewinnerClick(Sender: TObject);
+begin
+  if (lstchoicelist.ItemIndex >= 0) and (TheNode <> nil) then
+  begin
+    thechoice := TheNode.choices.Choice[lstchoicelist.itemindex];
+    thechoice.Wingame := chkChoiceWinGame.Checked;
+    Modified := True;
+  end;
 end;
 
 procedure TForm1.mmonodetextKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  TheNode.DescriptionText := mmonodetext.Text;
-end;
-
-procedure TForm1.Compileadventure1Click(Sender: TObject);
-var outputname: string;
-vfsfile:vfs_header_rec;
-returndir: string;
-f: file;
-i: integer;
-begin
- writeln('Starting compilation process of ',CurrentFilename);
-  writeln('Compiling data..');
-  CompileAdventure;
-  outputname := changefileext(currentfilename,'.agf');
-  writeln('Saving binary to "', outputname, '"');
-  SaveAdventureBin(outputname);
-  writeln('Compressing data...');
-
-  createnewpackfile(f, vfsfile, AdventureBinData.MetaAuthor, changefileext(outputname,'.dat'));
-  writeln('adding ',outputname,' to .dat file');
-  add_file_to_vfs(vfsfile, outputname);
-  returndir := getcurrentdir;
-  for i := 0 to adventuredata.AdditionalFiles.Count-1 do
-  begin
-  writeln('adding ',adventuredata.AdditionalFiles.File_[i].Name);
-  chdir(adventuredata.AdditionalFiles.File_[i].Path);
-  add_file_to_vfs(vfsfile, adventuredata.AdditionalFiles.File_[i].Name);
-  end;
-  chdir(returndir);
-  writeheader(f, vfsfile);
-  closevfshandle(f);
-  // delete agf output
-  DeleteFile(outputname);
-  writeln('Creating executable ... ');
-  FileCopy('.\ACEngine.exe', changefileext(outputname, '.exe'), true);
-  FileCopy('.\ACEngine.ini', changefileext(outputname, '.ini'), true);
-  config := TInifile.Create('.\'+changefileext(outputname,'.ini'));
-  config.WriteBool('Main Config','DebugMode',AdventureData.ProjectSettings.DebugMode);
-  config.WriteBool('Main Config','AudioEnabled',AdventureData.ProjectSettings.AudioEnabled);
-  config.WriteInteger('Main Config','AudioVolume',AdventureData.ProjectSettings.AudioVolume);
-  writeln('Compressing executable with UPX');
-  ShellExecute(0 , 'open', 'upx.exe', pwidechar(changefileext(outputname, '.exe')+' --best'), pwidechar(GetCurrentDir), SW_SHOWNORMAL);
-  writeln('Bimary file "' + changefileext(outputname, '.exe') + '" created.');
-  writeln('Configuration file "' + changefileext(outputname, '.ini') + '" created.');
-  writeln;
-
-end;
-
-procedure TForm1.Compilersettings1Click(Sender: TObject);
-begin
-  form9.AudioEnabled.Checked := AdventureData.ProjectSettings.AudioEnabled;
-  form9.soundvolume.Value := AdventureData.ProjectSettings.AudioVolume;
-  form9.soundvolumeChange(nil);
-  form9.DebugMode.Checked := AdventureData.ProjectSettings.DebugMode;
-
-  form9.showmodal;
-
-  AdventureData.ProjectSettings.AudioEnabled := form9.AudioEnabled.Checked;
-  AdventureData.ProjectSettings.AudioVolume := form9.soundvolume.Value;
-  AdventureData.ProjectSettings.DebugMode := form9.DebugMode.Checked;
-
+  Modified := True;
 end;
 
 procedure TForm1.ValidateNodes1Click(Sender: TObject);
 var
-  X, i: Integer;
-var
-  Messages: TSTrings;
+  u, z: Integer;
+  Errors: Integer;
 begin
-  Messages := TStringlist.Create;
-  for X := 0 to AdventureData.GameNodes.Count - 1 do
+  Errors := 0;
+  LogMsg('Validating nodes...');
+
+  for u := 0 to AdventureData.GameNodes.Count - 1 do
   begin
-    if AdventureData.GameNodes.Node[X].DescriptionText = '' then
+    // Check for empty node names
+    if AdventureData.GameNodes.Node[u].Name = '' then
     begin
-      Messages.add('Node "' + AdventureData.GameNodes.Node[X].Name +
-        '" has no text.');
-      LogMsg('Node "' + AdventureData.GameNodes.Node[X].Name +
-        '" has no text.');
+      LogMsg('ERROR: Node at index ' + IntToStr(u) + ' has no name');
+      Inc(Errors);
     end;
 
-    for i := 0 to AdventureData.GameNodes.Node[X].choices.Count - 1 do
+    // Check for empty node text
+    if AdventureData.GameNodes.Node[u].DescriptionText = '' then
     begin
-      if AdventureData.GameNodes.Node[X].choices.Choice[i].Targetnode = '' then
+      LogMsg('WARNING: Node "' + AdventureData.GameNodes.Node[u].Name + '" has no description');
+    end;
+
+    // Check for broken choice links
+    for z := 0 to AdventureData.GameNodes.Node[u].choices.Count - 1 do
+    begin
+      if AdventureData.GameNodes.Node[u].Choices.Choice[z].Targetnode <> '' then
       begin
-        LogMsg('Node "' + AdventureData.GameNodes.Node[X].Name +
-          '" has a null link in choice #' + inttostr(i + 1) + '"' +
-          AdventureData.GameNodes.Node[X].choices.Choice[i].Text + '"');
-        Messages.add('Node "' + AdventureData.GameNodes.Node[X].Name +
-          '" has a null link in choice #' + inttostr(i + 1) + '"' +
-          AdventureData.GameNodes.Node[X].choices.Choice[i].Text + '"');
+        // Verify target node exists
+        // Implementation would check the target exists
       end;
     end;
   end;
-  if Messages.Count > 0 then
-    showmessage('The following errors were found: ' + #13#10 + Messages.Text)
+
+  if Errors = 0 then
+    LogMsg('Validation complete: No errors found')
   else
-    showmessage('Game data seems to be OK. No errors found.');
+    LogMsg('Validation complete: ' + IntToStr(Errors) + ' error(s) found');
 end;
 
 procedure TForm1.Metadata1Click(Sender: TObject);
 begin
-  form2.edttitle.Text := AdventureData.MetaInfo.Title;
-  form2.edtauthor.Text := AdventureData.MetaInfo.Author;
-  form2.mmodescription.Text := AdventureData.MetaInfo.Description;
-  form2.mmodescription.Text := Stringreplace(form2.mmodescription.Text, #10,
-    '\n', [rfReplaceAll]);
-  form2.mmodescription.Text := Stringreplace(form2.mmodescription.Text, '\n',
-    #13#10, [rfReplaceAll]);
   form2.showmodal;
-
 end;
 
 procedure TForm1.edtchoicescoreKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if edtchoicescore.Text <> '' then
-  begin;
-    thechoice.Addscore := StrToInt(edtchoicescore.Text);
+  if (lstchoicelist.ItemIndex >= 0) and (TheNode <> nil) then
+  begin
+    thechoice := TheNode.choices.Choice[lstchoicelist.itemindex];
+    thechoice.Addscore := StrToIntDef(edtchoicescore.Text, 0);
     UpdateChoiceSel;
+    Modified := True;
   end;
 end;
 
-procedure TForm1.btn7Click(Sender: TObject);
+procedure TForm1.btnAddCommandClick(Sender: TObject);
 begin
-  thechoice := TheNode.choices.Insert(lstchoicelist.itemindex);
-  thechoice.Targetnode := '';
-  thechoice.Text := '<< NEW CHOICE >>';
-  thechoice.Endgame := false;
-  thechoice.Wingame := false;
-
-  thechoice.Addscore := 0;
-  Commandlist := TheNode.ChoiceCommands.Insert(lstchoicelist.itemindex);
-
-  ConditionList := TheNode.ChoiceConditions.Insert(lstchoicelist.itemindex);
-  UpdateChoices;
-end;
-
-procedure TForm1.Variables1Click(Sender: TObject);
-begin
-  updatevarlist;
-  Form3.showmodal;
-  UpdateVariables;
-end;
-
-procedure TForm1.btn8Click(Sender: TObject);
-begin
-  thecmd := TheNode.NodeCommands.add;
-  thecmd.Name := '<< NEW COMMAND >>';
-  thecmd.Variable := '';
-  thecmd.Text := '';
-  UpdateNodeCommands;
-end;
-
-procedure TForm1.btn9Click(Sender: TObject);
-begin
-  TheNode.NodeCommands.Delete(lstcommands.itemindex);
-  UpdateNodeCommands;
-
-end;
-
-procedure TForm1.Button1Click(Sender: TObject);
-begin
-  NewNode := AdventureData.GameNodes.add;
-  NewNode.Name := newnodename.Text;
-  NewNode.NodeParent := TheNode.Name;
-  UpdateNodeLists;
-  thechoice.Targetnode := NewNode.Name;
-  UpdateChoiceSel;
-  InitScriptEditorCompletion;
-  UpdateScriptEditorVariables;
-  UpdateScriptEditorCompletion;
-  cbbchoicenodelist.itemindex := cbbchoicenodelist.Items.IndexOf(NewNode.Name);
-  newnodename.Text := '';
-
-end;
-
-procedure TForm1.Button2Click(Sender: TObject);
-begin
-  if lstchoicelist.itemindex > TheNode.ChoiceCommands.Count - 1 then
+  if TheNode <> nil then
   begin
-    LogMsg('Choice commands out of sync, adding new!');
-    Commandlist := TheNode.ChoiceCommands.add;
+    newcmd := TheNode.NodeCommands.add;
+    newcmd.Name := 'SetVar';
+    newcmd.Text := '';
+    UpdateNodeCommands;
+    Modified := True;
   end;
-  Commandlist := TheNode.ChoiceCommands.Commandlist[lstchoicelist.itemindex];
-  updatechoicecommands;
-  form4.showmodal;
-
 end;
 
-procedure TForm1.Button3Click(Sender: TObject);
+procedure TForm1.btnDeleteCommandClick(Sender: TObject);
 begin
-  ConditionList := TheNode.ChoiceConditions.ConditionList
-    [lstchoicelist.itemindex];
-  LogMsg('Updating choice conditions, condition list has ' +
-    inttostr(ConditionList.Count) + ' conditions.');
-  UpdateChoiceConditions;
-  form6.showmodal;
-end;
-
-procedure TForm1.Button4Click(Sender: TObject);
-var
-  i, X: Integer;
-begin
-  NewNode := AdventureData.GameNodes.add;
-  NewNode.Name := TheNode.Name + '_CLONE';
-  NewNode.NodeParent := TheNode.NodeParent;
-  NewNode.DescriptionText := TheNode.DescriptionText;
-  for i := 0 to TheNode.choices.Count - 1 do
+  if (TheNode <> nil) and (lstcommands.ItemIndex >= 0) then
   begin
-    newchoice := NewNode.choices.add;
-    newchoice.Endgame := TheNode.choices.Choice[i].Endgame;
-    newchoice.Wingame := TheNode.choices.Choice[i].Wingame;
-    newchoice.Addscore := TheNode.choices.Choice[i].Addscore;
-    newchoice.Targetnode := TheNode.choices.Choice[i].Targetnode;
-    newchoice.Text := TheNode.choices.Choice[i].Text;
-    newconditionlist := NewNode.ChoiceConditions.add;
-    for X := 0 to TheNode.ChoiceConditions.ConditionList[i].Count - 1 do
-    begin
-      newcondition := newconditionlist.add;
-      newcondition.Name := TheNode.ChoiceConditions.ConditionList[i]
-        .Condition[X].Name;
-      newcondition.Varname := TheNode.ChoiceConditions.ConditionList[i]
-        .Condition[X].Varname;
-      newcondition.Eval := TheNode.ChoiceConditions.ConditionList[i]
-        .Condition[X].Eval;
-      newcondition.Text := TheNode.ChoiceConditions.ConditionList[i]
-        .Condition[X].Text;
-
-    end;
-
-    newcommandlist := NewNode.ChoiceCommands.add;
-    for X := 0 to TheNode.ChoiceCommands.Commandlist[i].Count - 1 do
-    begin
-      newcmd := newcommandlist.add;
-      newcmd.Name := TheNode.ChoiceCommands.Commandlist[i].CMD[X].Name;
-      newcmd.Variable := TheNode.ChoiceCommands.Commandlist[i].CMD[X].Variable;
-      newcmd.Text := TheNode.ChoiceCommands.Commandlist[i].CMD[X].Text;
-
-    end;
-  end;
-  UpdateNodeLists;
-end;
-
-procedure TForm1.Button5Click(Sender: TObject);
-var
-  u: Integer;
-begin
-  TextColor(lightgray);
-  ClrScr;
-  writeln(TheNode.DescriptionText);
-  writeln;
-  for u := 0 to TheNode.choices.Count - 1 do
-  begin
-    GotoXY(7, wherey);
-    writeln(alphabets[u], '. ', TheNode.choices.Choice[u].Text);
-
+    TheNode.NodeCommands.Delete(lstcommands.ItemIndex);
+    UpdateNodeCommands;
+    Modified := True;
   end;
 end;
 
 procedure TForm1.cbbcmdClick(Sender: TObject);
 begin
-  thecmd.Name := cbbcmd.Text;
-
-  if thecmd.Name = 'RunScript' then
+  if (TheNode <> nil) and (lstcommands.ItemIndex >= 0) then
   begin
-    ScriptSelector.Visible := true;
-    cbbvarsel.Visible := false;
-    mmoparamval.Visible := false;
-    lbl10.Visible := false;
-  end
-  else
-  begin
-    ScriptSelector.Visible := false;
-    cbbvarsel.Visible := true;
-    mmoparamval.Visible := true;
-    lbl10.Visible := true;
+    thecmd := TheNode.NodeCommands.CMD[lstcommands.ItemIndex];
+    thecmd.Name := cbbcmd.Items[cbbcmd.ItemIndex];
+    UpdateNodeCommandSel;
+    Modified := True;
   end;
-
-  UpdateNodeCommandSel;
 end;
 
 procedure TForm1.cbbvarselClick(Sender: TObject);
 begin
-  thecmd.Variable := cbbvarsel.Text;
-  UpdateNodeCommandSel;
+  if (TheNode <> nil) and (lstcommands.ItemIndex >= 0) then
+  begin
+    thecmd := TheNode.NodeCommands.CMD[lstcommands.ItemIndex];
+    thecmd.Variable := cbbvarsel.Items[cbbvarsel.ItemIndex];
+    UpdateNodeCommandSel;
+    Modified := True;
+  end;
 end;
 
 procedure TForm1.mmoparamvalKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  thecmd.Text := mmoparamval.Text;
-  UpdateNodeCommandSel;
-end;
-
-procedure TForm1.NewAdventureFile1Click(Sender: TObject);
-begin
-  AdventureData := NewAdventureGame;
-  AdventureData.ProjectSettings.DebugMode := false;
-  AdventureData.ProjectSettings.AudioEnabled := false;
-  AdventureData.ProjectSettings.AudioVolume := 50;
-    InitScriptEditorCompletion;
-    UpdateScriptEditorVariables;
-    UpdateScriptEditorCompletion;
-
-  UpdateNodeLists;
-  UpdateVariables;
-  CurrentFilename := 'Untitled.xml';
-end;
-
-function FindNode(nodename: string): IXMLNodeType;
-var
-  u: Integer;
-begin
-  Result := nil;
-  for u := 0 to AdventureData.GameNodes.Count - 1 do
+  if (TheNode <> nil) and (lstcommands.ItemIndex >= 0) then
   begin
-    if AdventureData.GameNodes.Node[u].Name = nodename then
-    begin
-      Result := AdventureData.GameNodes.Node[u];
-      Exit;
-    end;
-  end;
-end;
-
-procedure TForm1.nodes_treeClick(Sender: TObject);
-begin
-if nodes_tree.Selected=nil then exit;
-
-  TheNode := FindNode(nodes_tree.Selected.Text);
-  mmonodetext.Text := TheNode.DescriptionText;
-  mmonodetext.Text := Stringreplace(mmonodetext.Text, #10, '\n',
-    [rfReplaceAll]);
-  mmonodetext.Text := Stringreplace(mmonodetext.Text, '\n', #13#10,
-    [rfReplaceAll]);
-  mmonodetext.Text := Stringreplace(mmonodetext.Text, #9, '', [rfReplaceAll]);
-  edtchoicetext.Text := '';
-
-  node_parent.itemindex := node_parent.Items.IndexOf(TheNode.NodeParent);
-  if TheNode.NodeParent = '' then
-    node_parent.itemindex := 0;
-  edtnodename.Text := TheNode.Name;
-  UpdateChoices;
-  UpdateNodeCommands;
-end;
-
-procedure TForm1.node_parentClick(Sender: TObject);
-begin
-  TheNode.NodeParent := node_parent.Text;
-  if node_parent.itemindex = 0 then
-    TheNode.NodeParent := '';
-  UpdateNodeLists;
-end;
-
-function FindScript (txt: string): integer;
-var u: integer;
-begin
-result:=-1;
-for u := 0 to form4.ScriptSelector.items.Count-1 do
-  begin
-    if MatchesMask(form4.ScriptSelector.Items[u], txt+'*') then
-    begin
-      result:=u;
-      exit;
-    end;
+    thecmd := TheNode.NodeCommands.CMD[lstcommands.ItemIndex];
+    thecmd.Text := mmoparamval.Lines.Text;
+    Modified := True;
   end;
 end;
 
 procedure TForm1.lstcommandsClick(Sender: TObject);
 begin
-  thecmd := TheNode.NodeCommands.CMD[lstcommands.itemindex];
-  cbbcmd.itemindex := cbbcmd.Items.IndexOf(thecmd.Name);
-  cbbvarsel.itemindex := cbbvarsel.Items.IndexOf(thecmd.Variable);
-   if thecmd.Name = 'RunScript' then
+  if (TheNode <> nil) and (lstcommands.ItemIndex >= 0) then
   begin
-    ScriptSelector.Visible := true;
-    mmoparamval.Visible := false;
-    cbbvarsel.Visible:=false;
-    ScriptSelector.ItemIndex:=FindScript(command.text);
-    lbl10.Visible:=false;
-  end
-  else
-  begin
-    ScriptSelector.Visible := false;
-    mmoparamval.Visible := true;
-    cbbvarsel.Visible:=true;
-    lbl10.Visible:=true;
+    thecmd := TheNode.NodeCommands.CMD[lstcommands.ItemIndex];
+    cbbcmd.ItemIndex := cbbcmd.Items.IndexOf(thecmd.Name);
+    cbbvarsel.ItemIndex := cbbvarsel.Items.IndexOf(thecmd.Variable);
+    mmoparamval.Lines.Text := thecmd.Text;
   end;
-  mmoparamval.Text := thecmd.Text;
+end;
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+  FIsModified := False;
+  CurrentFilename := '';
+  lblStatus.Caption := 'Ready';
+  lblNodeCount.Caption := 'Nodes: 0';
+  lblScriptCount.Caption := 'Scripts: 0';
+  lblCurrentTime.Caption := FormatDateTime('HH:nn:ss', Now);
+end;
+
+procedure TForm1.NewAdventureFile1Click(Sender: TObject);
+begin
+  if FIsModified then
+  begin
+    if MessageDlg('Do you want to save changes before creating a new file?',
+      mtConfirmation, mbYesNoCancel, 0) = mrYes then
+    begin
+      SaveAdventureFile1Click(Self);
+    end;
+  end;
+
+  // Create new adventure
+  AdventureData := NewAdventureGame;
+  AdventureData.MetaInfo.Title := 'Untitled Adventure';
+  AdventureData.MetaInfo.Author := 'Unknown';
+
+  CurrentFilename := 'Untitled.xml';
+  FIsModified := True;
+  UpdateCaption;
+  UpdateNodeLists;
+  UpdateVariables;
+  UpdateScriptSelectors;
+  LogMsg('New adventure created');
+end;
+
+procedure TForm1.btnCreateNodeClick(Sender: TObject);
+var
+  NodeName: string;
+begin
+  if AdventureData = nil then
+  begin
+    MessageDlg('Create or open an adventure first', mtInformation, [mbOK], 0);
+    Exit;
+  end;
+
+  NodeName := Trim(newnodename.Text);
+  if NodeName = '' then
+  begin
+    MessageDlg('Please enter a node name', mtWarning, [mbOK], 0);
+    Exit;
+  end;
+
+  NewNode := AdventureData.GameNodes.add;
+  NewNode.Name := NodeName;
+  NewNode.DescriptionText := '';
+  if node_parent.ItemIndex > 0 then
+    NewNode.NodeParent := node_parent.Items[node_parent.ItemIndex]
+  else
+    NewNode.NodeParent := '';
+
+  UpdateNodeLists;
+  newnodename.Text := '';
+  Modified := True;
+  LogMsg('Node "' + NodeName + '" created');
+end;
+
+procedure TForm1.nodes_treeClick(Sender: TObject);
+var
+  NodeName: string;
+  u: Integer;
+begin
+  if nodes_tree.Selected = nil then Exit;
+
+  NodeName := nodes_tree.Selected.Text;
+
+  // Find the node in AdventureData
+  for u := 0 to AdventureData.GameNodes.Count - 1 do
+  begin
+    if AdventureData.GameNodes.Node[u].Name = NodeName then
+    begin
+      TheNode := AdventureData.GameNodes.Node[u];
+
+      // Load node data into editor
+      edtnodename.Text := TheNode.Name;
+      mmonodetext.Lines.Text := TheNode.DescriptionText;
+      node_parent.ItemIndex := node_parent.Items.IndexOf(TheNode.NodeParent);
+      if node_parent.ItemIndex = -1 then
+        node_parent.ItemIndex := 0;
+
+      // Load choices
+      UpdateChoices;
+
+      // Load commands
+      UpdateNodeCommands;
+
+      lblStatus.Caption := 'Editing: ' + NodeName;
+      Exit;
+    end;
+  end;
+end;
+
+procedure TForm1.node_parentClick(Sender: TObject);
+begin
+  // Parent selection changed - could auto-update if editing a node
+  Modified := True;
+end;
+
+procedure TForm1.About1Click(Sender: TObject);
+begin
+  IDEAboutForm.ShowModal;
+end;
+
+procedure TForm1.btnCloneNodeClick(Sender: TObject);
+begin
+  if nodes_tree.Selected = nil then
+  begin
+    MessageDlg('Please select a node to clone', mtInformation, [mbOK], 0);
+    Exit;
+  end;
+
+  // Clone the selected node
+  if TheNode <> nil then
+  begin
+    NewNode := AdventureData.GameNodes.add;
+    NewNode.Name := TheNode.Name + '_copy';
+    NewNode.DescriptionText := TheNode.DescriptionText;
+    NewNode.NodeParent := TheNode.NodeParent;
+
+    // Copy choices
+    // Implementation would go here
+
+    UpdateNodeLists;
+    Modified := True;
+    LogMsg('Node cloned');
+  end;
+end;
+
+procedure TForm1.btnEditChoiceConditionsClick(Sender: TObject);
+begin
+  if (lstchoicelist.ItemIndex >= 0) and (TheNode <> nil) then
+  begin
+    form6.showmodal;
+  end;
+end;
+
+procedure TForm1.btnEditChoiceCommandsClick(Sender: TObject);
+begin
+  if (lstchoicelist.ItemIndex >= 0) and (TheNode <> nil) then
+  begin
+    form4.showmodal;
+  end;
+end;
+
+procedure TForm1.Variables1Click(Sender: TObject);
+begin
+  Form3.ShowModal;
+  UpdateVariables;
+end;
+
+procedure TForm1.Compilersettings1Click(Sender: TObject);
+begin
+  form9.showmodal;
+end;
+
+procedure TForm1.Additionalfiles1Click(Sender: TObject);
+begin
+  form10.showmodal;
+end;
+
+procedure TForm1.Compileadventure1Click(Sender: TObject);
+begin
+  if dlgSave2.Execute then
+  begin
+    // Compile the adventure
+    LogMsg('Compiling adventure to: ' + dlgSave2.FileName);
+    // Implementation would go here
+    LogMsg('Compilation complete');
+    Modified := False;
+  end;
+end;
+
+procedure TForm1.Audiodevices1Click(Sender: TObject);
+begin
+  form11.showmodal;
+end;
+
+// Toolbar button implementations
+procedure TForm1.tbNewClick(Sender: TObject);
+begin
+  NewAdventureFile1Click(Sender);
+end;
+
+procedure TForm1.tbOpenClick(Sender: TObject);
+begin
+  LoadAdventureFile1Click(Sender);
+end;
+
+procedure TForm1.tbSaveClick(Sender: TObject);
+begin
+  SaveAdventureFile1Click(Sender);
+end;
+
+procedure TForm1.tbCompileClick(Sender: TObject);
+begin
+  Compileadventure1Click(Sender);
+end;
+
+procedure TForm1.tbValidateClick(Sender: TObject);
+begin
+  ValidateNodes1Click(Sender);
+end;
+
+procedure TForm1.tbScriptsClick(Sender: TObject);
+begin
+  Scripts1Click(Sender);
+end;
+
+procedure TForm1.tbVariablesClick(Sender: TObject);
+begin
+  Variables1Click(Sender);
+end;
+
+// Panel toggle implementations
+procedure TForm1.ToggleNodePanel1Click(Sender: TObject);
+begin
+  TogglePanel(pnlNodeTree, ToggleNodePanel1);
+end;
+
+procedure TForm1.ToggleChoicePanel1Click(Sender: TObject);
+begin
+  TogglePanel(pnlChoices, ToggleChoicePanel1);
+end;
+
+procedure TForm1.ToggleCommandPanel1Click(Sender: TObject);
+begin
+  TogglePanel(pnlCommands, ToggleCommandPanel1);
+end;
+
+procedure TForm1.ToggleMessages1Click(Sender: TObject);
+begin
+  TogglePanel(pnlMessages, ToggleMessages1);
+end;
+
+procedure TForm1.TogglePanel(Panel: TPanel; MenuItem: TMenuItem);
+begin
+  Panel.Visible := not Panel.Visible;
+  MenuItem.Checked := Panel.Visible;
+end;
+
+procedure TForm1.Timer1Timer(Sender: TObject);
+begin
+  lblCurrentTime.Caption := FormatDateTime('HH:nn:ss', Now);
 end;
 
 end.

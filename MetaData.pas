@@ -37,12 +37,14 @@ implementation
 procedure TForm2.edttitleKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
+  if AdventureData = nil then Exit;
   AdventureData.MetaInfo.Title := edttitle.text;
 end;
 
 procedure TForm2.edtauthorKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
+  if AdventureData = nil then Exit;
   AdventureData.MetaInfo.Author := edtauthor.text;
 
 end;
@@ -50,6 +52,7 @@ end;
 procedure TForm2.mmodescriptionKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
+  if AdventureData = nil then Exit;
   AdventureData.MetaInfo.Description := mmodescription.text;
 
   AdventureData.MetaInfo.Description :=

@@ -936,7 +936,8 @@ begin
 end;
 
 initialization
-  InitScreenMode;
+  // InitScreenMode removed - this is a GUI application, not a console app
+  // The console unit functions will gracefully fail if called without a console
 
 end.
 

@@ -249,13 +249,6 @@ begin
   TestCase.ExpectedValue := '0';
   RunLexerTest(TestCase);
   
-  // Test hexadecimal
-  TestCase.Name := 'TestLexerNumbers_HexDollar';
-  TestCase.Input := '$FF';
-  TestCase.ExpectedTokenType := ttHexNumber;
-  TestCase.ExpectedValue := '$FF';
-  RunLexerTest(TestCase);
-  
   // Test hexadecimal with 0x prefix
   TestCase.Name := 'TestLexerNumbers_Hex0x';
   TestCase.Input := '0xFF';
@@ -333,6 +326,13 @@ begin
   TestCase.Input := '<=';
   TestCase.ExpectedTokenType := ttLessEqual;
   TestCase.ExpectedValue := '<=';
+  RunLexerTest(TestCase);
+
+  // Test variable sigil
+  TestCase.Name := 'TestLexerOperators_Dollar';
+  TestCase.Input := '$';
+  TestCase.ExpectedTokenType := ttDollar;
+  TestCase.ExpectedValue := '$';
   RunLexerTest(TestCase);
 end;
 
