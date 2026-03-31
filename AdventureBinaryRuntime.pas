@@ -119,20 +119,24 @@ procedure SetVarValue(varname, value: string);
 function GetVarValue(varname: string): string;
 function ReplaceScriptVars(thescript: script; str: string): string;
 procedure UpdateMoney;
- procedure PrintHeader;
+procedure PrintHeader;
+procedure ResetGameState;
+procedure ResetAllVariables;
 
 implementation
-
 
 procedure SetVarValue(varname, value: string);
 var
   u: integer;
+  found: boolean;
 begin
+  found := false;
   for u := 0 to AdventureBinData.VariableCount - 1 do
   begin
     if varname = AdventureBinData.Variables[u].name then
     begin
       AdventureBinData.Variables[u].value := value;
+      found := true;
       exit;
     end;
   end;
@@ -142,11 +146,15 @@ function GetVarValue(varname: string): string;
 var
   u: integer;
 begin
+  Result := '';
   for u := 0 to AdventureBinData.VariableCount - 1 do
   begin
     if varname = AdventureBinData.Variables[u].name then
     begin
-      Result := AdventureBinData.Variables[u].value;
+      if AdventureBinData.Variables[u].value = '' then
+        Result := ''
+      else
+        Result := AdventureBinData.Variables[u].value;
       exit;
     end;
   end;
@@ -417,6 +425,37 @@ begin
     Result := not_equal_to
   else
 
+end;
+
+procedure ResetGameState;
+var
+  i: integer;
+begin
+  currentnode := '';
+  lastnode := '';
+  score := 0;
+  addedscore := 0;
+  wingame := false;
+  endgame := false;
+  currentmoney := 0;
+  numchoices := 0;
+  random_min := 0;
+  random_max := 0;
+end;
+
+procedure ResetAllVariables;
+var
+  i: integer;
+begin
+  for i := 0 to AdventureBinData.VariableCount - 1 do
+  begin
+    AdventureBinData.Variables[i].value := '';
+  end;
+  for i := 0 to AdventureBinData.ScriptCount - 1 do
+  begin
+    AdventureBinData.Scripts[i].variablecnt := 0;
+    SetLength(AdventureBinData.Scripts[i].variables, 0);
+  end;
 end;
 
 end.

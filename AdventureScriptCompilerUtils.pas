@@ -491,12 +491,15 @@ function GetVariableValue(TheScript: Script; varname: string): variant;
 var
   i: integer;
 begin
+  Result := '';
   for i := 0 to TheScript.variablecnt - 1 do
   begin
     if TheScript.variables[i].name = varname then
     begin
-      result := TheScript.variables[i].value;
-      // TheScript.variables[i].value := varvalue;
+      if VarIsNull(TheScript.variables[i].value) or VarIsEmpty(TheScript.variables[i].value) then
+        Result := ''
+      else
+        Result := TheScript.variables[i].value;
       exit;
     end;
   end;
@@ -506,26 +509,30 @@ procedure SetVariableValue(var TheScript: Script; varname: string;
   varvalue: variant);
 var
   i: integer;
+  found: boolean;
 begin
+  found := false;
   for i := 0 to TheScript.variablecnt - 1 do
   begin
     if TheScript.variables[i].name = varname then
     begin
       TheScript.variables[i].value := varvalue;
+      found := true;
       exit;
     end;
   end;
+  if not found then
+  begin
+    AddVariable(TheScript, varname);
+    TheScript.variables[TheScript.variablecnt - 1].value := varvalue;
+  end;
 end;
-
-//
-// When a variable is added to the script,
-// it is initially Null until it is used in the script
 
 procedure AddVariable(var TheScript: Script; varname: string);
 begin
   SetLength(TheScript.variables, TheScript.variablecnt + 1);
   TheScript.variables[TheScript.variablecnt].name := varname;
-  TheScript.variables[TheScript.variablecnt].value := Null;
+  TheScript.variables[TheScript.variablecnt].value := '';
   inc(TheScript.variablecnt);
 
 end;

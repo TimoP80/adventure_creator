@@ -1,4 +1,4 @@
-##adventure creator                                                                                                 
+# Adventure Creator
 
 Simple text based adventure game engine
 
@@ -11,29 +11,31 @@ An example game is provided to show you what this engine is capable of.
 
 Everything is coded in Object Pascal so knowledge of that language is required if you wish to contribute to this project.
 
-This project contains three executables: 
+## Executables
 
+This project contains three executables:
 
+- **acengine.exe** - Runtime engine for running compiled game files (.agf)
+- **accompiler.exe** - Command-line compiler for converting XML files to .agf format
+- **AdventureCreatorIDE.exe** - Full-featured IDE for creating and editing game files
 
-acengine.exe for running the game files (.agf)
-
-accompiler.exe for compiling xml files to agf
-
-AdventureCreatorIDE.exe for editing game files and saving them to xml format
+## Requirements
 
 The source code is compilable with Delphi 10 Seattle and above. Compiled binaries are provided and they are
 updated regularly. There is also an installer for the binary bundle in the IS-Installer folder.
 
-This repository is the full online mirror of my local development folder. The first release will be added when I feel the engine and editor are stable enough.
-
 For compiling the IDE, the following components are needed:
 
-- JVCL
-- JCL
+- JVCL (Jedi Visual Component Library)
+- JCL (Jedi Code Library)
 - SynEdit (for syntax highlighting)
 
-WARNING! This project is not fully documented yet, documentation is a work in progress as the engine is 
-being developed to its full form.
+## Current Versions
+
+- **Engine**: v0.92
+- **Editor**: v0.97
+- **Script Engine**: v0.15
+- **Lines of Code**: ~22,979
 
 ## New Modular Parser Architecture (v0.93+)
 
@@ -49,3 +51,22 @@ The new parser provides:
 - Comprehensive error reporting with line/column information
 - Unit tests for validation
 - Backward compatibility with existing scripts through the AdventureScript wrapper
+
+## Features
+
+- Node-based story progression system
+- Conditional choices and branching narratives
+- Variable system for game state tracking
+- Built-in scripting language for advanced game logic
+- Save/Load game functionality
+- Audio support for background music and sound effects
+- Cross-platform compatible game files
+
+## Warning
+
+This project is not fully documented yet, documentation is a work in progress as the engine is 
+being developed to its full form.
+
+## License
+
+This repository is the full online mirror of the local development folder. Releases are added when the engine and editor are stable enough.
