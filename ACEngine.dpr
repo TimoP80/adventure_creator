@@ -603,6 +603,7 @@ clrscr;
         moneydisplay := false;
       currentnode := 'Start';
       endgame := false;
+      ClearTranscript;
       TextColor(lightcyan);
       // Writeln('MoneyDisplay: ', GetVarValue('MoneyDisplay'));
       writeln(AdventureBinData.metadescription);
@@ -668,6 +669,10 @@ clrscr;
             addedscore := GetScoreFromChoice(currentnode, choiceinteger);
             lastnode:=currentnode;
             currentnode := GetTargetNodeFromChoice(currentnode, choiceinteger);
+            // Add choice to transcript
+            AddToTranscript(lastnode,
+              ReplaceVars(AdventureBinData.GameNodes[GetNodeIndex(lastnode)].NodeText),
+              AdventureBinData.GameNodes[GetNodeIndex(lastnode)].NodeChoices[choiceinteger].ChoiceText);
             //
             // scripts can override the target node by using the random chance system
             // so currentnode assignment is before choice command processing
@@ -707,6 +712,11 @@ clrscr;
         msgtemp := STringReplace(msgtemp, '%maxscore%',
           inttostr(AdventureBinData.maxscore), [rfReplaceAll]);
         writeln(msgtemp);
+
+        // Save transcript to HTML
+        SaveTranscriptToHTML(changefileext(ParamStr(0), '_transcript.html'));
+        writeln;
+        writeln('Your playthrough transcript has been saved to: ' + changefileext(ParamStr(0), '_transcript.html'));
 
         // writeln('You finished the game with the score '+inttostr(score)+ ' out of '+inttostr(AdventureBinData.MaxScore));
       end
